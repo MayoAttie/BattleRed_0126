@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Ground
+  - StartPoint
+  - SideView_Scroll
+  - TouchPad
+  - Controller
+  - TopCanvas
+  - DungeonSpwanPoint
+  - BottomCanvas
+  - CheckPoint
+  - MonsterSkillCollider
+  - SpawnPoint
+  - CameraAttachSubjects
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - 
+  - 
+  - Ground
+  - Player
+  - Monster
+  - Objects
+  - Weapon
+  - SpwanPoint
+  - SpawnPosImage
+  - Item
+  - InteractionObj
+  - InaccessibleObject
+  - WeaponDontDetect
+  - AttackInteractionObj
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
