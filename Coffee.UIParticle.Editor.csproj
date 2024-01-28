@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{29241D66-8B1D-F257-F9F8-E51EEAEC59AA}</ProjectGuid>
+    <ProjectGuid>{64580427-C8CC-95B1-D7A0-A9449C4D9E8E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Coffee.UIParticle.Editor</AssemblyName>
@@ -826,7 +826,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="Coffee.UIParticle.csproj">
-      <Project>{59069D3A-68EB-756D-8B7A-2BA3992E2E6B}</Project>
+      <Project>{6F1931F6-D976-1609-865A-F54B3424EF20}</Project>
       <Name>Coffee.UIParticle</Name>
     </ProjectReference>
   </ItemGroup>

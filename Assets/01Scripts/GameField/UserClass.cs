@@ -21,6 +21,8 @@ public class UserClass
     int nMora;
     int nStarLight;
 
+    string userMail;
+
     public UserClass() 
     {
         hadEtcItemList = new List<ItemClass>();

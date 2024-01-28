@@ -22,7 +22,6 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
     string nextScene;
     private eLoadingState eCurrnetState;
 
-
     private void Awake()
     {
         eCurrnetState = eLoadingState.NONE;
@@ -31,7 +30,7 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
 
     private void Start()
     {
-        SceneLoadder("GameField");
+        SceneLoadder("InitTitle");
     }
 
     private void Update()
@@ -163,7 +162,7 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
 
     void ChangeSceneManagerCall()
     {
-        if (GameManager.Instance != null)
+        if (FireBaseManager.Instance.IsUserLogin == true && GameManager.Instance != null)
         {
             GameManager.Instance.ChangeSceneManaging();
         }

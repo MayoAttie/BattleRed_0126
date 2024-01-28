@@ -52,8 +52,8 @@ namespace CartoonFX
             root.style.unityBackgroundScaleMode = ScaleMode.ScaleAndCrop;
 
             // Logo image
-            var titleImage = root.Q<Image>("img_title");
-            titleImage.image = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("a665b2e53088caa4c89dd09f9c889f62"));
+            //var titleImage = root.Q<Image>("img_title");
+            //titleImage.image = AssetDatabase.LoadAssetAtPath<Texture2D>(AssetDatabase.GUIDToAssetPath("a665b2e53088caa4c89dd09f9c889f62"));
 
             // Buttons
             root.Q<Label>("btn_cfxr1").AddManipulator(new Clickable(evt => { Application.OpenURL("https://assetstore.unity.com/packages/slug/4010"); }));

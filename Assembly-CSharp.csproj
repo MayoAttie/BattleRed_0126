@@ -10,7 +10,7 @@
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <RootNamespace></RootNamespace>
-    <ProjectGuid>{675F37CB-7BF9-2380-B7E6-185BF6B1F5A0}</ProjectGuid>
+    <ProjectGuid>{8CF0863A-A2B3-0D13-32B6-249CFD7B5E1E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
@@ -63,6 +63,7 @@
     <Compile Include="Assets\01Scripts\CustomTool\ECN_AnimationSetupWindow.cs" />
     <Compile Include="Assets\01Scripts\CustomTool\ECNaming.cs" />
     <Compile Include="Assets\01Scripts\CustomTool\ECTransformObject.cs" />
+    <Compile Include="Assets\01Scripts\DataBase\FireBaseManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\CameraController.cs" />
     <Compile Include="Assets\01Scripts\GameField\Character\CharacterAttackMng.cs" />
     <Compile Include="Assets\01Scripts\GameField\Character\CharacterClass.cs" />
@@ -133,6 +134,7 @@
     <Compile Include="Assets\01Scripts\GameField\UserClass.cs" />
     <Compile Include="Assets\01Scripts\GameField\WorldMap_Manager.cs" />
     <Compile Include="Assets\01Scripts\GameManager.cs" />
+    <Compile Include="Assets\01Scripts\Init_Title\AuthManager.cs" />
     <Compile Include="Assets\01Scripts\Patterns\CombatMediator.cs" />
     <Compile Include="Assets\01Scripts\Patterns\ICombatMediator.cs" />
     <Compile Include="Assets\01Scripts\Patterns\ObjectPool.cs" />
@@ -198,18 +200,22 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\TextMesh Pro\Shaders\TMPro.cginc" />
+    <None Include="Assets\Firebase\Plugins\x86_64\FirebaseCppApp-11_6_0.dll" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile Overlay.shader" />
     <None Include="Assets\02Assets\Female Knight\model\shader\Toon2side-Lighted.shader" />
     <None Include="Assets\02Assets\Hovl Studio\Sword slash VFX\Demo scene\HDRP and URP.txt" />
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\_LineStripShader.cginc" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Water_Shader_WebGl.shader" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR Particle Glow.shader" />
+    <None Include="Assets\Firebase\Plugins\Firebase.Analytics.dll" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR Particle Ubershader.shader" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_SETTINGS.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap.shader" />
     <None Include="Assets\02Assets\CactusPack\Readme.txt" />
+    <None Include="Assets\Firebase\Plugins\iOS\Firebase.Analytics.dll" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Oswald-Bold - OFL.txt" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Plants_Shader.shader" />
+    <None Include="Assets\Firebase\Plugins\Firebase.App.dll" />
     <None Include="Assets\TextMesh Pro\Examples &amp; Extras\Fonts\Anton OFL.txt" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR.cginc" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Mobile.cginc" />
@@ -218,18 +224,23 @@
     <None Include="Assets\donjon\Standard Assets\Water (Pro Only)\Water4\Sources\Shaders\WaterInclude.cginc" />
     <None Include="Assets\Particle Attractor by Moonflower Carnivore\Shaders\Particles Additive Intensify.shader" />
     <None Include="Assets\02Assets\UJoystick\ReadMe.txt" />
+    <None Include="Assets\Firebase\Plugins\x86_64\FirebaseCppAnalytics.dll" />
+    <None Include="Assets\Firebase\Plugins\x86_64\FirebaseCppAuth.dll" />
     <None Include="Assets\02Assets\CactusPack\Shaders\Basic_Rimlight.shader" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Add_Fresnel.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Surface-Mobile.shader" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Ice.shader" />
+    <None Include="Assets\Firebase\Plugins\Firebase.TaskExtension.dll" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Distortion.shader" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Blend_TwoSides.shader" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-app-unity\maven-metadata.xml" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Opaque_Shader_VS.shader" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Blend_CenterGlow.shader" />
     <None Include="Assets\Particle Attractor by Moonflower Carnivore\Particle Attractor documentation.txt" />
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\LineStrip-TextureAlphaBlended.shader" />
     <None Include="Assets\05Textures\Noelle\noel\使用规则.txt" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Opaque_Shader.shader" />
+    <None Include="Assets\Firebase\Plugins\Firebase.Auth.dll" />
     <None Include="Assets\donjon\Standard Assets\Water (Pro Only)\Water4\Sources\Shaders\FX-Water4.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Foliage_Shader.shader" />
     <None Include="Assets\02Assets\Hovl Studio\Sword slash VFX\Demo scene\Readme.txt" />
@@ -248,11 +259,14 @@
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\_SingleLineShader.cginc" />
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\LineStrip-TextureAdditive.shader" />
     <None Include="Assets\donjon\Standard Assets\ParticleSystems\ParticleSystemsGuidelines.txt" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-analytics-unity\maven-metadata.xml" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Properties.cginc" />
+    <None Include="Assets\Firebase\m2repository\com\google\firebase\firebase-auth-unity\maven-metadata.xml" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Water_Shader.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Flowers_Shader.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Rock_Shader_VS.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMPro_Surface.cginc" />
+    <None Include="Assets\Firebase\Plugins\iOS\Firebase.Auth.dll" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Prefabs\Texts\_Make your own text effect.txt" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_PASSES.cginc" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Plants_Shader_VS.shader" />
@@ -268,15 +282,18 @@
     <None Include="Assets\09Open_Source\ParticleEffectForUGUI-main\ParticleEffectForUGUI-main\Shaders\UIAdditive.shader" />
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\SingleLine-LightSaber.shader" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR Particle Procedural Ring.shader" />
+    <None Include="Assets\Firebase\Plugins\Firebase.Platform.dll" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Add_CenterGlow.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Rock_Shader.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF Overlay.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Bitmap-Mobile.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\VS_indirect.cginc" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR_URP.cginc" />
+    <None Include="Assets\Firebase\Plugins\Google.MiniJson.dll" />
     <None Include="Assets\TextMesh Pro\Fonts\LiberationSans - OFL.txt" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_SDF-Mobile.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Foliage_Shader_VS.shader" />
+    <None Include="Assets\Firebase\Plugins\iOS\Firebase.App.dll" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Explosion.shader" />
     <None Include="Assets\02Assets\JMO Assets\Cartoon FX Remaster\CFXR Assets\Shaders\CFXR Particle Distortion.shader" />
     <None Include="Assets\TextMesh Pro\Shaders\TMP_Sprite.shader" />
@@ -519,6 +536,30 @@
     </Reference>
     <Reference Include="UnityEditor">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2019.4.34f1\Editor\Data\Managed\UnityEditor.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.Analytics">
+      <HintPath>Assets\Firebase\Plugins\Firebase.Analytics.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.App">
+      <HintPath>Assets\Firebase\Plugins\Firebase.App.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.Auth">
+      <HintPath>Assets\Firebase\Plugins\Firebase.Auth.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.Platform">
+      <HintPath>Assets\Firebase\Plugins\Firebase.Platform.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Firebase.TaskExtension">
+      <HintPath>Assets\Firebase\Plugins\Firebase.TaskExtension.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.MiniJson">
+      <HintPath>Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
@@ -1024,31 +1065,31 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="CFXRRuntime.csproj">
-      <Project>{CC542831-1790-86EE-DB41-F56C311572E5}</Project>
+      <Project>{8733F805-CDE6-4236-CB89-331CDF5BA765}</Project>
       <Name>CFXRRuntime</Name>
     </ProjectReference>
     <ProjectReference Include="CFXREditor.csproj">
-      <Project>{E65B68A5-F0FA-529C-2659-4ADB873845CF}</Project>
+      <Project>{2B6D4A09-150B-2580-83C4-7B5327D7AA63}</Project>
       <Name>CFXREditor</Name>
     </ProjectReference>
     <ProjectReference Include="ToonyColorsPro.Demo.Editor.csproj">
-      <Project>{82F78FD8-4F26-4F66-6B03-A5ECD0D73BF2}</Project>
+      <Project>{F9DBC3A8-6DB7-A251-4761-EBF9377092ED}</Project>
       <Name>ToonyColorsPro.Demo.Editor</Name>
     </ProjectReference>
     <ProjectReference Include="CFXRDemo.csproj">
-      <Project>{7F03D1F6-7B26-7476-7710-78F75E721B3B}</Project>
+      <Project>{A7E8A5D7-C6FA-9F57-340A-0F0BE26869C0}</Project>
       <Name>CFXRDemo</Name>
     </ProjectReference>
     <ProjectReference Include="KinoBloom.Runtime.csproj">
-      <Project>{55198622-3AFE-3503-86A8-7B551600C6D4}</Project>
+      <Project>{169A08C3-83D9-1137-06A5-619ABCC258E8}</Project>
       <Name>KinoBloom.Runtime</Name>
     </ProjectReference>
     <ProjectReference Include="CFXR.WelcomeScreen.csproj">
-      <Project>{D9FA04B4-8928-4690-8F41-8A866D0B277A}</Project>
+      <Project>{EC4F7C2E-62FC-710F-3F71-BEF703158C53}</Project>
       <Name>CFXR.WelcomeScreen</Name>
     </ProjectReference>
     <ProjectReference Include="Coffee.UIParticle.csproj">
-      <Project>{59069D3A-68EB-756D-8B7A-2BA3992E2E6B}</Project>
+      <Project>{6F1931F6-D976-1609-865A-F54B3424EF20}</Project>
       <Name>Coffee.UIParticle</Name>
     </ProjectReference>
   </ItemGroup>

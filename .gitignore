@@ -1,1 +1,14 @@
+# .gitignore
+
+# Ignore FirebaseCppApp-11_6_0.bundle
+Assets/Firebase/Plugins/x86_64/FirebaseCppApp-11_6_0.bundle
+
+# Ignore data.unity3d
+Library/PlayerDataCache/Android/Data/data.unity3d
+
+# Ignore additional directories
+Assets/02Assets/
+Assets/04Prefabs/
+Assets/03Animation/
+Assets/00Scenes/
 .git/lfs/objects/
