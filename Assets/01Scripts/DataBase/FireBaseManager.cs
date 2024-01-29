@@ -9,6 +9,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
     private void Awake()
     {
         auth = FirebaseAuth.DefaultInstance;
+        //test push
     }
 
     private void OnDestroy()
