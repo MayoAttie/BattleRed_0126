@@ -1406,6 +1406,7 @@ public class GameManager : Singleton<GameManager>
 
     public void ChangeSceneManaging()
     {
+        FireBaseManager.Instance.LoadUserDataForGameManager();
         Transform startPos = null;
         GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
 
@@ -1777,6 +1778,8 @@ public class GameManager : Singleton<GameManager>
         get { return list_SpawnPoint; }
     }
 
+
+    public void SetUserClass(UserClass cls){playerData = cls;}
     #endregion
 
 }

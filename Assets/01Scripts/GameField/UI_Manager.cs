@@ -32,6 +32,8 @@ public class UI_Manager : EnergyBarManager
     private GameObject SortSelectionButtonOnList;                       // Sort 선택 버튼 클릭 시, 띄우는 리스트 버튼 객체
     [SerializeField]
     private TextMeshProUGUI selectedOrderPrintText;                     // 선택한 정렬오더 출력용 TEXT
+    [SerializeField]
+    private TextMeshProUGUI inventory_moraText;
 
     private List<InvenItemObjClass> openUI_ItemList;                    // 선택한 아이템 타입의 객체 리스트
     private bool[] invenButtonIsClicked;                                // 인벤토리 아이템 타입선택 버튼 클릭 여부
@@ -215,6 +217,7 @@ public class UI_Manager : EnergyBarManager
         ExpressFrame.SetActive(false);
         invenButtons[0].ButtonUIColorSet();
         InventoryViewItemTypeNotify(e_InventoryTypeSelected.Weapon);
+        inventory_moraText.text = GameManager.Instance.GetUserClass().GetMora().ToString();
         Debug.Log("일시정지");
     }
     // 인벤토리 종료 버튼
@@ -1640,8 +1643,8 @@ public class UI_Manager : EnergyBarManager
             }
         }
 
-        Debug.Log(nameof(nWeaponUpgradeExp )+":"+ nWeaponUpgradeExp);
-        Debug.Log(nameof(dic_ItemClsForUpgrade.Count) +":"+ dic_ItemClsForUpgrade.Count);
+        //Debug.Log(nameof(nWeaponUpgradeExp )+":"+ nWeaponUpgradeExp);
+        //Debug.Log(nameof(dic_ItemClsForUpgrade.Count) +":"+ dic_ItemClsForUpgrade.Count);
     }
 
 
@@ -4054,8 +4057,8 @@ public class UI_Manager : EnergyBarManager
         // 사용버튼 클릭 이벤트 리스너
         void UseButtonFunc()
         {
-            Debug.Log(nameof(instance.dic_ItemClsForUpgrade.Count)+instance.dic_ItemClsForUpgrade.Count);
-            Debug.Log(nameof(etc_currentNum)+ etc_currentNum);
+            //Debug.Log(nameof(instance.dic_ItemClsForUpgrade.Count)+instance.dic_ItemClsForUpgrade.Count);
+            //Debug.Log(nameof(etc_currentNum)+ etc_currentNum);
 
             if (selectedItem_sythesis == null || synthesisType_Index == e_InventoryTypeSelected.None)
                 return;
@@ -4127,8 +4130,8 @@ public class UI_Manager : EnergyBarManager
                 List<WeaponAndEquipCls> updatedItems = GameManager.Instance.Item_Id_Generator_Copied(childList);
                 getItems = new List<ItemClass>(updatedItems);
 
-                foreach (var tmp in getItems)
-                    Debug.Log(tmp.GetId() + "<= id값 ");
+                //foreach (var tmp in getItems)
+                //    Debug.Log(tmp.GetId() + "<= id값 ");
 
                 if (synthesisType_Index == e_InventoryTypeSelected.Equipment)
                     GameManager.Instance.EquipItemStatusSet(getItems);

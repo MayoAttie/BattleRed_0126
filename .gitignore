@@ -12,4 +12,10 @@ Assets/02Assets/
 Assets/04Prefabs/
 Assets/03Animation/
 Assets/00Scenes/
-.git/lfs/objects//Library/ArtifactDB
+.git/lfs/objects/Library/ArtifactDB
+
+# Ignore all files under Library/il2cpp_android_arm64-v8a
+Library/il2cpp_android_arm64-v8a/**
+
+# Ignore all files under Library/il2cpp_android_armeabi-v7a
+Library/il2cpp_android_armeabi-v7a/**

@@ -21488,6 +21488,7 @@ MonoBehaviour:
   ExpressFrame: {fileID: 1072150490}
   SortSelectionButtonOnList: {fileID: 505570240}
   selectedOrderPrintText: {fileID: 1463842305}
+  inventory_moraText: {fileID: 4055112262938206541}
   PlayerInfoScreen: {fileID: 468823287}
   infoSelectButtons:
   - {fileID: 959179131}
@@ -55518,6 +55519,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 53bbe2ce7f8b2bb4b8653a3115c96568, type: 3}
+--- !u!114 &4055112262938206541 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4055112263556531065, guid: 53bbe2ce7f8b2bb4b8653a3115c96568,
+    type: 3}
+  m_PrefabInstance: {fileID: 4055112262938206540}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &4151842970338380535
 RectTransform:
   m_ObjectHideFlags: 0

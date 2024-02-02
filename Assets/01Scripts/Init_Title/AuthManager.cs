@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Firebase;
 using Firebase.Auth;
+using Firebase.Database;
+using Firebase.Extensions;
 using TMPro;
 public class AuthManager : MonoBehaviour
 {
@@ -69,6 +72,7 @@ public class AuthManager : MonoBehaviour
         {
             isLogout = true;
             isLogin = false;
+            FireBaseManager.Instance.DB_Set_Flag = false;
             // 사용자가 로그인 중인 경우 로그아웃 수행
             auth.SignOut();
             Debug.Log("로그아웃 성공");
@@ -89,6 +93,28 @@ public class AuthManager : MonoBehaviour
             if (!task.IsCanceled && !task.IsFaulted)
             {
                 Debug.Log(mail_field.text + "의 회원가입");
+
+                AuthResult authResult = task.Result;
+                FirebaseUser newUser = authResult.User;
+
+                string userID = newUser.UserId;
+
+                // UserClass 객체를 JSON 형식의 문자열로 변환
+                string jsonUserData = JsonUtility.ToJson(new UserClass());
+
+                // Firebase Realtime Database에 저장
+                FireBaseManager.Instance.DB_Reference.Child("userID").Child(userID).Child("UserData").SetValueAsync(jsonUserData)
+                    .ContinueWithOnMainThread(databaseTask =>
+                    {
+                        if (databaseTask.IsCompleted)
+                        {
+                            Debug.Log(mail_field.text + "의 회원가입 및 데이터베이스 노드 추가 완료");
+                        }
+                        else
+                        {
+                            Debug.LogError(mail_field.text + "의 회원가입 성공, 데이터베이스 노드 추가 실패: " + databaseTask.Exception);
+                        }
+                    });
             }
             else
             {

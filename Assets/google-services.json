@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "1010500123359",
+    "firebase_url": "https://battlered-61ae5-default-rtdb.firebaseio.com",
     "project_id": "battlered-61ae5",
     "storage_bucket": "battlered-61ae5.appspot.com"
   },

@@ -3,35 +3,80 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class UserClass
 {
-    CharacterClass userCharacter;               // 유저 캐릭터
-    ItemClass userEquippedWeapon;               // 장비한 무기
-    ItemClass[] userEquippedEquipment;          // 장비한 성유물(꽃,깃털,모래,성배,왕관)
+    [SerializeField] private CharacterClass userCharacter;               // 유저 캐릭터
+    [SerializeField] private ItemClass userEquippedWeapon;               // 장비한 무기
+    [SerializeField] private ItemClass[] userEquippedEquipment;          // 장비한 성유물(꽃,깃털,모래,성배,왕관)
 
-    List<ItemClass> hadWeaponList;              // 보유한 무기 리스트
-    List<ItemClass> hadEquipmentList;           // 보유한 성유물 리스트
-    List<ItemClass> hadGemList;                 // 보유한 광물 리스트
-    List<ItemClass> hadFoodList;                // 보유한 음식 리스트
-    List<ItemClass> hadGrowMaterialList;        // 보유한 육성 재화 리스트
-    List<ItemClass> hadEtcItemList;
+    [SerializeField] private List<ItemClass> hadWeaponList;              // 보유한 무기 리스트
+    [SerializeField] private List<ItemClass> hadEquipmentList;           // 보유한 성유물 리스트
+    [SerializeField] private List<ItemClass> hadGemList;                 // 보유한 광물 리스트
+    [SerializeField] private List<ItemClass> hadFoodList;                // 보유한 음식 리스트
+    [SerializeField] private List<ItemClass> hadGrowMaterialList;        // 보유한 육성 재화 리스트
+    [SerializeField] private List<ItemClass> hadEtcItemList;
 
-    DateTime userLastConnectTime;
+    [SerializeField] private DateTime userLastConnectTime;
 
-    int nMora;
-    int nStarLight;
+    [SerializeField] private int nMora;
+    [SerializeField] private int nStarLight;
 
-    string userMail;
+    [SerializeField] private string userMail;
 
     public UserClass() 
     {
+        userCharacter = new CharacterClass(300, 300, 0, 100, 50, 20, 1, 20, 3.0f, CharacterClass.eCharactgerState.e_NONE, 50, 120, 50, 2.8f, "플레이어", "Knight", 0, true, 100, 20, 0, 0, 0);
+        
+        hadWeaponList = new List<ItemClass>();
+        hadEquipmentList = new List<ItemClass>();
+        hadGemList = new List<ItemClass>();
+        hadFoodList = new List<ItemClass>();
         hadEtcItemList = new List<ItemClass>();
+        hadGrowMaterialList = new List<ItemClass>();
+
         userEquippedWeapon = new ItemClass();
         userEquippedEquipment = new ItemClass[5];
         nMora = 0;
         nStarLight = 0;
     }
 
+    public UserClass(CharacterClass userCharacter, ItemClass userEquippedWeapon, ItemClass[] userEquippedEquipment, List<ItemClass> hadWeaponList, List<ItemClass> hadEquipmentList, List<ItemClass> hadGemList, List<ItemClass> hadFoodList, List<ItemClass> hadGrowMaterialList, List<ItemClass> hadEtcItemList, DateTime userLastConnectTime, int nMora, int nStarLight, string userMail)
+    {
+        this.userCharacter = userCharacter;
+        this.userEquippedWeapon = userEquippedWeapon;
+        this.userEquippedEquipment = userEquippedEquipment;
+        this.hadWeaponList = hadWeaponList;
+        this.hadEquipmentList = hadEquipmentList;
+        this.hadGemList = hadGemList;
+        this.hadFoodList = hadFoodList;
+        this.hadGrowMaterialList = hadGrowMaterialList;
+        this.hadEtcItemList = hadEtcItemList;
+        this.userLastConnectTime = userLastConnectTime;
+        this.nMora = nMora;
+        this.nStarLight = nStarLight;
+        this.userMail = userMail;
+    }
+
+    public UserClass(int nMora, int nStarLight, string userMail)
+    {
+        userCharacter = new CharacterClass(300, 300, 0, 100, 50, 20, 1, 20, 3.0f, CharacterClass.eCharactgerState.e_NONE, 50, 120, 50, 2.8f, "플레이어", "Knight", 0, true, 100, 20, 0, 0, 0);
+
+        hadWeaponList = new List<ItemClass>();
+        hadEquipmentList = new List<ItemClass>();
+        hadGemList = new List<ItemClass>();
+        hadFoodList = new List<ItemClass>();
+        hadEtcItemList = new List<ItemClass>();
+        hadGrowMaterialList = new List<ItemClass>();
+        userEquippedWeapon = new ItemClass();
+        userEquippedEquipment = new ItemClass[5];
+
+        this.nMora = nMora;
+        this.nStarLight = nStarLight;
+        this.userMail = userMail;
+    }
+
+    // 게터세터
     public void SetUserCharacter(CharacterClass userCharacter) { this.userCharacter = userCharacter; }
     public void SetUserEquippedWeapon(ItemClass userEquippedWeapon) { this.userEquippedWeapon = userEquippedWeapon; }
     public void SetUserEquippedEquipment(ItemClass[] userEquippedEquipment)
@@ -91,4 +136,19 @@ public class UserClass
     public DateTime GetUserLastConnectTime() { return this.userLastConnectTime; }
     public int GetMora() { return this.nMora; }
 
+
+    // 프로퍼티 추가
+    public CharacterClass UserCharacter { get { return userCharacter; } set { userCharacter = value; } }
+    public ItemClass UserEquippedWeapon { get { return userEquippedWeapon; } set { userEquippedWeapon = value; } }
+    public ItemClass[] UserEquippedEquipment { get { return userEquippedEquipment; } set { userEquippedEquipment = value; } }
+    public List<ItemClass> HadWeaponList { get { return hadWeaponList; } set { hadWeaponList = value; } }
+    public List<ItemClass> HadEquipmentList { get { return hadEquipmentList; } set { hadEquipmentList = value; } }
+    public List<ItemClass> HadGemList { get { return hadGemList; } set { hadGemList = value; } }
+    public List<ItemClass> HadFoodList { get { return hadFoodList; } set { hadFoodList = value; } }
+    public List<ItemClass> HadGrowMaterialList { get { return hadGrowMaterialList; } set { hadGrowMaterialList = value; } }
+    public List<ItemClass> HadEtcItemList { get { return hadEtcItemList; } set { hadEtcItemList = value; } }
+    public DateTime UserLastConnectTime { get { return userLastConnectTime; } set { userLastConnectTime = value; } }
+    public int NMora { get { return nMora; } set { nMora = value; } }
+    public int NStarLight { get { return nStarLight; } set { nStarLight = value; } }
+    public string UserMail { get { return userMail; } set { userMail = value; } }
 }
