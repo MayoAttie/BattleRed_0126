@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using System;
 public class Objects
 {
     private string sTag;
@@ -62,4 +62,43 @@ public class Objects
     }
     #endregion
 
+
+    #region 파이어베이스 처리함수
+
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> dict = new Dictionary<string, object>
+        {
+            { "sTag", sTag },
+            { "sName", sName },
+            { "nGrade", nGrade },
+            { "isActive", isActive }
+        };
+
+        return dict;
+    }
+    public void SetFromDictionary(Dictionary<string, object> dict)
+    {
+        if (dict.TryGetValue("sTag", out object tagValue))
+        {
+            sTag = tagValue.ToString();
+        }
+
+        if (dict.TryGetValue("sName", out object nameValue))
+        {
+            sName = nameValue.ToString();
+        }
+
+        if (dict.TryGetValue("nGrade", out object gradeValue))
+        {
+            nGrade = Convert.ToInt32(gradeValue);
+        }
+
+        if (dict.TryGetValue("isActive", out object activeValue))
+        {
+            isActive = Convert.ToBoolean(activeValue);
+        }
+    }
+    #endregion
 }

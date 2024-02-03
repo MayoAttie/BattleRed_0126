@@ -99,22 +99,7 @@ public class AuthManager : MonoBehaviour
 
                 string userID = newUser.UserId;
 
-                // UserClass 객체를 JSON 형식의 문자열로 변환
-                string jsonUserData = JsonUtility.ToJson(new UserClass());
-
-                // Firebase Realtime Database에 저장
-                FireBaseManager.Instance.DB_Reference.Child("userID").Child(userID).Child("UserData").SetValueAsync(jsonUserData)
-                    .ContinueWithOnMainThread(databaseTask =>
-                    {
-                        if (databaseTask.IsCompleted)
-                        {
-                            Debug.Log(mail_field.text + "의 회원가입 및 데이터베이스 노드 추가 완료");
-                        }
-                        else
-                        {
-                            Debug.LogError(mail_field.text + "의 회원가입 성공, 데이터베이스 노드 추가 실패: " + databaseTask.Exception);
-                        }
-                    });
+                //FireBaseManager.Instance.SaveUserData(new UserClass(), userID);
             }
             else
             {

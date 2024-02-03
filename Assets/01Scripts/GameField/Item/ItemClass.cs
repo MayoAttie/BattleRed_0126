@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
+[Serializable]
 public class ItemClass : Objects
 {
     int nNumber;
@@ -57,4 +59,54 @@ public class ItemClass : Objects
         sContent = string.Copy(other.sContent); //other.sContent; 
         sSet = string.Copy(other.sSet); //other.sSet; 
     }
+
+    #region  파이어 베이스 처리 함수
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> dict = base.ToDictionary();
+        dict.Add("nNumber", nNumber);
+        dict.Add("nCost", nCost);
+        dict.Add("nLevel", nLevel);
+        dict.Add("nId", nId);
+        dict.Add("sContent", sContent);
+        dict.Add("sSet", sSet);
+
+        return dict;
+    }
+    public void SetFromDictionary(Dictionary<string, object> dict)
+    {
+        base.SetFromDictionary(dict);
+
+        if (dict.TryGetValue("nNumber", out object numberValue))
+        {
+            nNumber = Convert.ToInt32(numberValue);
+        }
+
+        if (dict.TryGetValue("nCost", out object costValue))
+        {
+            nCost = Convert.ToInt32(costValue);
+        }
+
+        if (dict.TryGetValue("nLevel", out object levelValue))
+        {
+            nLevel = Convert.ToInt32(levelValue);
+        }
+
+        if (dict.TryGetValue("nId", out object idValue))
+        {
+            nId = Convert.ToInt32(idValue);
+        }
+
+        if (dict.TryGetValue("sContent", out object contentValue))
+        {
+            sContent = contentValue.ToString();
+        }
+
+        if (dict.TryGetValue("sSet", out object setValue))
+        {
+            sSet = setValue.ToString();
+        }
+    }
+    #endregion
+
 }

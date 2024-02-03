@@ -84,6 +84,41 @@ public class CharacterClass : Objects
 
     public CharacterClass()
     {
+        ChildElement = new Element[5];
+        for (int i = 0; i < ChildElement.Length; i++)
+        {
+            ChildElement[i] = new Element(Element.e_Element.None, false, true);
+        }
+    }
+
+    public CharacterClass(int nCurrentHp, int nMaxHp, int nCurrentExp, int nMaxExp, int nAttack, int nDefense, float increase_Damage, float increased_NormalAttackDamage, float increased_SkillAttackDamage, float fSkill_coolTime, Dictionary<int, int> itemAddHp, Dictionary<int, int> itemAddAttack, Dictionary<int, int> itemAddDefense, Dictionary<Tuple<string, int>, float> equipSetApplied, int nLevel, int nMaxLevel, int nElementNum, int nStamina, float fElementCharge, float fCriticalDamage, float fCriticalPercentage, float fSpeed, eCharactgerState eCharacState, Element eCharacElement, Element eEncountElement, Element[] childElement)
+    {
+        this.nCurrentHp = nCurrentHp;
+        this.nMaxHp = nMaxHp;
+        this.nCurrentExp = nCurrentExp;
+        this.nMaxExp = nMaxExp;
+        this.nAttack = nAttack;
+        this.nDefense = nDefense;
+        Increase_Damage = increase_Damage;
+        Increased_NormalAttackDamage = increased_NormalAttackDamage;
+        Increased_SkillAttackDamage = increased_SkillAttackDamage;
+        this.fSkill_coolTime = fSkill_coolTime;
+        this.itemAddHp = itemAddHp;
+        this.itemAddAttack = itemAddAttack;
+        this.itemAddDefense = itemAddDefense;
+        this.equipSetApplied = equipSetApplied;
+        this.nLevel = nLevel;
+        this.nMaxLevel = nMaxLevel;
+        this.nElementNum = nElementNum;
+        this.nStamina = nStamina;
+        this.fElementCharge = fElementCharge;
+        this.fCriticalDamage = fCriticalDamage;
+        this.fCriticalPercentage = fCriticalPercentage;
+        this.fSpeed = fSpeed;
+        this.eCharacState = eCharacState;
+        this.eCharacElement = eCharacElement;
+        this.eEncountElement = eEncountElement;
+        ChildElement = childElement;
     }
 
     #region 세터게터
@@ -202,4 +237,173 @@ public class CharacterClass : Objects
     #endregion
 
 
+    #region 파이어베이스 처리 함수
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> dict = base.ToDictionary();
+        dict.Add("nCurrentHp", nCurrentHp);
+        dict.Add("nMaxHp", nMaxHp);
+        dict.Add("nCurrentExp", nCurrentExp);
+        dict.Add("nMaxExp", nMaxExp);
+        dict.Add("nAttack", nAttack);
+        dict.Add("nDefense", nDefense);
+        dict.Add("nLevel", nLevel);
+        dict.Add("nMaxLevel", nMaxLevel);
+        dict.Add("fSpeed", fSpeed);
+        dict.Add("eCharacState", (int)eCharacState);  // 열거형을 int로 변환
+        dict.Add("fSkill_coolTime", fSkill_coolTime);
+        dict.Add("eCharacElement", eCharacElement.ToDictionary());
+        dict.Add("nElementNum", nElementNum);
+        dict.Add("eEncountElement", eEncountElement.ToDictionary());
+        dict.Add("fCriticalDamage", fCriticalDamage);
+        dict.Add("fCriticalPercentage", fCriticalPercentage);
+        dict.Add("fElementCharge", fElementCharge);
+        dict.Add("Increased_NormalAttackDamage", Increased_NormalAttackDamage);
+        dict.Add("Increased_SkillAttackDamage", Increased_SkillAttackDamage);
+        dict.Add("Increase_Damage", Increase_Damage);
+
+        for (int i = 0; i < ChildElement.Length; i++)
+        {
+            dict.Add($"ChildElement_{i}", ChildElement[i].ToDictionary());
+        }
+
+        dict.Add("nStamina", nStamina);
+
+        // itemAddHp, itemAddAttack, itemAddDefense 딕셔너리를 Firebase에서 지원하는 형식으로 변환
+        Dictionary<string, object> itemAddHpDict = new Dictionary<string, object>();
+        foreach (var pair in itemAddHp)
+        {
+            itemAddHpDict.Add(pair.Key.ToString(), pair.Value);
+        }
+        dict.Add("itemAddHp", itemAddHpDict);
+
+        Dictionary<string, object> itemAddAttackDict = new Dictionary<string, object>();
+        foreach (var pair in itemAddAttack)
+        {
+            itemAddAttackDict.Add(pair.Key.ToString(), pair.Value);
+        }
+        dict.Add("itemAddAttack", itemAddAttackDict);
+
+        Dictionary<string, object> itemAddDefenseDict = new Dictionary<string, object>();
+        foreach (var pair in itemAddDefense)
+        {
+            itemAddDefenseDict.Add(pair.Key.ToString(), pair.Value);
+        }
+        dict.Add("itemAddDefense", itemAddDefenseDict);
+
+        // equipSetApplied 딕셔너리를 Firebase에서 지원하는 형식으로 변환
+        foreach (var pair in equipSetApplied)
+        {
+            var key = pair.Key;
+            var value = pair.Value;
+            dict.Add($"equipSetApplied_{key.Item1}_{key.Item2}", value);
+        }
+
+        return dict;
+    }
+
+
+
+    public void SetFromDictionary(Dictionary<string, object> dict)
+    {
+        base.SetFromDictionary(dict);
+
+        nCurrentHp = GetIntValue(dict, "nCurrentHp");
+        nMaxHp = GetIntValue(dict, "nMaxHp");
+        nCurrentExp = GetIntValue(dict, "nCurrentExp");
+        nMaxExp = GetIntValue(dict, "nMaxExp");
+        nAttack = GetIntValue(dict, "nAttack");
+        nDefense = GetIntValue(dict, "nDefense");
+        nLevel = GetIntValue(dict, "nLevel");
+        nMaxLevel = GetIntValue(dict, "nMaxLevel");
+        fSpeed = GetFloatValue(dict, "fSpeed");
+        eCharacState = (eCharactgerState)GetIntValue(dict, "eCharacState");
+        fSkill_coolTime = GetFloatValue(dict, "fSkill_coolTime");
+        eCharacElement.SetFromDictionary(GetDictionaryValue(dict, "eCharacElement"));
+        nElementNum = GetIntValue(dict, "nElementNum");
+        eEncountElement.SetFromDictionary(GetDictionaryValue(dict, "eEncountElement"));
+        fCriticalDamage = GetFloatValue(dict, "fCriticalDamage");
+        fCriticalPercentage = GetFloatValue(dict, "fCriticalPercentage");
+        fElementCharge = GetFloatValue(dict, "fElementCharge");
+        Increased_NormalAttackDamage = GetFloatValue(dict, "Increased_NormalAttackDamage");
+        Increased_SkillAttackDamage = GetFloatValue(dict, "Increased_SkillAttackDamage");
+        Increase_Damage = GetFloatValue(dict, "Increase_Damage");
+
+        for (int i = 0; i < ChildElement.Length; i++)
+        {
+            ChildElement[i].SetFromDictionary(GetDictionaryValue(dict, $"ChildElement_{i}"));
+        }
+
+        nStamina = GetIntValue(dict, "nStamina");
+
+        // itemAddHp, itemAddAttack, itemAddDefense 딕셔너리를 다시 원래의 형태로 변환
+        itemAddHp = GetIntDictionaryValue(dict, "itemAddHp");
+        itemAddAttack = GetIntDictionaryValue(dict, "itemAddAttack");
+        itemAddDefense = GetIntDictionaryValue(dict, "itemAddDefense");
+
+        // equipSetApplied 딕셔너리를 다시 원래의 형태로 변환
+        equipSetApplied = new Dictionary<Tuple<string, int>, float>();
+        foreach (var key in dict.Keys)
+        {
+            if (key.StartsWith("equipSetApplied_"))
+            {
+                var parts = key.Split('_');
+                if (parts.Length == 4)
+                {
+                    string setName = parts[2];
+                    int setNum = int.Parse(parts[3]);
+                    float effectValue = GetFloatValue(dict, key);
+                    equipSetApplied[new Tuple<string, int>(setName, setNum)] = effectValue;
+                }
+            }
+        }
+    }
+
+    private int GetIntValue(Dictionary<string, object> dict, string key)
+    {
+        if (dict.TryGetValue(key, out object value))
+        {
+            return Convert.ToInt32(value);
+        }
+        return 0;
+    }
+
+    private float GetFloatValue(Dictionary<string, object> dict, string key)
+    {
+        if (dict.TryGetValue(key, out object value))
+        {
+            return Convert.ToSingle(value);
+        }
+        return 0f;
+    }
+
+    private Dictionary<int, int> GetIntDictionaryValue(Dictionary<string, object> dict, string key)
+    {
+        if (dict.TryGetValue(key, out object value) && value is Dictionary<string, object> innerDict)
+        {
+            Dictionary<int, int> resultDict = new Dictionary<int, int>();
+
+            foreach (var pair in innerDict)
+            {
+                if (int.TryParse(pair.Key, out int intKey) && pair.Value is int intValue)
+                {
+                    resultDict[intKey] = intValue;
+                }
+            }
+
+            return resultDict;
+        }
+        return new Dictionary<int, int>();
+    }
+
+    private Dictionary<string, object> GetDictionaryValue(Dictionary<string, object> dict, string key)
+    {
+        if (dict.TryGetValue(key, out object value) && value is Dictionary<string, object> subDict)
+        {
+            return subDict;
+        }
+        return new Dictionary<string, object>();
+    }
+    #endregion
 }

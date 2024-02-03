@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-
+using System;
 public class Element
 {
     #region 변수
@@ -61,6 +61,34 @@ public class Element
         this.isChild = isChild;
     }
 
+    #region 파이어 베이스 처리 함수
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> dict = new Dictionary<string, object>
+        {
+            { "element", element.ToString() },
+            { "isActive", isActive },
+            { "isChild", isChild }
+        };
+        return dict;
+    }
 
+    public void SetFromDictionary(Dictionary<string, object> dict)
+    {
+        if (dict.TryGetValue("element", out object elementValue) && Enum.TryParse(elementValue.ToString(), out e_Element parsedElement))
+        {
+            element = parsedElement;
+        }
 
+        if (dict.TryGetValue("isActive", out object isActiveValue))
+        {
+            isActive = Convert.ToBoolean(isActiveValue);
+        }
+
+        if (dict.TryGetValue("isChild", out object isChildValue))
+        {
+            isChild = Convert.ToBoolean(isChildValue);
+        }
+    }
+    #endregion
 }

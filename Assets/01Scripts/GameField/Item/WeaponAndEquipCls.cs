@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
-
+using System;
 public class WeaponAndEquipCls : ItemClass
 {
     int nLimitLevel;            // 한계레벨
@@ -69,4 +69,76 @@ public class WeaponAndEquipCls : ItemClass
         }
     }
 
+    #region 파이어베이스 처리함수
+
+    public Dictionary<string, object> ToDictionary()
+    {
+        Dictionary<string, object> dict = base.ToDictionary();
+        dict.Add("nLimitLevel", nLimitLevel);
+        dict.Add("nMainStat", nMainStat);
+        dict.Add("nSubStat", nSubStat);
+        dict.Add("nEffectLevel", nEffectLevel);
+        dict.Add("sEffectText", sEffectText);
+        dict.Add("nCurrentExp", nCurrentExp);
+        dict.Add("nMaxExp", nMaxExp);
+        dict.Add("list_ExtraStat", list_ExtraStat);
+
+        return dict;
+    }
+
+    public new void SetFromDictionary(Dictionary<string, object> dict)
+    {
+        base.SetFromDictionary(dict);
+
+        if (dict.TryGetValue("nLimitLevel", out object limitLevelValue))
+        {
+            nLimitLevel = Convert.ToInt32(limitLevelValue);
+        }
+
+        if (dict.TryGetValue("nMainStat", out object mainStatValue))
+        {
+            nMainStat = Convert.ToSingle(mainStatValue);
+        }
+
+        if (dict.TryGetValue("nSubStat", out object subStatValue))
+        {
+            nSubStat = Convert.ToSingle(subStatValue);
+        }
+
+        if (dict.TryGetValue("nEffectLevel", out object effectLevelValue))
+        {
+            nEffectLevel = Convert.ToInt32(effectLevelValue);
+        }
+
+        if (dict.TryGetValue("sEffectText", out object effectTextValue))
+        {
+            sEffectText = effectTextValue.ToString();
+        }
+
+        if (dict.TryGetValue("nCurrentExp", out object currentExpValue))
+        {
+            nCurrentExp = Convert.ToInt32(currentExpValue);
+        }
+
+        if (dict.TryGetValue("nMaxExp", out object maxExpValue))
+        {
+            nMaxExp = Convert.ToInt32(maxExpValue);
+        }
+
+        if (dict.TryGetValue("list_ExtraStat", out object extraStatValue))
+        {
+            if (extraStatValue is List<object> extraStatList)
+            {
+                list_ExtraStat = new List<float>();
+                foreach (var item in extraStatList)
+                {
+                    if (item is float statValue)
+                    {
+                        list_ExtraStat.Add(statValue);
+                    }
+                }
+            }
+        }
+    }
+    #endregion
 }

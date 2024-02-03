@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using UnityEngine;
 using Firebase;
 using Firebase.Auth;
 using Firebase.Database;
 using Firebase.Extensions;
 using Firebase.Analytics;
+using Newtonsoft.Json;
 public class FireBaseManager : Singleton<FireBaseManager>
 {
     FirebaseAuth auth;
@@ -24,16 +26,6 @@ public class FireBaseManager : Singleton<FireBaseManager>
         isActive = false;
         DB_Set();
         auth = FirebaseAuth.DefaultInstance;
-
-        
-        //FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
-        //{
-        //    FirebaseApp app = FirebaseApp.DefaultInstance;
-        //    dbReference = FirebaseDatabase.DefaultInstance.RootReference;
-
-        //    // Firebase 데이터 로딩이 완료된 후에 다음 코드 실행
-        //    LoadUserDataForGameManager();
-        //});
 
     }
     private void Start()
@@ -53,14 +45,15 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
     private void OnApplicationQuit()
     {
-        if (!isQuitting)
-        {
-            // 프로그램 종료 중이 아닌 경우에만 데이터 저장
-            SaveUserData(GameManager.Instance.GetUserClass());
-        }
-
         // 현재 로그인한 사용자 가져오기
         FirebaseUser user = auth.CurrentUser;
+        if (!isQuitting)
+        {
+
+            // 프로그램 종료 중이 아닌 경우에만 데이터 저장
+            SaveUserData(GameManager.Instance.GetUserClass(), user.UserId);
+        }
+
 
         if (user != null)
         {
@@ -103,91 +96,218 @@ public class FireBaseManager : Singleton<FireBaseManager>
         set { isUserLogin = value; }
     }
 
+
+    #region 데이터 저장
     // 데이터 저장
-    public void SaveUserData(UserClass userData)
+    public void SaveUserData(UserClass userData, string userID)
     {
-        FirebaseApp app = FirebaseApp.DefaultInstance;
+        dbReference = FirebaseDatabase.DefaultInstance.RootReference;
+        FirebaseUser user = auth.CurrentUser;
+        DB_Writer(userID, userData);
+    }
+
+    void DB_Writer(string userID, UserClass userDatas)
+    {
         dbReference = FirebaseDatabase.DefaultInstance.RootReference;
 
-        string jsonUserData = JsonUtility.ToJson(userData);
-        Debug.Log("jsonUserData : " + jsonUserData);
-
-        // 현재 로그인한 사용자 가져오기
-        FirebaseUser user = auth.CurrentUser;
-
-        if (user != null)
+        CharacterClass userCharacter = userDatas.GetUserCharacter();
+        if (userCharacter != null)
         {
-            string userID = user.UserId;
-
-            // UserID 하위의 "UserData" 노드에 접근
-            dbReference.Child("userID").Child(userID).Child("UserData").GetValueAsync().ContinueWithOnMainThread(task =>
-            {
-                if (task.IsCompleted)
+            Dictionary<string, object> characterData = userCharacter.ToDictionary();
+            dbReference.Child("userID").Child(userID).Child("UserData").Child("userCharacter").SetValueAsync(characterData)
+                .ContinueWithOnMainThread(characterTask =>
                 {
-                    DataSnapshot snapshot = task.Result;
-
-                    if (snapshot.Exists)
+                    if (characterTask.IsCompleted)
                     {
-                        // "UserData" 노드가 이미 존재하면 해당 노드의 데이터를 수정
-                        dbReference.Child("userID").Child(userID).Child("UserData").SetValueAsync(jsonUserData)
-                            .ContinueWithOnMainThread(updateTask =>
-                            {
-                                if (updateTask.IsCompleted)
-                                {
-                                    Debug.Log("유저 데이터 수정");
-                                }
-                                else
-                                {
-                                    Debug.LogError("유저 데이터 수정 실패: " + updateTask.Exception);
-                                }
-                            });
+                        Debug.Log("유저 캐릭터 데이터 저장 완료");
                     }
                     else
                     {
-                        // "UserData" 노드가 존재하지 않으면 새로운 노드 생성
-                        dbReference.Child("userID").Child(userID).Child("UserData").GetValueAsync().ContinueWithOnMainThread(task2 =>
-                        {
-                            if (task.IsCompleted)
-                            {
-                                DataSnapshot snapshot2 = task2.Result;
-
-                                if (!snapshot2.Exists)
-                                {
-                                    Debug.Log("새로운 유저 데이터 저장1");
-
-                                    dbReference.Child("userID").Child(userID).Child("UserData").SetValueAsync(jsonUserData)
-                                        .ContinueWithOnMainThread(newDataSaveTask =>
-                                        {
-                                            if (newDataSaveTask.IsCompleted)
-                                            {
-                                                Debug.Log("기본 데이터 저장 완료");
-                                            }
-                                            else
-                                            {
-                                                Debug.LogError("기본 데이터 저장 실패: " + newDataSaveTask.Exception);
-                                            }
-                                        });
-                                }
-                            }
-                        });
+                        Debug.LogError("유저 캐릭터 데이터 저장 실패: " + characterTask.Exception);
                     }
-                }
-                else
-                {
-                    // 새로운 유저 데이터를 생성하여 저장하는 예시
-                    UserClass newUser = GameManager.Instance.GetUserClass();
-                    string jsonNewUserData = JsonUtility.ToJson(newUser);
-                    dbReference.Child("userID").Child(userID).Child("UserData").SetValueAsync(jsonNewUserData);
-                    Debug.Log("새로운 유저 데이터 저장2");
-                }
-            });
+                });
         }
         else
         {
-            Debug.LogError("사용자 로그인 중이 아님");
+            Debug.LogWarning("유저 캐릭터 데이터가 없습니다.");
+        }
+
+        WeaponAndEquipCls userEquippedWeapon = userDatas.GetUserEquippedWeapon() as WeaponAndEquipCls;
+        if (userEquippedWeapon != null)
+        {
+            Dictionary<string, object> equippedWeaponData = userEquippedWeapon.ToDictionary();
+            dbReference.Child("userID").Child(userID).Child("UserData").Child("userEquippedWeapon").SetValueAsync(equippedWeaponData)
+                .ContinueWithOnMainThread(weaponTask =>
+                {
+                    if (weaponTask.IsCompleted)
+                    {
+                        Debug.Log("유저 장착 무기 데이터 저장 완료");
+                    }
+                    else
+                    {
+                        Debug.LogError("유저 장착 무기 데이터 저장 실패: " + weaponTask.Exception);
+                    }
+                });
+        }
+        else
+        {
+            Debug.LogWarning("유저 장착 무기 데이터가 없습니다.");
+        }
+
+        ItemClass[] userEquippedEquipment = userDatas.GetUserEquippedEquipment();
+        if (userEquippedEquipment != null)
+        {
+            WeaponAndEquipCls[] weaponAndEquipArray = userEquippedEquipment.Select(item => item as WeaponAndEquipCls).ToArray();
+            Dictionary<string, object>[] equippedEquipmentDataArray = weaponAndEquipArray.Select(weapon => weapon?.ToDictionary()).ToArray();
+            dbReference.Child("userID").Child(userID).Child("UserData").Child("userEquippedEquipment").SetValueAsync(equippedEquipmentDataArray)
+                .ContinueWithOnMainThread(EquippedEquipmentTask =>
+                {
+                    if (EquippedEquipmentTask.IsCompleted)
+                    {
+                        Debug.Log("유저 장착 성유물 데이터 저장 완료");
+                    }
+                    else
+                    {
+                        Debug.LogError("유저 장착 성유물 데이터 저장 실패: " + EquippedEquipmentTask.Exception);
+                    }
+                });
+        }
+        else
+        {
+            Debug.LogWarning("유저 장착 성유물 데이터가 없습니다.");
+        }
+
+        // 리스트 데이터 저장
+        SaveItemList(userID, "hadWeaponList", userDatas.GetHadWeaponList(), true);
+        SaveItemList(userID, "hadEquipmentList", userDatas.GetHadEquipmentList(), true);
+        SaveItemList(userID, "hadGemList", userDatas.GetHadGemList(), false);
+        SaveItemList(userID, "hadFoodList", userDatas.GetHadFoodList(), false);
+        SaveItemList(userID, "hadGrowMaterialList", userDatas.GetHadGrowMaterialList(), false);
+        SaveItemList(userID, "hadEtcItemList", userDatas.GetHadEtcItemList(), false);
+
+        // 시간, 모라 등 데이터 저장
+        DateTime? lastConnectTime = userDatas.GetUserLastConnectTime();
+        if (lastConnectTime != null)
+        {
+            string jsonLastConnectTime = JsonUtility.ToJson(lastConnectTime);
+            dbReference.Child("userID").Child(userID).Child("UserData").Child("userLastConnectTime").SetValueAsync(jsonLastConnectTime)
+                .ContinueWithOnMainThread(connectTimeTask =>
+                {
+                    if (connectTimeTask.IsCompleted)
+                    {
+                        Debug.Log("마지막 접속시간 저장 완료");
+                    }
+                    else
+                    {
+                        Debug.LogError("마지막 접속시간 데이터 저장 실패: " + connectTimeTask.Exception);
+                    }
+                });
+        }
+        else
+        {
+            Debug.LogWarning("마지막 접속시간이 없습니다.");
+        }
+
+        int moraData = userDatas.GetMora();
+        string jsonMoraData = JsonUtility.ToJson(moraData);
+        dbReference.Child("userID").Child(userID).Child("UserData").Child("userMora").SetValueAsync(moraData.ToString())
+            .ContinueWithOnMainThread(moraTask =>
+            {
+                if (moraTask.IsCompleted)
+                {
+                    Debug.Log("모라 저장 완료");
+                }
+                else
+                {
+                    Debug.LogError("모라 데이터 저장 실패: " + moraTask.Exception);
+                }
+            });
+
+        int starLight = userDatas.NStarLight;
+        string jsonStar = JsonUtility.ToJson(starLight);
+        dbReference.Child("userID").Child(userID).Child("UserData").Child("userStar").SetValueAsync(starLight.ToString())
+            .ContinueWithOnMainThread(starTask =>
+            {
+                if (starTask.IsCompleted)
+                {
+                    Debug.Log("스타라이트 저장 완료");
+                }
+                else
+                {
+                    Debug.LogError("스타라이트 데이터 저장 실패: " + starTask.Exception);
+                }
+            });
+
+        string userMail = userDatas.UserMail;
+        string jsonMail = JsonUtility.ToJson(userMail);
+        dbReference.Child("userID").Child(userID).Child("UserData").Child("userMail").SetValueAsync(userMail)
+            .ContinueWithOnMainThread(mailTask =>
+            {
+                if (mailTask.IsCompleted)
+                {
+                    Debug.Log("유저 메일 저장 완료");
+                }
+                else
+                {
+                    Debug.LogError("유저 메일 저장 실패: " + mailTask.Exception);
+                }
+            });
+
+    }
+
+
+    void SaveItemList(string userID, string nodeName, List<ItemClass> itemList, bool isWeaponEquips)
+    {
+        if (itemList != null)
+        {
+            if (isWeaponEquips)
+            {
+                // List<ItemClass>를 WeaponAndEquipCls[]으로 변환합니다.
+                WeaponAndEquipCls[] weaponEquipmentArray = itemList.OfType<WeaponAndEquipCls>().ToArray();
+
+                // 리스트 저장
+                Dictionary<string, object>[] equippedEquipmentDataArray = weaponEquipmentArray.Select(weapon => weapon?.ToDictionary()).ToArray();
+                dbReference.Child("userID").Child(userID).Child("UserData").Child(nodeName).SetValueAsync(equippedEquipmentDataArray)
+                    .ContinueWithOnMainThread(itemListTask =>
+                    {
+                        if (itemListTask.IsCompleted)
+                        {
+                            Debug.Log("유저 " + nodeName + " 데이터 저장 완료");
+                        }
+                        else
+                        {
+                            Debug.LogError("유저 " + nodeName + " 데이터 저장 실패: " + itemListTask.Exception);
+                        }
+                    });
+            }
+            else
+            {
+                // 리스트 저장
+                Dictionary<string, object>[] itemDataArray = itemList.Select(item => item?.ToDictionary()).ToArray();
+                dbReference.Child("userID").Child(userID).Child("UserData").Child(nodeName).SetValueAsync(itemDataArray)
+                    .ContinueWithOnMainThread(itemListTask =>
+                    {
+                        if (itemListTask.IsCompleted)
+                        {
+                            Debug.Log("유저 " + nodeName + " 데이터 저장 완료");
+                        }
+                        else
+                        {
+                            Debug.LogError("유저 " + nodeName + " 데이터 저장 실패: " + itemListTask.Exception);
+                        }
+                    });
+            }
+        }
+        else
+        {
+            Debug.LogWarning("유저 " + nodeName + " 데이터가 없습니다.");
         }
     }
 
+    #endregion
+
+
+    #region 데이터 불러오기
 
     public void LoadUserDataForGameManager()
     {
@@ -228,25 +348,22 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
                 if (snapshot.Exists)
                 {
-                    //// 데이터가 존재하는 경우
-                    //string jsonUserData = snapshot.GetRawJsonValue();
-                    //UserClass userData = JsonUtility.FromJson<UserClass>(jsonUserData);
-
-                    //// userData를 활용하여 불러온 데이터를 처리
-                    //GameManager.Instance.SetUserClass(userData);
-                    //Debug.Log("유저 데이터 로드 완료");
-
-
                     // 데이터가 존재하는 경우
-                    int nMora = Convert.ToInt32(snapshot.Child("nMora").Value);
-                    int nStarLight = Convert.ToInt32(snapshot.Child("nStarLight").Value);
-                    string userMail = snapshot.Child("userMail").Value.ToString();
+                    LoadUserCharacter(snapshot);
+                    LoadUserEquippedWeapon(snapshot);
+                    LoadUserEquippedEquipment(snapshot);
+                    LoadItemList(snapshot, "hadWeaponList", GameManager.Instance.GetUserClass().GetHadWeaponList());
+                    LoadItemList(snapshot, "hadEquipmentList", GameManager.Instance.GetUserClass().GetHadEquipmentList());
+                    LoadItemList(snapshot, "hadGemList", GameManager.Instance.GetUserClass().GetHadGemList());
+                    LoadItemList(snapshot, "hadFoodList", GameManager.Instance.GetUserClass().GetHadFoodList());
+                    LoadItemList(snapshot, "hadGrowMaterialList", GameManager.Instance.GetUserClass().GetHadGrowMaterialList());
+                    LoadItemList(snapshot, "hadEtcItemList", GameManager.Instance.GetUserClass().GetHadEtcItemList());
 
-                    // 새로운 UserClass 인스턴스 생성
-                    UserClass userData = new UserClass(nMora, nStarLight, userMail);
+                    LoadUserLastConnectTime(snapshot);
+                    LoadUserMora(snapshot);
+                    LoadUserStar(snapshot);
+                    LoadUserMail(snapshot);
 
-                    // userData를 활용하여 불러온 데이터를 처리
-                    GameManager.Instance.SetUserClass(userData);
                     Debug.Log("유저 데이터 로드 완료");
                 }
                 else
@@ -256,13 +373,210 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 }
             }
         });
-
     }
+
+    private void LoadUserCharacter(DataSnapshot snapshot)
+    {
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null)
+            {
+                // 예시: userEquippedWeapon 데이터를 가져와서 초기화
+                if (userDataDict.ContainsKey("userCharacter"))
+                {
+                    Dictionary<string, object> equippedWeaponData = userDataDict["userCharacter"] as Dictionary<string, object>;
+
+                    if (equippedWeaponData != null)
+                    {
+                        GameManager.Instance.GetUserClass().GetUserCharacter().SetFromDictionary(equippedWeaponData);
+                    }
+                }
+            }
+        }
+
+        //DataSnapshot userCharacterSnapshot = snapshot.Child("userCharacter");
+        //if (userCharacterSnapshot.Exists)
+        //{
+        //    string jsonUserCharacter = userCharacterSnapshot.GetRawJsonValue();
+        //    CharacterClass userCharacter = JsonConvert.DeserializeObject<CharacterClass>(jsonUserCharacter);
+
+        //    GameManager.Instance.GetUserClass().SetUserCharacter(userCharacter);
+        //}
+    }
+
+
+    private void LoadUserEquippedWeapon(DataSnapshot snapshot)
+    {
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null)
+            {
+                // 예시: userEquippedWeapon 데이터를 가져와서 초기화
+                if (userDataDict.ContainsKey("userEquippedWeapon"))
+                {
+                    Dictionary<string, object> equippedWeaponData = userDataDict["userEquippedWeapon"] as Dictionary<string, object>;
+
+                    if (equippedWeaponData != null)
+                    {
+                        GameManager.Instance.GetUserClass().GetUserEquippedWeapon().SetFromDictionary(equippedWeaponData);
+                    }
+                }
+            }
+        }
+        //DataSnapshot userEquippedWeaponSnapshot = snapshot.Child("userEquippedWeapon");
+        //if (userEquippedWeaponSnapshot.Exists)
+        //{
+        //    string jsonUserEquippedWeapon = userEquippedWeaponSnapshot.GetRawJsonValue();
+        //    WeaponAndEquipCls userEquippedWeapon = JsonConvert.DeserializeObject<WeaponAndEquipCls>(jsonUserEquippedWeapon);
+
+        //    GameManager.Instance.GetUserClass().SetUserEquippedWeapon(userEquippedWeapon);
+        //}
+    }
+
+    private void LoadUserEquippedEquipment(DataSnapshot snapshot)
+    {
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null)
+            {
+                // 예시: userEquippedEquipment 데이터를 가져와서 초기화
+                if (userDataDict.ContainsKey("userEquippedEquipment"))
+                {
+                    List<Dictionary<string, object>> equippedEquipmentDataList = userDataDict["userEquippedEquipment"] as List<Dictionary<string, object>>;
+
+                    if (equippedEquipmentDataList != null)
+                    {
+                        List<WeaponAndEquipCls> userEquippedEquipmentList = new List<WeaponAndEquipCls>();
+                        foreach (var equipData in equippedEquipmentDataList)
+                        {
+                            WeaponAndEquipCls equip = new WeaponAndEquipCls();
+                            equip.SetFromDictionary(equipData);
+                            userEquippedEquipmentList.Add(equip);
+                        }
+                        GameManager.Instance.GetUserClass().SetUserEquippedEquipment(userEquippedEquipmentList.ToArray());
+                    }
+                }
+            }
+        }
+
+        //DataSnapshot userEquippedEquipmentSnapshot = snapshot.Child("userEquippedEquipment");
+        //if (userEquippedEquipmentSnapshot.Exists)
+        //{
+        //    List<WeaponAndEquipCls> userEquippedEquipmentList = new List<WeaponAndEquipCls>();
+        //    foreach (DataSnapshot equipSnapshot in userEquippedEquipmentSnapshot.Children)
+        //    {
+        //        string jsonEquip = equipSnapshot.GetRawJsonValue();
+        //        WeaponAndEquipCls equip = JsonConvert.DeserializeObject<WeaponAndEquipCls>(jsonEquip);
+        //        userEquippedEquipmentList.Add(equip);
+        //    }
+        //    GameManager.Instance.GetUserClass().SetUserEquippedEquipment(userEquippedEquipmentList.ToArray());
+        //}
+    }
+
+    private void LoadItemList(DataSnapshot snapshot, string nodeName, List<ItemClass> itemList)
+    {
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null)
+            {
+                // 예시: itemList 데이터를 가져와서 초기화
+                if (userDataDict.ContainsKey(nodeName))
+                {
+                    List<Dictionary<string, object>> itemDataList = userDataDict[nodeName] as List<Dictionary<string, object>>;
+
+                    if (itemDataList != null)
+                    {
+                        List<ItemClass> loadedItemList = new List<ItemClass>();
+                        foreach (var itemData in itemDataList)
+                        {
+                            ItemClass item = new ItemClass();
+                            item.SetFromDictionary(itemData);
+                            loadedItemList.Add(item);
+                        }
+                        itemList.Clear();
+                        itemList.AddRange(loadedItemList);
+                    }
+                }
+            }
+        }
+
+        //DataSnapshot itemListSnapshot = snapshot.Child(nodeName);
+        //if (itemListSnapshot.Exists)
+        //{
+        //    List<ItemClass> loadedItemList = new List<ItemClass>();
+        //    foreach (DataSnapshot itemSnapshot in itemListSnapshot.Children)
+        //    {
+        //        string jsonItem = itemSnapshot.GetRawJsonValue();
+        //        ItemClass item = JsonConvert.DeserializeObject<ItemClass>(jsonItem);
+        //        loadedItemList.Add(item);
+        //    }
+        //    itemList.Clear();
+        //    itemList.AddRange(loadedItemList);
+        //}
+    }
+
+    private void LoadUserLastConnectTime(DataSnapshot snapshot)
+    {
+        DataSnapshot userLastConnectTimeSnapshot = snapshot.Child("userLastConnectTime");
+        if (userLastConnectTimeSnapshot.Exists)
+        {
+            string jsonLastConnectTime = userLastConnectTimeSnapshot.GetRawJsonValue();
+            DateTime lastConnectTime = JsonUtility.FromJson<DateTime>(jsonLastConnectTime);
+            GameManager.Instance.GetUserClass().SetUserLastConnectTime(lastConnectTime);
+        }
+    }
+
+    private void LoadUserMora(DataSnapshot snapshot)
+    {
+        DataSnapshot userMoraSnapshot = snapshot.Child("userMora");
+        if (userMoraSnapshot.Exists)
+        {
+            string jsonMora = userMoraSnapshot.GetRawJsonValue();
+            int mora = int.Parse(jsonMora);
+            GameManager.Instance.GetUserClass().SetMora(mora);
+        }
+    }
+
+    private void LoadUserStar(DataSnapshot snapshot)
+    {
+        DataSnapshot userStarSnapshot = snapshot.Child("userStar");
+        if (userStarSnapshot.Exists)
+        {
+            string jsonStar = userStarSnapshot.GetRawJsonValue();
+            int starLight = int.Parse(jsonStar);
+            GameManager.Instance.GetUserClass().NStarLight = starLight;
+        }
+    }
+
+    private void LoadUserMail(DataSnapshot snapshot)
+    {
+        DataSnapshot userMailSnapshot = snapshot.Child("userMail");
+        if (userMailSnapshot.Exists)
+        {
+            string jsonMail = userMailSnapshot.GetRawJsonValue();
+            string userMail = JsonUtility.FromJson<string>(jsonMail);
+            GameManager.Instance.GetUserClass().UserMail = userMail;
+        }
+    }
+    #endregion
 
     void DB_Set()
     {
         FirebaseApp.DefaultInstance.Options.DatabaseUrl = new System.Uri(db_URL);
 
+        // Firebase 초기화
+        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task => {
+            FirebaseApp app = FirebaseApp.DefaultInstance;
+            dbReference = FirebaseDatabase.DefaultInstance.RootReference;
+        });
     }
 
     public DatabaseReference DB_Reference
