@@ -953,7 +953,7 @@ public class UI_Manager : EnergyBarManager
 
         CharacterDataReviseWhenWeaponTakeOff(); // 아이템 데이터 감산
         ItemClass ExistingItem = GameManager.Instance.GetUserClass().GetUserEquippedWeapon();   // 기존 장착중인 아이템 가져오기
-        ItemClass tmp = WeaponsList.Find(item => item.Equals(ExistingItem));                    // 기존 장착중인 아이템 리스트에서 찾기
+        ItemClass tmp = WeaponsList.Find(item => item.GetId().Equals(ExistingItem.GetId()));                    // 기존 장착중인 아이템 리스트에서 찾기
         tmp.SetActive(false);                                                                   // 장착 중이던 아이템을 활성화 X
 
         ItemClass SelectItem = WeaponsList.Find(item => item.Equals(cls));              // 선택한 아이템 찾기
@@ -2563,7 +2563,7 @@ public class UI_Manager : EnergyBarManager
         {
             CharacterDataReviseWhenEquipmentTakeOff(index);
             ItemClass ExistingItem = equipedEquipList[index];                                               // 기존 장착중인 아이템 가져오기
-            ItemClass tmp = equipList.Find(item => item.Equals(ExistingItem));                              // 기존 장착중인 아이템 리스트에서 찾기
+            ItemClass tmp = equipList.Find(item => item.GetId().Equals(ExistingItem.GetId()));                              // 기존 장착중인 아이템 리스트에서 찾기
             tmp.SetActive(false);                                                                           // 장착 중이던 아이템을 활성화 X
 
             ItemClass SelectItem = equipList.Find(item => item.Equals(cls));                        // 선택한 아이템 찾기

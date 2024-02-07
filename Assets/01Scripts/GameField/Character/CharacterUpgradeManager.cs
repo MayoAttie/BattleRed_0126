@@ -12,7 +12,7 @@ public class CharacterUpgradeManager
     public static bool WeaponExpUp_Upgrade(WeaponAndEquipCls weapon, int nWeaponUpgradeExp)
     {
         CharacterDataReviseWhenWeaponTakeOff(); // 기존 Add 데이터 제거
-        var data = GameManager.Instance.GetUserClass().GetHadWeaponList().Find(tmp => tmp.Equals(weapon));
+        var data = GameManager.Instance.GetUserClass().GetHadWeaponList().Find(tmp => tmp.GetId().Equals(weapon.GetId()));
         var weaponData = data as WeaponAndEquipCls;
 
         int curExp = weapon.GetCurrentExp();

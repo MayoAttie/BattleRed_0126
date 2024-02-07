@@ -376,7 +376,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
             }
         });
     }
-
+    // 캐릭터 정보 불러오기
     private void LoadUserCharacter(DataSnapshot snapshot)
     {
         if (snapshot.Exists)
@@ -399,7 +399,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
         }
     }
 
-
+    // 착용 무기 정보 불러오기
     private void LoadUserEquippedWeapon(DataSnapshot snapshot)
     {
         if (snapshot.Exists)
@@ -422,7 +422,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
             }
         }
     }
-
+    // 착용 장비 정보 불러오기
     private void LoadUserEquippedEquipment(DataSnapshot snapshot)
     {
         if (snapshot.Exists)
@@ -435,7 +435,38 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 {
                     object equippedEquipmentDataObject = userDataDict["userEquippedEquipment"];
 
-                    if (equippedEquipmentDataObject is IDictionary<string, object> equippedEquipmentDataDict)
+                    if(equippedEquipmentDataObject is List<object> itemDataList)
+                    {
+                        List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>();
+                        foreach(var data in itemDataList)
+                        {
+                            if(data is IDictionary<string,object> stringDataList)
+                            {
+
+                                Dictionary<string, object> convertDic = new Dictionary<string, object>();
+
+                                foreach(var stringData in stringDataList)
+                                {
+                                    string key = stringData.Key;
+                                    object value = stringData.Value;
+                                    convertDic.Add(key, value);
+                                }
+
+                                WeaponAndEquipCls newItem = new WeaponAndEquipCls();
+                                newItem.SetFromDictionary(convertDic);
+                                fullList.Add(newItem);
+                            }
+                            else
+                            {
+                                Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+
+                            }
+                            GameManager.Instance.GetUserClass().SetUserEquippedEquipment(fullList.ToArray());
+                            Debug.Log("userEquippedEquipment 데이터 로드 완료");
+
+                        }
+                    }
+                    else if(equippedEquipmentDataObject is IDictionary<string, object> equippedEquipmentDataDict)
                     {
                         List<WeaponAndEquipCls> userEquippedEquipmentList = new List<WeaponAndEquipCls>();
 
@@ -465,7 +496,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
             }
         }
     }
-
+    // 아이템 리스트 정보 불러오기
     private void LoadItemList(DataSnapshot snapshot, string nodeName, List<ItemClass> itemList, bool isWeaponAndEuip)
     {
         if(isWeaponAndEuip)
