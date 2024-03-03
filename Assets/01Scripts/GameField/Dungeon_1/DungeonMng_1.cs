@@ -133,9 +133,8 @@ public class DungeonMng_1 : DungeonManager, Observer
                 index++;
             }
         }
-
-
     }
+    
 
 
 
@@ -187,10 +186,11 @@ public class DungeonMng_1 : DungeonManager, Observer
 
     public void AttackSkillEndNotify(){}
 
-    // 캐릭터가 특정 포인트 지났을 시에, 몬스터 재활성화
+    // 캐릭터가 특정 포인트 지났을 시에, 상호작용
     public void CheckPoint_PlayerPassNotify(int num)
     {
         CheckPointPassRespawn(num);
+
     }
 
     public void WorldMapOpenNotify(){}
