@@ -447,6 +447,45 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
     #endregion
 
 
+    #region 기타함수
+
+    public void Heal_ItemConsume(int itemLevel)
+    {
+        int curHp = clsCharacter.GetCurrentHp();
+        UI_Manager.Instance.HpBarFill_Init(curHp);
+        int maxHp = clsCharacter.GetMaxHp();
+        switch (itemLevel)
+        {
+            case 5:
+                {
+                    curHp = maxHp;
+                }
+                break;
+            case 4:
+                {
+                    int tmp = maxHp / 2;
+                    curHp = Mathf.Min(tmp+curHp, maxHp);
+                }
+                break;
+            case 3:
+                {
+                    int tmp = 50;
+                    curHp = Mathf.Min(tmp + curHp, maxHp);
+                }
+                break;
+            default:
+                {
+                    int tmp = 30;
+                    curHp = Mathf.Min(tmp + curHp, maxHp);
+                }
+                break;
+        }
+        UI_Manager.Instance.HpBarFill_End(maxHp, curHp, true);
+    }
+
+    #endregion
+
+
     // 씬 전환 간 캐릭터 동작함수 세팅 함수
     public void CharacterManagerConrollerBtnSet()
     {

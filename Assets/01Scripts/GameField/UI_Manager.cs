@@ -308,15 +308,13 @@ public class UI_Manager : EnergyBarManager
         {
             datas = GameManager.Instance.GetUserClass().GetHadFoodList();
             var findData = datas.Find(item => item.Equals(selectedObjAndItemCls.Item1));
-            
+
             // 소모 효과 구현
-            
+            CharacterManager.Instance.Heal_ItemConsume(findData.GetGrade());
 
             // 아이템 감산
-            if(findData.GetNumber() >1)     // 갯수가 1 초과라면, 아이템 소모
+            if (findData.GetNumber() >1)     // 갯수가 1 초과라면, 아이템 소모
             {
-                
-
                 int num = findData.GetNumber();
                 findData.SetNumber(--num);
             }

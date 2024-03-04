@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class ObjectTriggerEnterCheck : MonoBehaviour
 {
-    IObjectTriggerCheckFunc parents;
+    IObjectTriggerCheckFunc[] parents;
     bool isActive;
     private void Awake()
     {
         isActive = false;
-        parents = transform.parent.GetComponent<IObjectTriggerCheckFunc>();
+        parents = GetComponentsInParent<IObjectTriggerCheckFunc>();
+
     }
 
     private void OnTriggerStay(Collider other)
@@ -23,7 +24,11 @@ public class ObjectTriggerEnterCheck : MonoBehaviour
             {
                 isActive = true;
                 // 부모 객체가 가진 인터페이스의 기능 함수를 호출.
-                parents.EnterTriggerFunctionInit(this);
+                foreach (IObjectTriggerCheckFunc triggerCheckFunc in parents)
+                {
+                    // 부모 객체가 IObjectTriggerCheckFunc를 가진 경우 해당 함수 호출
+                    triggerCheckFunc.EnterTriggerFunctionInit(this);
+                }
             }
 
         }
