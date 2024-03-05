@@ -393,10 +393,15 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     {
                         GameManager.Instance.GetUserClass().GetUserCharacter().SetFromDictionary(equippedWeaponData);
                     }
+                    Invoke("CallHpModifyFunc", 1f);
                     Debug.Log("userCharacter 데이터 로드 완료");
                 }
             }
         }
+    }
+    void CallHpModifyFunc()
+    {   // 체력 수정 함수 호출
+        CharacterManager.Instance.Hp_Modify();
     }
 
     // 착용 무기 정보 불러오기
@@ -437,24 +442,35 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
                     if(equippedEquipmentDataObject is List<object> itemDataList)
                     {
-                        List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>();
-                        foreach(var data in itemDataList)
+                        List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>() { null, null, null, null, null };
+                        foreach (var data in itemDataList)
                         {
-                            if(data is IDictionary<string,object> stringDataList)
+                            if (data == "null" || data == null)
+                                continue;
+                            if (data is IDictionary<string,object> stringDataList)
                             {
 
                                 Dictionary<string, object> convertDic = new Dictionary<string, object>();
 
-                                foreach(var stringData in stringDataList)
+                                foreach (var stringData in stringDataList)
                                 {
                                     string key = stringData.Key;
                                     object value = stringData.Value;
                                     convertDic.Add(key, value);
                                 }
-
                                 WeaponAndEquipCls newItem = new WeaponAndEquipCls();
                                 newItem.SetFromDictionary(convertDic);
-                                fullList.Add(newItem);
+
+                                // 태그에 따라서, 배열 인덱스 설정
+                                string tag = newItem.GetTag();
+                                int index = 0;
+                                if (tag == "꽃") index = 0;
+                                else if (tag == "깃털") index = 1;
+                                else if (tag == "모래") index = 2;
+                                else if (tag == "성배") index = 3;
+                                else if (tag == "왕관") index = 4;
+
+                                fullList[index] = newItem;
                             }
                             else
                             {

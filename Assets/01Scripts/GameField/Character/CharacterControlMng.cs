@@ -15,13 +15,14 @@ public class CharacterControlMng : Subject, Observer
     TouchPadController TouchController;
 
     Vector3 velocity;
+    public bool isBattle;                              // 전투중인지 체크
+    bool isReverseGround;                       // 반중력 체크
     bool isGrounded;                            // 지면인지 체크
     bool isJump;                                // 점프중인지 체크
     bool isBlinking;                            // 회피중인지 체크
-    public bool isBattle;                              // 전투중인지 체크
     bool isBlinkCoolTimeFleg;                   // 쿨타임 코루틴함수 제어 플래그
     bool isBlinkStart;                          // 블링크 애니메이션이 시작되었는지 체크
-    bool isConsecutiveBlink;                    //
+    
 
     float jumpHeight = 2f;                      // 점프 높이
     float groundDistance = 0f;                // 지면과의 거리
@@ -55,6 +56,7 @@ public class CharacterControlMng : Subject, Observer
 
     private void Awake()
     {
+        isReverseGround = false;
         controller = gameObject.GetComponent<CharacterController>();
         groundCheck = gameObject.transform;
         isBlinkCoolTimeFleg = false;
@@ -139,14 +141,26 @@ public class CharacterControlMng : Subject, Observer
     void GravityFunc()
     {
         isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (isGrounded && velocity.y < 0)
+        if(!isReverseGround)    // 정중력
         {
-            velocity.y = -4f; // 지면에 닿아있을 때 y 속도를 초기화
-        }
+            if (isGrounded && velocity.y < 0)
+            {
+                velocity.y = -4f; // 지면에 닿아있을 때 y 속도를 초기화
+            }
 
-        // 중력 적용
-        velocity.y += gravity * Time.deltaTime;
+            // 중력 적용
+            velocity.y += gravity * Time.deltaTime;
+        }
+        else                  // 반중력
+        {
+            if (isGrounded && velocity.y > 0)
+            {
+                velocity.y = 4f; // 지면에 닿아있을 때 y 속도를 초기화
+            }
+
+            // 중력 적용 (반대 방향)
+            velocity.y -= gravity * Time.deltaTime;
+        }
     }
 
     #region 걷기
@@ -402,6 +416,8 @@ public class CharacterControlMng : Subject, Observer
             ButtonClass_Reset(blinkBtn);
             blinkBtnObj.onClick.AddListener(() => BlinkClickEvent());
         }
+
+
     }
 
 
@@ -416,6 +432,11 @@ public class CharacterControlMng : Subject, Observer
         xPos = x;
         runX = x;
         runZ = z;
+    }
+    public bool IsReverseGround
+    {
+        get { return isReverseGround; }
+        set { isReverseGround = value; }
     }
     #endregion
 

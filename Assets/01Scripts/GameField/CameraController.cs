@@ -436,6 +436,8 @@ public class CameraController : MonoBehaviour, Observer
         StartCoroutine(MoveToTargetByLerp());
     }
 
+    public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
+
 
     #endregion
 

@@ -68,6 +68,7 @@
     <Compile Include="Assets\01Scripts\Dungeon_1\DungeonManager.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\DungeonMng_1.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\MoveAtoB.cs" />
+    <Compile Include="Assets\01Scripts\Dungeon_1\UnderObj_CircleBlock.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\UndergroundObject.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\WaterCheck.cs" />
     <Compile Include="Assets\01Scripts\GameField\CameraController.cs" />

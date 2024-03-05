@@ -249,6 +249,8 @@ public class MonsterAttack : MonoBehaviour, Observer
 
     public void ConvertToTargetStateNotify(List<Vector3> listTarget){}
 
+    public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
+
 
 
     #endregion

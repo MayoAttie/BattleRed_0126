@@ -90,4 +90,13 @@ public abstract class Subject : MonoBehaviour
             tmp.ConvertToTargetStateNotify(listTarget);
         }
     }
+
+    // 지하지역 호출 함수
+    public void CallUndergroundObjectNorify(UnderObj_CircleBlock other)
+    {
+        foreach(Observer tmp in _observers)
+        {
+            tmp.CallUndergroundObjectNorify(other);
+        }
+    }
 }

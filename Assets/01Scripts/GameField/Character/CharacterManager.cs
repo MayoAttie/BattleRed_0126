@@ -483,6 +483,13 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         UI_Manager.Instance.HpBarFill_End(maxHp, curHp, true);
     }
 
+    public void Hp_Modify()
+    {
+        var cls = GameManager.Instance.GetUserClass().GetUserCharacter();
+        UI_Manager.Instance.HpBarFill_Init(cls.GetCurrentHp());
+        UI_Manager.Instance.HpBarFill_End(cls.GetMaxHp(), cls.GetCurrentHp(), false);
+    }
+
     #endregion
 
 
@@ -567,6 +574,8 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
     public void WorldMapCloseNotify(){}
 
     public void ConvertToTargetStateNotify(List<Vector3> listTarget){}
+
+    public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
 
 
 

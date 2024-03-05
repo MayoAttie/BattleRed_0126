@@ -11,5 +11,6 @@ public interface Observer
     void WorldMapOpenNotify();
     void WorldMapCloseNotify();
     void ConvertToTargetStateNotify(List<Vector3> listTarget);
+    void CallUndergroundObjectNorify(UnderObj_CircleBlock other);
 }
 

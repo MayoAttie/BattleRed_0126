@@ -199,6 +199,8 @@ public class DungeonMng_1 : DungeonManager, Observer
 
     public void ConvertToTargetStateNotify(List<Vector3> listTarget){}
 
+    public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
+
 
     #endregion
 }

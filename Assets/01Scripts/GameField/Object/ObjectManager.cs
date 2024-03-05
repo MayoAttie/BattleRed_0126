@@ -56,6 +56,9 @@ public class ObjectManager : Singleton<ObjectManager>
             case "원소비석_풀":
                 ElementRockTrigger(obj);
                 break;
+            case "ControlTotem":
+                CircleBlock_ControlTotem(obj);
+                break;
 
         }
     }
@@ -257,6 +260,19 @@ public class ObjectManager : Singleton<ObjectManager>
         ParticleSystem effect = obj.transform.GetComponentInChildren<ParticleSystem>(true);
         if(effect != null)
             effect.gameObject.SetActive(true);
+    }
+
+    #endregion
+
+    #region 원형블럭 객체_컨트롤 토템
+
+    void CircleBlock_ControlTotem(InteractionObject obj)
+    {
+        Transform parents = obj.transform.parent;
+        UnderObj_CircleBlock blockCls = parents.GetComponent<UnderObj_CircleBlock>();
+
+        // 원형 블럭 회전 함수 호출
+        blockCls.RotateSelf();
     }
 
     #endregion
