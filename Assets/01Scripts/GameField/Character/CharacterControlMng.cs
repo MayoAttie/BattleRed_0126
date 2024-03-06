@@ -436,7 +436,23 @@ public class CharacterControlMng : Subject, Observer
     public bool IsReverseGround
     {
         get { return isReverseGround; }
-        set { isReverseGround = value; }
+        set 
+        { 
+            isReverseGround = value;
+            
+            if(isReverseGround) // 중력 반전
+            {
+                controller.enabled = false;
+                this.gameObject.transform.rotation = Quaternion.Euler(180, 0, 0);
+                controller.enabled = true;
+            }
+            else
+            {
+                controller.enabled = false;
+                this.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
+                controller.enabled = true;
+            }
+        }
     }
     #endregion
 

@@ -151,6 +151,13 @@
     <Compile Include="Assets\02Assets\UJoystick\Content\Script\Core\bl_Joystick.cs" />
     <Compile Include="Assets\02Assets\UJoystick\Content\Script\Internal\bl_JoystickUtils.cs" />
     <Compile Include="Assets\02Assets\UJoystick\Example\Scrips\bl_ControllerExample.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\ExampleScenes\ExampleScripts\CannonBehavior.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\ExampleScenes\ExampleScripts\CreateSinShapedLineStrip.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\ExampleScenes\ExampleScripts\ShotBehavior.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\ExampleScenes\ExampleScripts\VolumetricMultiLineBehavior.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\VolumetricLines\Scripts\VolumetricLineBehavior.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\VolumetricLines\Scripts\VolumetricLineStripBehavior.cs" />
+    <Compile Include="Assets\02Assets\VolumetricLines\VolumetricLines\Scripts\VolumetricLineVertexData.cs" />
     <Compile Include="Assets\Particle Attractor by Moonflower Carnivore\Scripts\particleAttractorLinear.cs" />
     <Compile Include="Assets\Particle Attractor by Moonflower Carnivore\Scripts\particleAttractorMove.cs" />
     <Compile Include="Assets\Particle Attractor by Moonflower Carnivore\Scripts\particleAttractorSelf.cs" />
