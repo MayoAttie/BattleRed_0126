@@ -13,6 +13,7 @@ public class CharacterControlMng : Subject, Observer
     Transform groundCheck;               // 지면 체크를 위한 위치 정보를 저장하는 변수
     [SerializeField] LayerMask groundMask;                // 지면을 나타내는 레이어 정보를 저장하는 변수
     TouchPadController TouchController;
+    Transform originParents;
 
     Vector3 velocity;
     public bool isBattle;                              // 전투중인지 체크
@@ -393,6 +394,72 @@ public class CharacterControlMng : Subject, Observer
     public void GetBlinkStartNotify()
     {
         isBlinkStart = true;
+    }
+
+    #endregion
+
+    #region 기타이동
+
+    public void Move_aPoint_to_bPoint(Vector3 aPoint, Vector3 bPoint, float time)
+    {
+        controller.enabled = false;
+        characMng.IsControl = false;
+        StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time));
+    }
+    IEnumerator MoveAtoB_Smoothly(Vector3 aPoint, Vector3 bPoint, float time)
+    {
+        float elapsedTime = 0f; // 경과 시간
+
+        Vector3 direction = bPoint - transform.position;
+        direction.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = rotation;
+
+        while (elapsedTime < time)
+        {
+            // 경과 시간에 따른 이동 보간
+            float t = elapsedTime / time;
+            Vector3 newPosition = Vector3.Lerp(aPoint, bPoint, t);
+
+            // 이동
+            transform.position = newPosition;
+
+            // 경과 시간 업데이트
+            elapsedTime += Time.deltaTime;
+            yield return null; // 다음 프레임까지 대기
+        }
+
+
+        transform.position = bPoint;
+        // 종료 시 캐릭터 컨트롤 활성화
+        controller.enabled = true;
+        characMng.IsControl = true;
+        // 코루틴 종료
+        yield break;
+    }
+    public void Move_aPoint_to_bPoint(Vector3 targetPoint)
+    {
+        CharacterManager.Instance.IsControl = false;
+        CharacterManager.Instance.ControlMng.MyController.enabled = false;
+
+        gameObject.transform.position = targetPoint;
+        Vector3 direction = targetPoint - transform.position;
+        direction.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = rotation;
+
+        CharacterManager.Instance.ControlMng.MyController.enabled = true;
+        CharacterManager.Instance.IsControl = true;
+    }
+
+    public void ParentsSet(Transform setParetns)
+    {
+        originParents = transform.parent;
+        transform.parent = setParetns;
+    }
+    public void ReturnOriginParents()
+    {
+        transform.parent = originParents;
     }
 
     #endregion

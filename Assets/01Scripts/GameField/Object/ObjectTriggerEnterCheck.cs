@@ -4,13 +4,23 @@ using UnityEngine;
 
 public class ObjectTriggerEnterCheck : MonoBehaviour
 {
-    IObjectTriggerCheckFunc[] parents;
+    Dictionary<IObjectTriggerCheckFunc, Transform> dicComponent;
+    IObjectTriggerCheckFunc[] parentComponents;
     bool isActive;
     private void Awake()
     {
         isActive = false;
-        parents = GetComponentsInParent<IObjectTriggerCheckFunc>();
-
+        dicComponent = new Dictionary<IObjectTriggerCheckFunc, Transform>();
+        parentComponents = transform.GetComponentsInParent<IObjectTriggerCheckFunc>();
+        Transform[] componets = transform.GetComponentsInParent<Transform>();
+        foreach (var obj in componets)
+        {
+            if (obj.GetComponent<IObjectTriggerCheckFunc>() != null)
+            {
+                IObjectTriggerCheckFunc component = obj.GetComponent<IObjectTriggerCheckFunc>();
+                dicComponent.Add(component, obj);
+            }
+        }
     }
 
     private void OnTriggerStay(Collider other)
@@ -23,11 +33,21 @@ public class ObjectTriggerEnterCheck : MonoBehaviour
             if (!isActive)
             {
                 isActive = true;
+                Transform parents = gameObject.transform.parent;
                 // 부모 객체가 가진 인터페이스의 기능 함수를 호출.
-                foreach (IObjectTriggerCheckFunc triggerCheckFunc in parents)
+                foreach (IObjectTriggerCheckFunc triggerCheckFunc in parentComponents)
                 {
-                    // 부모 객체가 IObjectTriggerCheckFunc를 가진 경우 해당 함수 호출
-                    triggerCheckFunc.EnterTriggerFunctionInit(this);
+                    if (dicComponent.ContainsKey(triggerCheckFunc))
+                    {
+                        if (dicComponent[triggerCheckFunc] != parents)
+                            continue;
+                        else
+                        {
+                            triggerCheckFunc.EnterTriggerFunctionInit(this);
+                            break;
+                        }
+                    }
+                    else { }
                 }
             }
 

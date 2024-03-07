@@ -19,28 +19,22 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
     // 써클 진입 시 호출 함수.
     public void EnterTriggerFunctionInit(ObjectTriggerEnterCheck other)
     {
-        // 점프 상태가 아니면 리턴
-        if (CharacterManager.Instance.GetCharacterClass().GetState() != CharacterClass.eCharactgerState.e_JUMP)
-        {
-            other.IsActive = false;
-            return;
-        }
-
         CallUndergroundObjectNorify(this);
     }
 
     public void RotateSelf()
     {   // 회전
-        if(isRotatePossible)
+        if(isRotatePossible && !isHitted)
         {
             isHitted = true;
-            RotateSmoothly(this.gameObject);
+            StartCoroutine(RotateSmoothly(this.gameObject));
         }
     }
 
     // 회전 함수
     IEnumerator RotateSmoothly(GameObject obj)
     {
+        CharacterManager.Instance.ControlMng.ParentsSet(this.transform);
         // 초기 각도 설정
         float currentAngle = nowRotateY % 360;
 
@@ -82,6 +76,7 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
         nowRotateY = targetY;
         // 총 관리 클래스에 옵저버 패턴으로 알림
         CallUndergroundObjectNorify(this);
+        CharacterManager.Instance.ControlMng.ReturnOriginParents();
         isHitted = false;
         yield break;
     }

@@ -24,16 +24,7 @@ public class MoveAtoB : MonoBehaviour, IObjectTriggerCheckFunc
         CharacterManager.Instance.ControlMng.MyController.enabled = false;
         StartPosition = other.transform;
 
-        CharacterManager.Instance.transform.position = EndPosition.position;
-
-        Vector3 direction = EndPosition.position - CharacterManager.Instance.gameObject.transform.position;
-        direction.y = 0;
-        Quaternion rotation = Quaternion.LookRotation(direction);
-        CharacterManager.Instance.gameObject.transform.rotation = rotation;
-
-        Debug.Log("CharacterManager.Instance.gameObject.transform.position : " + CharacterManager.Instance.gameObject.transform.position);
-        Debug.Log("EndPosition.position : " + EndPosition.position);
-
+        CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(EndPosition.position);
 
         CharacterManager.Instance.ControlMng.MyController.enabled = true;
         CharacterManager.Instance.IsControl = true;
