@@ -58,8 +58,10 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         matchPathBlocks = new Dictionary<string, Point>
         {
             {"start", new Point(0,"bot01", "01") },
+            {"bot01", new Point(-1,"top01","") },
             {"top01", new Point(1,"top02","02") },
-            {"top02", new Point(2,"top03", "03") }
+            {"top02", new Point(2,"top03", "03") },
+            {"top03", new Point(-1,"bot02", "") }
         };
 
         // 각 보정 이름에 따른, UnderObj_CircleBlock 오브젝트 매핑
@@ -88,7 +90,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
 
         // 각도 가져오기
         float targetDegree = targetRotates[index];
-        float nowDegree = other.transform.localRotation.y;
+        float nowDegree = other.transform.eulerAngles.y;
 
         // 각도 비교
         if (nowDegree == targetDegree)
@@ -146,7 +148,23 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     // 상하 지역 이동(Jump).
     void RotationConvertToDifferntBlock(UnderObj_CircleBlock other)
     {
+        string correctedName = NameCorrector(other.name);
+        Debug.Log(correctedName);
+        string destinationName = matchPathBlocks[correctedName].blockName;
+        UnderObj_CircleBlock targetObject = dic_blocks[destinationName];
 
+        Transform endPosTransform = targetObject.transform.Find("EndPos");
+        Vector3 destinationPos = endPosTransform != null ? endPosTransform.position : Vector3.zero;
+        Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
+
+        var controlMng = CharacterManager.Instance.ControlMng;
+        // 이동 함수 호출.
+        controlMng.Move_aPoint_to_bPoint(nowPos, destinationPos, 2f);
+
+        // 현재 각도에 따라서, 정중력 역중력 분기 후 제어.
+        bool isReverseGravity = !other.IsTopOjbect;
+        // 각도 변경
+        controlMng.IsReverseGround = isReverseGravity;
     }
 
 
@@ -167,15 +185,20 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         }
         else                            // 써클 진입 함수.
         {
-            Transform originPos = other.transform.Find("EndPos");
-            CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(originPos.position);
 
             if (other.IsRotatePossible == false)        // 회전 불가 객체 (점프)
                 RotationConvertToDifferntBlock(other);
             else
+            {
                 if(other.IsMovePossible == true)        // 회전 가능 객체 (이동)
                     Move_Between_TwoPoint(other);
-
+                else
+                {
+                    Transform originPos = other.transform.Find("EndPos");
+                    CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(originPos.position);
+                    other.CircleTrigger.IsActive = false;
+                }
+            }
         }
     }
 

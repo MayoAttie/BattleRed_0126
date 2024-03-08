@@ -154,7 +154,7 @@ public class CharacterControlMng : Subject, Observer
         }
         else                  // 반중력
         {
-            if (isGrounded && velocity.y > 0)
+            if (isGrounded && velocity.y < 0)
             {
                 velocity.y = 4f; // 지면에 닿아있을 때 y 속도를 초기화
             }
@@ -248,6 +248,8 @@ public class CharacterControlMng : Subject, Observer
             // 캐릭터를 왼쪽으로 회전시킵니다.
             transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime);
         }
+
+
     }
     #endregion
 
@@ -451,7 +453,7 @@ public class CharacterControlMng : Subject, Observer
         CharacterManager.Instance.ControlMng.MyController.enabled = true;
         CharacterManager.Instance.IsControl = true;
     }
-
+    // 부모 객체 set관련
     public void ParentsSet(Transform setParetns)
     {
         originParents = transform.parent;
@@ -461,7 +463,25 @@ public class CharacterControlMng : Subject, Observer
     {
         transform.parent = originParents;
     }
+    // X축 회전.(역중력 관련)
 
+    IEnumerator RotateX_Dgree(float targetRotation)
+    {
+        float duration = 1.5f;
+        float elapsed = 0f;
+        Quaternion startRotation = transform.rotation;
+        Quaternion target = Quaternion.Euler(targetRotation, 0, 0);
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            transform.rotation = Quaternion.Slerp(startRotation, target, elapsed / duration);
+            yield return null;
+        }
+
+        transform.rotation = target;
+        controller.enabled = true;
+    }
     #endregion
 
 
@@ -504,21 +524,12 @@ public class CharacterControlMng : Subject, Observer
     {
         get { return isReverseGround; }
         set 
-        { 
-            isReverseGround = value;
-            
-            if(isReverseGround) // 중력 반전
+        {
+            if (isReverseGround != value)
             {
-                controller.enabled = false;
-                this.gameObject.transform.rotation = Quaternion.Euler(180, 0, 0);
-                controller.enabled = true;
-            }
-            else
-            {
-                controller.enabled = false;
-                this.gameObject.transform.rotation = Quaternion.Euler(0, 0, 0);
-                controller.enabled = true;
-            }
+                isReverseGround = value;
+                StartCoroutine(RotateX_Dgree(value ? 180 : 0));
+             }
         }
     }
     #endregion

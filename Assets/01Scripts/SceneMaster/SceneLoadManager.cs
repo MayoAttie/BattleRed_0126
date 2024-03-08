@@ -52,7 +52,7 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         }
     }
 
-    #region 싱글로딩
+#region 싱글로딩
     //싱글 로딩, 로딩바 표시
     public void SceneLoadder(string sceneName)
     {
@@ -103,9 +103,9 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         eCurrnetState = eLoadingState.NONE;
     }
 
-    #endregion
+#endregion
 
-    #region 멀티로딩
+#region 멀티로딩
     //멀티 로딩, 로딩바 표시O
     public void SceneLoadder_Additive(string sceneName)
     {
@@ -156,9 +156,9 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         eCurrnetState = eLoadingState.NONE;
     }
 
-    #endregion
+#endregion
 
-    #region 기타함수
+#region 기타함수
 
     void ChangeSceneManagerCall()
     {
@@ -168,7 +168,7 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         }
     }
 
-    #endregion
+#endregion
 
 
 }
