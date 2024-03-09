@@ -13,11 +13,12 @@ public class CharacterControlMng : Subject, Observer
     Transform groundCheck;               // 지면 체크를 위한 위치 정보를 저장하는 변수
     [SerializeField] LayerMask groundMask;                // 지면을 나타내는 레이어 정보를 저장하는 변수
     TouchPadController TouchController;
-    Transform originParents;
+    Transform originParents;                        // 기존의 부모객체 저장 변수
 
     Vector3 velocity;
     public bool isBattle;                              // 전투중인지 체크
     bool isReverseGround;                       // 반중력 체크
+    bool isEndReverseAnimation;                 // 반중력 회전 애니메이션 종료
     bool isGrounded;                            // 지면인지 체크
     bool isJump;                                // 점프중인지 체크
     bool isBlinking;                            // 회피중인지 체크
@@ -151,6 +152,7 @@ public class CharacterControlMng : Subject, Observer
 
             // 중력 적용
             velocity.y += gravity * Time.deltaTime;
+            isEndReverseAnimation = false;
         }
         else                  // 반중력
         {
@@ -179,7 +181,10 @@ public class CharacterControlMng : Subject, Observer
 
         // 객체 이동
         Vector3 move = transform.right * xPos + transform.forward * zPos;
-        controller.Move((move * 5 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+        if(isEndReverseAnimation)
+            controller.Move((move * 5 - velocity) * Time.deltaTime); // 중력이 적용된 이동
+        else
+            controller.Move((move * 5 + velocity) * Time.deltaTime); // 중력이 적용된 이동
 
         // x,y 값이 0에 가까우면, 이동을 멈추고 iDle상태로 바꿈
         if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
@@ -236,20 +241,29 @@ public class CharacterControlMng : Subject, Observer
         e_TouchSlideDic touchDic;
         touchDic = TouchController.GetDirectionHorizontal();
 
+        Quaternion newRotation = transform.localRotation;  // 현재 로컬 회전값을 저장
+
         // 만약 수평 방향 입력이 오른쪽(Right)으로 감지된 경우
         if (touchDic == e_TouchSlideDic.Right)
         {
             // 캐릭터를 오른쪽으로 회전시킵니다.
-            transform.Rotate(Vector3.up, rotationSpeed * Time.deltaTime);
+            newRotation *= Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
         }
         // 만약 수평 방향 입력이 왼쪽(Left)으로 감지된 경우
         else if (touchDic == e_TouchSlideDic.Left)
         {
             // 캐릭터를 왼쪽으로 회전시킵니다.
-            transform.Rotate(Vector3.up, -rotationSpeed * Time.deltaTime);
+            newRotation *= Quaternion.Euler(0, -rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
         }
 
+        // 회전 중이 아닌 경우에도 x축 회전값을 유지하기 위해 이전 회전값을 복원
+        if(isEndReverseAnimation)
+            newRotation.eulerAngles = new Vector3(newRotation.eulerAngles.x, newRotation.eulerAngles.y, 180);
+        else
+            newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, newRotation.eulerAngles.z);
 
+        // 새로운 회전값을 적용
+        transform.localRotation = newRotation;
     }
     #endregion
 
@@ -286,10 +300,13 @@ public class CharacterControlMng : Subject, Observer
         }
 
 
-
-        // 객체 이동
         Vector3 move = transform.right * xPos + transform.forward * zPos;
-        controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+        // 객체 이동
+        if (isEndReverseAnimation)
+            controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
+        else
+            controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+
 
 
         // x,y 값이 0에 가까우면, 이동을 멈추고 ATTACK 상태로 바꿈
@@ -417,6 +434,8 @@ public class CharacterControlMng : Subject, Observer
         Quaternion rotation = Quaternion.LookRotation(direction);
         transform.rotation = rotation;
 
+
+
         while (elapsedTime < time)
         {
             // 경과 시간에 따른 이동 보간
@@ -425,6 +444,14 @@ public class CharacterControlMng : Subject, Observer
 
             // 이동
             transform.position = newPosition;
+
+            Quaternion newRotation = transform.localRotation;  // 현재 로컬 회전값을 저장
+            // 회전 중이 아닌 경우에도 x축 회전값을 유지하기 위해 이전 회전값을 복원
+            if (isEndReverseAnimation)
+                newRotation.eulerAngles = new Vector3(newRotation.eulerAngles.x, newRotation.eulerAngles.y, 180);
+            else
+                newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, newRotation.eulerAngles.z);
+            transform.localRotation = newRotation;
 
             // 경과 시간 업데이트
             elapsedTime += Time.deltaTime;
@@ -478,9 +505,9 @@ public class CharacterControlMng : Subject, Observer
             transform.rotation = Quaternion.Slerp(startRotation, target, elapsed / duration);
             yield return null;
         }
-
         transform.rotation = target;
         controller.enabled = true;
+        isEndReverseAnimation = true;
     }
     #endregion
 
