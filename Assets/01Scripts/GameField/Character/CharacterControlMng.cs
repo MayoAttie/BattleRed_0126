@@ -423,10 +423,18 @@ public class CharacterControlMng : Subject, Observer
     {
         controller.enabled = false;
         characMng.IsControl = false;
-        StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time));
+        StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time,0));
     }
-    IEnumerator MoveAtoB_Smoothly(Vector3 aPoint, Vector3 bPoint, float time)
+    public void Move_aPoint_to_bPoint(Vector3 aPoint, Vector3 bPoint, float time, float frontWaitTime)
     {
+        controller.enabled = false;
+        characMng.IsControl = false;
+        StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time, frontWaitTime));
+    }
+    IEnumerator MoveAtoB_Smoothly(Vector3 aPoint, Vector3 bPoint, float time, float frontWaitTime)
+    {
+        yield return new WaitForSeconds(frontWaitTime);
+
         float elapsedTime = 0f; // 경과 시간
 
         Vector3 direction = bPoint - transform.position;
@@ -494,11 +502,10 @@ public class CharacterControlMng : Subject, Observer
 
     IEnumerator RotateX_Dgree(float targetRotation)
     {
-        float duration = 1.5f;
+        float duration = 0.9f;
         float elapsed = 0f;
         Quaternion startRotation = transform.rotation;
         Quaternion target = Quaternion.Euler(targetRotation, 0, 0);
-
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;

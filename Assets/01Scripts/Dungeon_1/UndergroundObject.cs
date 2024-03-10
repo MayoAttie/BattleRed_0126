@@ -61,7 +61,10 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
             {"bot01", new Point(-1,"top01","") },
             {"top01", new Point(1,"top02","02") },
             {"top02", new Point(2,"top03", "03") },
-            {"top03", new Point(-1,"bot02", "") }
+            {"top03", new Point(-1,"bot02", "") },
+            {"bot02", new Point(3,"bot03", "04") },
+            {"bot03", new Point(4,"bot04", "05") },
+            {"bot04", new Point(5,"end", "06") },
         };
 
         // 각 보정 이름에 따른, UnderObj_CircleBlock 오브젝트 매핑
@@ -158,14 +161,15 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
 
         var controlMng = CharacterManager.Instance.ControlMng;
-        // 이동 함수 호출.
-        controlMng.Move_aPoint_to_bPoint(nowPos, destinationPos, 2f);
 
         // 현재 각도에 따라서, 정중력 역중력 분기 후 제어.
         bool isReverseGravity = !other.IsTopOjbect;
+        // 이동 함수 호출.
+        controlMng.Move_aPoint_to_bPoint(nowPos, destinationPos, 2f);
         // 각도 변경
         controlMng.IsReverseGround = isReverseGravity;
     }
+
 
 
     string NameCorrector(string name)
@@ -179,13 +183,12 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     #region 옵저버 패턴
     public void CallUndergroundObjectNorify(UnderObj_CircleBlock other)
     {
-        if(other.IsHitted == true)      // 회전 후, 정답 체크
+        if(other.IsHitted == true && !other.IsMovePossible)      // 회전 후, 정답 체크
         {
             other.IsMovePossible =  CheckPossibleRoot(other);
         }
         else                            // 써클 진입 함수.
         {
-
             if (other.IsRotatePossible == false)        // 회전 불가 객체 (점프)
                 RotationConvertToDifferntBlock(other);
             else

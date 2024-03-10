@@ -33,7 +33,7 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
 
     public void RotateSelf()
     {   // 회전
-        if(isRotatePossible && !isHitted)
+        if(isRotatePossible && !isHitted && !isMovePossible)
         {
             isHitted = true;
             if(!isTopObject)
@@ -109,7 +109,11 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
             while (currentAngle < targetY - epsilon)
             {
                 // 부드러운 회전 계산
-                Quaternion newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(X, targetY, 0f), 30f * Time.deltaTime);
+                Quaternion newRotation;
+                if (!isTopObject)
+                    newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(X, targetY, 0f), 30f * Time.deltaTime);
+                else
+                    newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(0f, targetY, 180f), 30f * Time.deltaTime);
 
                 // 부드러운 회전 적용
                 obj.transform.rotation = newRotation;
@@ -123,7 +127,11 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
         {
             while (currentAngle < 359.9 && currentAngle != 0)        // 디버깅으로 확인 후, 회전 예외를 조건문으로 설정.
             {
-                Quaternion newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(X, targetY, 0f), 30f * Time.deltaTime);
+                Quaternion newRotation;
+                if (!isTopObject)
+                    newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(X, targetY, 0f), 30f * Time.deltaTime);
+                else
+                    newRotation = Quaternion.RotateTowards(obj.transform.rotation, Quaternion.Euler(0f, targetY, 180f), 30f * Time.deltaTime);
 
                 obj.transform.rotation = newRotation;
 

@@ -63,6 +63,7 @@
     <Compile Include="Assets\01Scripts\CustomTool\ECN_AnimationSetupWindow.cs" />
     <Compile Include="Assets\01Scripts\CustomTool\ECNaming.cs" />
     <Compile Include="Assets\01Scripts\CustomTool\ECTransformObject.cs" />
+    <Compile Include="Assets\01Scripts\CustomTool\EC_ObjectCopySet.cs" />
     <Compile Include="Assets\01Scripts\DataBase\FireBaseManager.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\CheckPointNotify.cs" />
     <Compile Include="Assets\01Scripts\Dungeon_1\DungeonManager.cs" />
