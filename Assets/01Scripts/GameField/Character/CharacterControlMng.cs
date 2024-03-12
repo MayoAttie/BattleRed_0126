@@ -17,9 +17,9 @@ public class CharacterControlMng : Subject, Observer
 
     Vector3 velocity;
     public bool isBattle;                              // 전투중인지 체크
-    bool isReverseGround;                       // 반중력 체크
-    bool isEndReverseAnimation;                 // 반중력 회전 애니메이션 종료
-    bool isGrounded;                            // 지면인지 체크
+    [SerializeField]bool isReverseGround;                       // 반중력 체크
+    [SerializeField]bool isEndReverseAnimation;                 // 반중력 회전 애니메이션 종료
+    [SerializeField]bool isGrounded;                            // 지면인지 체크
     bool isJump;                                // 점프중인지 체크
     bool isBlinking;                            // 회피중인지 체크
     bool isBlinkCoolTimeFleg;                   // 쿨타임 코루틴함수 제어 플래그
@@ -33,7 +33,7 @@ public class CharacterControlMng : Subject, Observer
     float runX;                          // 달리기 제어용 변수
     float runZ;                          // 달리기 제어용 변수
     float rotationSpeed = 100f;                 // 캐릭터 회전 속도
-    float gravity = -9.18f;                     // 중력
+    float gravity = -9.81f;                     // 중력
     float fBliknkCoolTime = 3.0f;               // 회피기 충전 주기
     
     int nBlinkNumber = 2;                       // 회피기 숫자
@@ -70,8 +70,13 @@ public class CharacterControlMng : Subject, Observer
 
     void Start()
     {
+        Rigidbody body = gameObject.GetComponent<Rigidbody>();
+        if (body != null)
+            Destroy(body);
+
         characMng = CharacterManager.Instance;
         TouchController = GameObject.FindGameObjectWithTag("TouchPad").GetComponent<TouchPadController>();
+        
     }
 
     private void OnEnable()
@@ -102,16 +107,16 @@ public class CharacterControlMng : Subject, Observer
         GravityFunc();                      // 중력 함수
         ControllerGetInputData();           // 컨트롤러 값 호출 함수
         RotateCharacter();                  // 캐릭터 회전 함수
-        if(!isBlinking)
+        if (!isBlinking)
         {
-            if(isBattle)
+            if (isBattle)
             {
-                groundDistance = 6f;
+                groundDistance = 3f;
                 RunCharacterFunction();     // 달리기 함수
             }
             else
             {
-                groundDistance = 4f;
+                groundDistance = isGrounded ? 0.3f : 2f;
                 MoveCharacterFunction();    // 걷기 함수
             }
         }
@@ -142,28 +147,28 @@ public class CharacterControlMng : Subject, Observer
     //중력함수
     void GravityFunc()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-        if(!isReverseGround)    // 정중력
-        {
-            if (isGrounded && velocity.y < 0)
-            {
-                velocity.y = -4f; // 지면에 닿아있을 때 y 속도를 초기화
-            }
+        // isReverseGround가 true이면 y 축의 위쪽 방향으로 Ray를 쏘도록 설정
+        Vector3 rayDirection = isReverseGround ? Vector3.up : Vector3.down;
+        // Physics.Raycast를 사용하여 Ray를 발사하여 지면과의 충돌을 체크
+        RaycastHit hitInfo;
+        bool isRaycastHit = Physics.Raycast(groundCheck.position, rayDirection, out hitInfo, groundDistance, groundMask);
 
-            // 중력 적용
-            velocity.y += gravity * Time.deltaTime;
-            isEndReverseAnimation = false;
-        }
-        else                  // 반중력
-        {
-            if (isGrounded && velocity.y < 0)
-            {
-                velocity.y = 4f; // 지면에 닿아있을 때 y 속도를 초기화
-            }
+        // isRaycastHit으로 지면과의 충돌 여부를 확인하여 isGrounded를 업데이트
+        isGrounded = isRaycastHit;
 
-            // 중력 적용 (반대 방향)
-            velocity.y -= gravity * Time.deltaTime;
+        // isGrounded가 true이고 velocity.y가 음수일 때 지면에 닿았음을 확인하여 y 속도를 초기화
+        if (isGrounded && velocity.y < 0)
+        {
+            velocity.y = isReverseGround ? 4f : -4f;
         }
+
+
+
+        // 중력 적용
+        velocity.y += (isReverseGround ? -gravity : gravity) * Time.deltaTime;
+
+        // controller.Move로 이동 처리
+        controller.Move(velocity * Time.deltaTime);
     }
 
     #region 걷기
@@ -181,7 +186,7 @@ public class CharacterControlMng : Subject, Observer
 
         // 객체 이동
         Vector3 move = transform.right * xPos + transform.forward * zPos;
-        if(isEndReverseAnimation)
+        if (isEndReverseAnimation)
             controller.Move((move * 5 - velocity) * Time.deltaTime); // 중력이 적용된 이동
         else
             controller.Move((move * 5 + velocity) * Time.deltaTime); // 중력이 적용된 이동
@@ -190,6 +195,7 @@ public class CharacterControlMng : Subject, Observer
         if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
         {
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_Idle);
+            controller.Move(Vector3.zero);
         }
     }
     #endregion
@@ -209,26 +215,28 @@ public class CharacterControlMng : Subject, Observer
     // 점프 애니메이션 함수
     void JumpCharacterFunction()
     {
-        // 캐릭터가 지면에 있는지를 확인하고 결과를 isGrounded 변수에 저장.
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-        //Debug.Log(nameof(isGrounded) + ":" + isGrounded);
+        // isReverseGround가 true이면 y 축의 위쪽 방향으로 Ray를 쏘도록 설정
+        Vector3 rayDirection = isReverseGround ? Vector3.up : Vector3.down;
+        // Physics.Raycast를 사용하여 Ray를 발사하여 지면과의 충돌을 체크
+        RaycastHit hitInfo;
+        bool isRaycastHit = Physics.Raycast(groundCheck.position, rayDirection, out hitInfo, groundDistance, groundMask);
 
-        // 만약 캐릭터가 지면에 있고(isGrounded가 true) 점프를 시도할 수 있는(isJump가 true) 상태라면
+        isGrounded = isRaycastHit;
+
         if (isGrounded && isJump)
         {
             var mng = gameObject.GetComponent<CharacterAttackMng>();
-            mng.FlagValueReset();   // 점프로 인한, 동작 강탈로 전투 동작 관리에 필요했던 플래그 변수들을 초기화
+            mng.FlagValueReset();  
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_JUMP);
 
-            // 점프를 시도한 후 isJump 값을 false로 변경하여 추가 점프를 방지
             isJump = false;
         }
 
-        // 중력을 적용합니다. velocity.y에 중력(gravity)을 더해준다.
-        velocity.y += gravity * Time.deltaTime;
+        if(isReverseGround)
+            velocity.y -= gravity * Time.deltaTime;
+        else
+            velocity.y += gravity * Time.deltaTime;
 
-        // controller.Move를 사용하여 캐릭터를 점프할 높이(jumpHeight)에 따라 이동.
-        // velocity와 jumpHeight를 곱하고 Time.deltaTime을 곱하여 시간에 따른 이동을 적용.
         controller.Move(velocity * jumpHeight * Time.deltaTime);
     }
     #endregion
@@ -314,6 +322,7 @@ public class CharacterControlMng : Subject, Observer
         {
             // 대기 모드 전환을 위한 함수 호출
             var instance = gameObject.GetComponent<CharacterAttackMng>();
+            controller.Move(Vector3.zero);
             instance.OffBattleMode();
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
         }
@@ -421,6 +430,7 @@ public class CharacterControlMng : Subject, Observer
 
     public void Move_aPoint_to_bPoint(Vector3 aPoint, Vector3 bPoint, float time)
     {
+        controller.Move(Vector3.zero);
         controller.enabled = false;
         characMng.IsControl = false;
         StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time,0));
@@ -467,9 +477,10 @@ public class CharacterControlMng : Subject, Observer
         }
 
 
-        transform.position = bPoint;
         // 종료 시 캐릭터 컨트롤 활성화
+        transform.position = bPoint;
         controller.enabled = true;
+        controller.Move(Vector3.zero);
         characMng.IsControl = true;
         // 코루틴 종료
         yield break;
@@ -502,7 +513,7 @@ public class CharacterControlMng : Subject, Observer
 
     IEnumerator RotateX_Dgree(float targetRotation)
     {
-        float duration = 0.9f;
+        float duration = 1.95f;
         float elapsed = 0f;
         Quaternion startRotation = transform.rotation;
         Quaternion target = Quaternion.Euler(targetRotation, 0, 0);
@@ -515,6 +526,7 @@ public class CharacterControlMng : Subject, Observer
         transform.rotation = target;
         controller.enabled = true;
         isEndReverseAnimation = true;
+        yield break;
     }
     #endregion
 
@@ -563,7 +575,11 @@ public class CharacterControlMng : Subject, Observer
             {
                 isReverseGround = value;
                 StartCoroutine(RotateX_Dgree(value ? 180 : 0));
-             }
+            }
+            if (isReverseGround)
+                Physics.gravity = new Vector3(0, -gravity, 0);
+            else
+                Physics.gravity = new Vector3(0, gravity, 0);
         }
     }
     #endregion

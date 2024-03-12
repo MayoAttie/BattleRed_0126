@@ -123,7 +123,6 @@ public class CameraController : MonoBehaviour, Observer
     public void Start()
     {
 
-
         UI_Manager.Instance.GetWorldMap_Manager.Attach(this);
         _pitch = Mathf.DeltaAngle(0, -transform.localEulerAngles.x);
         _distance = Distance;
@@ -172,6 +171,7 @@ public class CameraController : MonoBehaviour, Observer
         if (Target == null) return;
 
         float characterYaw = Target.eulerAngles.y;
+
         transform.rotation = Quaternion.Euler(transform.eulerAngles.x, characterYaw, transform.eulerAngles.z);
 
         var startPos = Target.position;
@@ -184,8 +184,10 @@ public class CameraController : MonoBehaviour, Observer
         // 캐릭터 위에 원하는 높이를 계산.
         var desiredPosition = result + Vector3.up * DesiredHeight;
 
+
+        CharacterManager CharacMng = CharacterManager.Instance;
         // 점프 감지
-        if (CharacterManager.Instance.GetCharacterClass().GetState() == CharacterClass.eCharactgerState.e_JUMP)
+        if (CharacMng.GetCharacterClass().GetState() == CharacterClass.eCharactgerState.e_JUMP)
         {
             // 점프 상태일 때
             _jumpStartPos = Target.position;  // 점프 시작 위치 업데이트

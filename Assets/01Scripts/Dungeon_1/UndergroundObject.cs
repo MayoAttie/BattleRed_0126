@@ -126,6 +126,8 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         
         Transform endPosTransform = targetObject.transform.Find("EndPos");
         Vector3 destinationPos = endPosTransform != null ? endPosTransform.position : Vector3.zero;
+        if (other.IsTopOjbect)
+            destinationPos += new Vector3(0, -2, 0);
         Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
 
         Transform[] targetColliders = targetObject.transform.GetComponentsInChildren<Transform>().Where(t => t.name == "collider").ToArray();
@@ -157,7 +159,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         UnderObj_CircleBlock targetObject = dic_blocks[destinationName];
 
         Transform endPosTransform = targetObject.transform.Find("EndPos");
-        Vector3 destinationPos = endPosTransform != null ? endPosTransform.position : Vector3.zero;
+        Vector3 destinationPos = endPosTransform.position;
         Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
 
         var controlMng = CharacterManager.Instance.ControlMng;
@@ -198,7 +200,12 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
                 else
                 {
                     Transform originPos = other.transform.Find("EndPos");
-                    CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(originPos.position);
+                    Vector3 newPos;
+                    if (other.IsTopOjbect)
+                        newPos = originPos.position + new Vector3(0, -2, 0);
+                    else
+                        newPos = originPos.position;
+                    CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(newPos);
                     other.CircleTrigger.IsActive = false;
                 }
             }
