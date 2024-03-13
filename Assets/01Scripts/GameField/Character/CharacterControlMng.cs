@@ -42,6 +42,7 @@ public class CharacterControlMng : Subject, Observer
     e_BlinkPos blinkpos;
     #endregion
 
+    public bool debugging= false;
 
     #region 구조체
     public enum e_BlinkPos
@@ -103,7 +104,6 @@ public class CharacterControlMng : Subject, Observer
         {
             blinkCoolTimeCoroutine = StartCoroutine(BlinkCoolTimeReset());
         }
-
         GravityFunc();                      // 중력 함수
         ControllerGetInputData();           // 컨트롤러 값 호출 함수
         RotateCharacter();                  // 캐릭터 회전 함수
@@ -111,12 +111,12 @@ public class CharacterControlMng : Subject, Observer
         {
             if (isBattle)
             {
-                groundDistance = 3f;
+                groundDistance = isReverseGround ? 3.6f : 3f;
                 RunCharacterFunction();     // 달리기 함수
             }
             else
             {
-                groundDistance = isGrounded ? 0.3f : 2f;
+                groundDistance = isReverseGround ? 2.2f : 0.3f;
                 MoveCharacterFunction();    // 걷기 함수
             }
         }
@@ -152,6 +152,12 @@ public class CharacterControlMng : Subject, Observer
         // Physics.Raycast를 사용하여 Ray를 발사하여 지면과의 충돌을 체크
         RaycastHit hitInfo;
         bool isRaycastHit = Physics.Raycast(groundCheck.position, rayDirection, out hitInfo, groundDistance, groundMask);
+
+
+        // 레이캐스트 방향을 시각적으로 확인하기 위해 DrawRay 함수 사용
+        Color rayColor = isRaycastHit ? Color.green : Color.red; // 충돌 여부에 따라 색상 지정
+        DrawRay(groundCheck.position, rayDirection * groundDistance, rayColor, 0.1f); // 충돌 여부에 따라 색상이 다른 레이 그리기
+
 
         // isRaycastHit으로 지면과의 충돌 여부를 확인하여 isGrounded를 업데이트
         isGrounded = isRaycastHit;
@@ -211,7 +217,10 @@ public class CharacterControlMng : Subject, Observer
         }
     }
 
-
+    void DrawRay(Vector3 origin, Vector3 direction, Color color, float duration)
+    {
+        Debug.DrawRay(origin, direction, color, duration);
+    }
     // 점프 애니메이션 함수
     void JumpCharacterFunction()
     {
@@ -220,6 +229,7 @@ public class CharacterControlMng : Subject, Observer
         // Physics.Raycast를 사용하여 Ray를 발사하여 지면과의 충돌을 체크
         RaycastHit hitInfo;
         bool isRaycastHit = Physics.Raycast(groundCheck.position, rayDirection, out hitInfo, groundDistance, groundMask);
+
 
         isGrounded = isRaycastHit;
 
@@ -230,6 +240,7 @@ public class CharacterControlMng : Subject, Observer
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_JUMP);
 
             isJump = false;
+            velocity.y += jumpHeight * Time.deltaTime;
         }
 
         if(isReverseGround)
@@ -431,6 +442,7 @@ public class CharacterControlMng : Subject, Observer
     public void Move_aPoint_to_bPoint(Vector3 aPoint, Vector3 bPoint, float time)
     {
         controller.Move(Vector3.zero);
+        controller.velocity.Set(0,0,0);
         controller.enabled = false;
         characMng.IsControl = false;
         StartCoroutine(MoveAtoB_Smoothly(aPoint, bPoint, time,0));
@@ -471,19 +483,43 @@ public class CharacterControlMng : Subject, Observer
                 newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, newRotation.eulerAngles.z);
             transform.localRotation = newRotation;
 
+            characMng.IsControl = false;
+            controller.enabled = false;
             // 경과 시간 업데이트
             elapsedTime += Time.deltaTime;
             yield return null; // 다음 프레임까지 대기
         }
 
 
+        Rigidbody body = gameObject.GetComponent<Rigidbody>();
+        if (body != null)
+            Destroy(body);
+
         // 종료 시 캐릭터 컨트롤 활성화
         transform.position = bPoint;
+        Debug.Log("MoveAtoB_Smoothly _ bPoint : " + bPoint);
+        Debug.Log("MoveAtoB_Smoothly _ transform.position : " + transform.position);
+
         controller.enabled = true;
         controller.Move(Vector3.zero);
         characMng.IsControl = true;
+
+        StartCoroutine(PositionSet(bPoint, 0.3f));
+
         // 코루틴 종료
         yield break;
+    }
+    IEnumerator PositionSet(Vector3 pos, float time)
+    {
+
+
+        yield return new WaitForSeconds(time);
+        characMng.IsControl = false;
+        controller.enabled = false;
+        transform.position = pos;
+        characMng.IsControl = true;
+        controller.enabled = true;
+        controller.Move(Vector3.zero);
     }
     public void Move_aPoint_to_bPoint(Vector3 targetPoint)
     {
@@ -513,7 +549,7 @@ public class CharacterControlMng : Subject, Observer
 
     IEnumerator RotateX_Dgree(float targetRotation)
     {
-        float duration = 1.95f;
+        float duration = 2f;
         float elapsed = 0f;
         Quaternion startRotation = transform.rotation;
         Quaternion target = Quaternion.Euler(targetRotation, 0, 0);
@@ -521,11 +557,14 @@ public class CharacterControlMng : Subject, Observer
         {
             elapsed += Time.deltaTime;
             transform.rotation = Quaternion.Slerp(startRotation, target, elapsed / duration);
+
+            characMng.IsControl = false;
+            controller.enabled = false;
             yield return null;
         }
         transform.rotation = target;
         controller.enabled = true;
-        isEndReverseAnimation = true;
+        isEndReverseAnimation = !isEndReverseAnimation;
         yield break;
     }
     #endregion
@@ -574,12 +613,12 @@ public class CharacterControlMng : Subject, Observer
             if (isReverseGround != value)
             {
                 isReverseGround = value;
+                if (isReverseGround)
+                    Physics.gravity = new Vector3(0, -gravity, 0);
+                else
+                    Physics.gravity = new Vector3(0, gravity, 0);
                 StartCoroutine(RotateX_Dgree(value ? 180 : 0));
             }
-            if (isReverseGround)
-                Physics.gravity = new Vector3(0, -gravity, 0);
-            else
-                Physics.gravity = new Vector3(0, gravity, 0);
         }
     }
     #endregion

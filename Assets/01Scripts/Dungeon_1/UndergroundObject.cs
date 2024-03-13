@@ -127,7 +127,8 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         Transform endPosTransform = targetObject.transform.Find("EndPos");
         Vector3 destinationPos = endPosTransform != null ? endPosTransform.position : Vector3.zero;
         if (other.IsTopOjbect)
-            destinationPos += new Vector3(0, -2, 0);
+            destinationPos += new Vector3(0, -3, 0);
+        Debug.Log("destinationPos : " + destinationPos);
         Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
 
         Transform[] targetColliders = targetObject.transform.GetComponentsInChildren<Transform>().Where(t => t.name == "collider").ToArray();
@@ -160,6 +161,13 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
 
         Transform endPosTransform = targetObject.transform.Find("EndPos");
         Vector3 destinationPos = endPosTransform.position;
+        if (!other.IsTopOjbect)
+            destinationPos += new Vector3(0, -3, 0);
+        else
+            destinationPos += new Vector3(0, -0.3f, 0);
+
+        Debug.Log("destinationPos : " + destinationPos);
+
         Vector3 nowPos = CharacterManager.Instance.gameObject.transform.position;
 
         var controlMng = CharacterManager.Instance.ControlMng;
@@ -170,6 +178,12 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         controlMng.Move_aPoint_to_bPoint(nowPos, destinationPos, 2f);
         // 각도 변경
         controlMng.IsReverseGround = isReverseGravity;
+
+        if(correctedName == "top03")
+        {
+            Transform[] colliders = other.transform.GetComponentsInChildren<Transform>(true).Where(t => t.name == "collider").ToArray();
+            StartCoroutine(CallColliderOn(colliders, 1.85f));
+        }
     }
 
 

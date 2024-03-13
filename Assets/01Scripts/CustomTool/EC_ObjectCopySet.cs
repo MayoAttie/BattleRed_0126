@@ -26,8 +26,10 @@ public class EC_ObjectCopySet : EditorWindow
         spacingX = EditorGUILayout.FloatField("X축 간격:", spacingX);
         spacingZ = EditorGUILayout.FloatField("Z축 간격:", spacingZ);
         scaleSize = EditorGUILayout.FloatField("객체 사이즈 : ", scaleSize);
-
-        Vector3 originVector3 = originalObject.transform.position;
+        
+        Vector3 originVector3 = default;
+        if (originalObject != null)
+            originVector3 = originalObject.transform.position;
         if (GUILayout.Button("Copy Objects"))
         {
             if (originalObject != null)
