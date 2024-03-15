@@ -493,7 +493,12 @@ public class CharacterControlMng : Subject, Observer
 
         Rigidbody body = gameObject.GetComponent<Rigidbody>();
         if (body != null)
+        {
+            body.useGravity = false;
+            body.angularVelocity = Vector3.zero;
+            body.velocity = Vector3.zero;
             Destroy(body);
+        }
 
         // 종료 시 캐릭터 컨트롤 활성화
         transform.position = bPoint;
@@ -511,8 +516,6 @@ public class CharacterControlMng : Subject, Observer
     }
     IEnumerator PositionSet(Vector3 pos, float time)
     {
-
-
         yield return new WaitForSeconds(time);
         characMng.IsControl = false;
         controller.enabled = false;
@@ -535,6 +538,29 @@ public class CharacterControlMng : Subject, Observer
         CharacterManager.Instance.ControlMng.MyController.enabled = true;
         CharacterManager.Instance.IsControl = true;
     }
+    public void Move_aPoint_to_bPoint(Vector3 targetPoint, float time)
+    {
+        StartCoroutine(Move_aPoint_to_bPointFunc(targetPoint, time));
+    }
+
+    IEnumerator Move_aPoint_to_bPointFunc(Vector3 targetPoint, float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        CharacterManager.Instance.IsControl = false;
+        CharacterManager.Instance.ControlMng.MyController.enabled = false;
+
+        gameObject.transform.position = targetPoint;
+        Vector3 direction = targetPoint - transform.position;
+        direction.y = 0;
+        Quaternion rotation = Quaternion.LookRotation(direction);
+        transform.rotation = rotation;
+
+        CharacterManager.Instance.ControlMng.MyController.enabled = true;
+        CharacterManager.Instance.IsControl = true;
+        yield break;
+    }
+
     // 부모 객체 set관련
     public void ParentsSet(Transform setParetns)
     {

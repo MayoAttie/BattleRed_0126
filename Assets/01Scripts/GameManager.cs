@@ -61,6 +61,7 @@ public class GameManager : Singleton<GameManager>
 
     // 기타
     [SerializeField] Transform objectPoolSavePos;
+    DungeonManager dungeonMng;
 
 
     // 전역변수
@@ -1483,6 +1484,12 @@ public class GameManager : Singleton<GameManager>
                 var subject= tmp.GetComponent<Subject>();
                 subject.Attach(cameraMngObserver);
             }
+            if(tmp.tag == "Manager")
+            {
+                var mng = tmp.GetComponent<DungeonManager>();
+                if (mng != null)
+                    dungeonMng = mng;
+            }
         }
 
 
@@ -1780,7 +1787,7 @@ public class GameManager : Singleton<GameManager>
         get { return list_SpawnPoint; }
     }
 
-
+    public DungeonManager DungeonMng { get { return dungeonMng; } }
     public void SetUserClass(UserClass cls){playerData = cls;}
     #endregion
 

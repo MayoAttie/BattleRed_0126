@@ -49,6 +49,9 @@ public class ObjectManager : Singleton<ObjectManager>
             case "퍼즐 보물상자1":
                 obj.ObjectClickEventSet().onClick.AddListener(() => Dynamic_TreasureBox_1(obj));
                 break;
+            case "지하 박스1":
+                obj.ObjectClickEventSet().onClick.AddListener(() => Dynamic_TreasureBox_2(obj));
+                break;
             case "원소비석_불":
             case "원소비석_물":
             case "원소비석_바람":
@@ -240,7 +243,34 @@ public class ObjectManager : Singleton<ObjectManager>
 
         StartCoroutine(AniPlayWaitAfterFuncStart(length, getItem_list, obj.gameObject));
     }
+    void Dynamic_TreasureBox_2(InteractionObject obj)
+    {
+        IsOpenChecker[obj] = true;
 
+        List<ItemClass> getItem_list = new List<ItemClass>();
+
+        AddItemToList_CopyData("칼바람 울프의 젖니", getItem_list);
+        AddItemToList_CopyData("칼바람 울프의 젖니", getItem_list);
+        AddItemToList_CopyData("칼바람 울프의 젖니", getItem_list);
+        AddItemToList_CopyData("라이언 투사의 족쇄", getItem_list);
+        AddItemToList_CopyData("라이언 투사의 족쇄", getItem_list);
+        AddItemToList_CopyData("라이언 투사의 족쇄", getItem_list);
+        AddItemToList_CopyData("봉마의 두루마리", getItem_list);
+        AddItemToList_CopyData("혼돈의 회로", getItem_list);
+        AddItemToList_CopyData("슬라임청", getItem_list);
+        AddItemToList_CopyData("지맥의 마른 잎", getItem_list);
+
+
+
+        var ani = obj.GetComponent<Animator>();
+        ani.SetBool("isOpen", true);
+        float length = GetAnimationLength(ani, "treasure_chest_open");
+
+        Transform pos = GameManager.Instance.DungeonMng.ObjectTransforms[0];
+        CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(pos.position, 5f);
+
+        StartCoroutine(AniPlayWaitAfterFuncStart(length, getItem_list, obj.gameObject));
+    }
 
     #endregion
 

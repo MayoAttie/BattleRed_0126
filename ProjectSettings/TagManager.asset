@@ -16,6 +16,8 @@ TagManager:
   - MonsterSkillCollider
   - SpawnPoint
   - CameraAttachSubjects
+  - Fire
+  - Manager
   layers:
   - Default
   - TransparentFX

@@ -12,6 +12,8 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     Dictionary<string, Point> matchPathBlocks;                          // 교류가능한 지역과 Line 간 매핑
     [SerializeField]
     float[] targetRotates;                                              // 목표 각도 배열
+    [SerializeField]
+    string rewardObjName;
     #endregion
     #region 구조체
     struct Point
@@ -31,7 +33,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     private void Awake()
     {
         list_underObj_CircleBlock = GetComponentsInChildren<UnderObj_CircleBlock>();
-        foreach(var i in list_underObj_CircleBlock)         // 옵저버 패턴 연결
+        foreach (var i in list_underObj_CircleBlock)         // 옵저버 패턴 연결
         {
             i.Attach(this);
         }
@@ -42,12 +44,12 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     }
     void Start()
     {
-        
+
     }
 
     void Update()
     {
-        
+
     }
 
     #region CircleBlock 관련 함수
@@ -88,6 +90,15 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         bool result = false;
         string correctedName = NameCorrector(other.name);
         Debug.Log("correctedName : " + correctedName);
+
+        // 딕셔너리에서 해당 이름의 값 가져오기
+        if (!matchPathBlocks.TryGetValue(correctedName, out var blockInfo))
+        {
+            // 예외처리: 딕셔너리에서 해당 이름의 값이 없을 경우
+            Debug.LogError("No matching block found in matchPathBlocks dictionary.");
+            return false;
+        }
+
         int index = matchPathBlocks[correctedName].index;
         string laser = matchPathBlocks[correctedName].LineName;
 
@@ -98,10 +109,10 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         // 각도 비교
         if (nowDegree == targetDegree)
         {
-            foreach(var i in list_LightLines)
+            foreach (var i in list_LightLines)
             {
                 string subName = NameCorrector(i.name);
-                if(subName == laser)
+                if (subName == laser)
                 {
                     i.gameObject.SetActive(true);
                     break;
@@ -115,7 +126,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         }
         return result;
     }
-    
+
     // 직선 이동.
     void Move_Between_TwoPoint(UnderObj_CircleBlock other)
     {
@@ -123,7 +134,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         string correctedName = NameCorrector(other.name);
         string destinationName = matchPathBlocks[correctedName].blockName;
         UnderObj_CircleBlock targetObject = dic_blocks[destinationName];
-        
+
         Transform endPosTransform = targetObject.transform.Find("EndPos");
         Vector3 destinationPos = endPosTransform != null ? endPosTransform.position : Vector3.zero;
         if (other.IsTopOjbect)
@@ -179,7 +190,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         // 각도 변경
         controlMng.IsReverseGround = isReverseGravity;
 
-        if(correctedName == "top03")
+        if (correctedName == "top03")
         {
             Transform[] colliders = other.transform.GetComponentsInChildren<Transform>(true).Where(t => t.name == "collider").ToArray();
             StartCoroutine(CallColliderOn(colliders, 1.85f));
@@ -191,6 +202,21 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     string NameCorrector(string name)
     {
         return name.Substring(9);
+    }
+
+    bool CheckLastObject(UnderObj_CircleBlock other, Transform rewardPos)
+    {
+        string correctedName = NameCorrector(other.name);
+        if (correctedName != "end")
+            return false;
+
+        var box = Instantiate(ObjectManager.Instance.TreasureBox, rewardPos);
+        box.transform.localScale *= 8f;
+
+        InteractionObject cls = box.GetComponent<InteractionObject>();
+        cls.Name = rewardObjName;    // 보물상자에 설정된 이름을 초기화. (오브젝트 매니저에서 보상처리할 때 사용)
+        ObjectManager.Instance.IsOpenChecker[cls] = false;
+        return true;
     }
 
     #endregion
@@ -214,13 +240,21 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
                 else
                 {
                     Transform originPos = other.transform.Find("EndPos");
-                    Vector3 newPos;
-                    if (other.IsTopOjbect)
-                        newPos = originPos.position + new Vector3(0, -2, 0);
+                    bool isDestination = CheckLastObject(other, originPos);
+                    if(!isDestination)
+                    {
+                        Vector3 newPos;
+                        if (other.IsTopOjbect)
+                            newPos = originPos.position + new Vector3(0, -2, 0);
+                        else
+                            newPos = originPos.position;
+                        CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(newPos);
+                        other.CircleTrigger.IsActive = false;
+                    }
                     else
-                        newPos = originPos.position;
-                    CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(newPos);
-                    other.CircleTrigger.IsActive = false;
+                    {
+                        other.CircleTrigger.IsActive = true;
+                    }
                 }
             }
         }

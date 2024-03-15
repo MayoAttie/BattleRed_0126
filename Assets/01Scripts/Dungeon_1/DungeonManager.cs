@@ -5,6 +5,7 @@ using UnityEngine;
 public class DungeonManager : MonoBehaviour
 {
     Transform monsters;
+    [SerializeField] Transform[] objectTransforms;
     protected void Awake()
     {
         monsters = GameObject.Find("GameObjParents").transform;
@@ -53,5 +54,5 @@ public class DungeonManager : MonoBehaviour
     // 게터 세터
     public Transform GetMonstersTrasform() { return monsters; }
 
-
+    public Transform[] ObjectTransforms { get { return objectTransforms; } }
 }
