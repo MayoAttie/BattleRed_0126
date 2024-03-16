@@ -464,8 +464,6 @@ public class CharacterControlMng : Subject, Observer
         Quaternion rotation = Quaternion.LookRotation(direction);
         transform.rotation = rotation;
 
-
-
         while (elapsedTime < time)
         {
             // 경과 시간에 따른 이동 보간
@@ -490,7 +488,6 @@ public class CharacterControlMng : Subject, Observer
             yield return null; // 다음 프레임까지 대기
         }
 
-
         Rigidbody body = gameObject.GetComponent<Rigidbody>();
         if (body != null)
         {
@@ -502,8 +499,6 @@ public class CharacterControlMng : Subject, Observer
 
         // 종료 시 캐릭터 컨트롤 활성화
         transform.position = bPoint;
-        Debug.Log("MoveAtoB_Smoothly _ bPoint : " + bPoint);
-        Debug.Log("MoveAtoB_Smoothly _ transform.position : " + transform.position);
 
         controller.enabled = true;
         controller.Move(Vector3.zero);
@@ -647,6 +642,7 @@ public class CharacterControlMng : Subject, Observer
             }
         }
     }
+
     #endregion
 
     #region 옵저버 패턴

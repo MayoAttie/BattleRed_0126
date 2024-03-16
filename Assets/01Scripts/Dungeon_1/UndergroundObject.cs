@@ -42,15 +42,6 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
             i.gameObject.SetActive(false);
         InitBlocksMatch();
     }
-    void Start()
-    {
-
-    }
-
-    void Update()
-    {
-
-    }
 
     #region CircleBlock 관련 함수
 

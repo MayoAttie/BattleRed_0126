@@ -50,13 +50,14 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
     // 회전 함수
     IEnumerator RotateSmoothlyReverse(GameObject obj)
     {
-        CharacterManager.Instance.ControlMng.ParentsSet(this.transform);
         // 초기 각도 설정
         float currentAngle = nowRotateY % 360;
 
         float X = transform.rotation.eulerAngles.z;
         float targetY = (currentAngle + 90) % 360;
         float epsilon = 0.01f; // 근사치 보정에 사용할 값
+
+        CharacterManager chMng = CharacterManager.Instance;
 
         if (targetY != 0)
         {
@@ -67,6 +68,7 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
                 obj.transform.rotation = newRotation;
                 // 현재 각도 업데이트
                 currentAngle = obj.transform.rotation.eulerAngles.y;
+
 
                 yield return null;
             }
@@ -80,6 +82,7 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
 
                 currentAngle = obj.transform.rotation.eulerAngles.y;
 
+
                 yield return null;
             }
         }
@@ -89,7 +92,6 @@ public class UnderObj_CircleBlock : Subject, IObjectTriggerCheckFunc
         nowRotateY = targetY;
         // 총 관리 클래스에 옵저버 패턴으로 알림
         CallUndergroundObjectNorify(this);
-        CharacterManager.Instance.ControlMng.ReturnOriginParents();
         isHitted = false;
         yield break;
     }
