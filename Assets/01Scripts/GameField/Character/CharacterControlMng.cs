@@ -60,6 +60,8 @@ public class CharacterControlMng : Subject, Observer
     private void Awake()
     {
         isReverseGround = false;
+        isEndReverseAnimation = false;
+        Physics.gravity = new Vector3(0,gravity,0);
         controller = gameObject.GetComponent<CharacterController>();
         groundCheck = gameObject.transform;
         isBlinkCoolTimeFleg = false;
