@@ -430,6 +430,7 @@ public class CharacterControlMng : Subject, Observer
         isBlinking = false;
         isBlinkStart = false;
 
+        characMng.AttackMng.CallCurtainOff(0.09f);
     }
 
     public void GetBlinkStartNotify()

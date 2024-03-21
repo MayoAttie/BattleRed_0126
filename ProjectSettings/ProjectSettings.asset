@@ -254,7 +254,7 @@ PlayerSettings:
   AndroidTargetDevices: 0
   AndroidSplashScreenScale: 0
   androidSplashScreen: {fileID: 0}
-  AndroidKeystoreName: G:/Build_Project/BattleRed_master.keystore
+  AndroidKeystoreName: '{dedicated}: BattleRed_master.keystore'
   AndroidKeyaliasName: master
   AndroidBuildApkPerCpuArchitecture: 0
   AndroidTVCompatibility: 0

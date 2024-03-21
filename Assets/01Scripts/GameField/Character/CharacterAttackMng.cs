@@ -156,6 +156,8 @@ public class CharacterAttackMng : Subject, Observer
         if (isClickedCoolCheck == true)
             return;
 
+        isClickedCoolCheck = true; // 클릭 쿨타임 중임을 나타내는 플래그를 true로 설정
+
         darkCurtain.SetActive(true);
         characMng.SetIsBattle(true);
         Element.e_Element element = characMng.GetElement();
@@ -181,8 +183,6 @@ public class CharacterAttackMng : Subject, Observer
     // 버튼 쿨타임 함수
     IEnumerator ButtonClickedCoolTime(float time, ButtonClass ClickedBtnCls)
     {
-        isClickedCoolCheck = true; // 클릭 쿨타임 중임을 나타내는 플래그를 true로 설정
-
         float elapsedTime = 0f; // 경과 시간 초기화
         float fillAmountStart = 0f;
         float fillAmountEnd = 1f;
@@ -209,20 +209,25 @@ public class CharacterAttackMng : Subject, Observer
     {
         // 어두운 커튼이 활성화된 경우
         if (darkCurtain.activeSelf == true)
-            Invoke("CurtainOff", 1.1f); // 1.1초 후에 CurtainOff 함수 호출
+            CallCurtainOff(1.1f);
         SwordColider.SetActive(true);
 
         // 공격 스킬 시작을 알림 -> 카메라/조명 제어 함수
         NotifyAttackSkillStart();
     }
-    public void CurtainOff()
+    public void CallCurtainOff(float time)
     {
-        if (darkCurtain.activeSelf == false)
-            return;
+        StartCoroutine(CurtainOff(time));
+    }
+    IEnumerator CurtainOff(float time)
+    {
+        yield return new WaitForSeconds(time);
         darkCurtain.SetActive(false);
 
         // 공격 스킬 종료를 알림 -> 카메라/조명 제어 함수
         NotifyAttackSkillEnd();
+        yield break;
+
     }
     public void AttackSkillAniEnd()
     {

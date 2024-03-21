@@ -402,12 +402,12 @@ public class CameraController : MonoBehaviour, Observer
 
     public void AttackSkillStartNotify()
     {
-        if(LightObject!=null)
+        //if(LightObject!=null)
             LightObject.gameObject.SetActive(false);
     }
     public void AttackSkillEndNotify()
     {
-        if (LightObject != null)
+        //if (LightObject != null)
             LightObject.gameObject.SetActive(true);
     }
 
