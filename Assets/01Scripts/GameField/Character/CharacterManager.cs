@@ -490,6 +490,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         UI_Manager.Instance.HpBarFill_End(cls.GetMaxHp(), cls.GetCurrentHp(), false);
     }
 
+
     #endregion
 
 
@@ -532,6 +533,10 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
     {
         get { return isControl; }
         set { isControl = value; }
+    }
+    public Animator GetAnimator()
+    {
+        return aniController;
     }
 
     public void SetIsBattle(bool b) { isBattle = b; }

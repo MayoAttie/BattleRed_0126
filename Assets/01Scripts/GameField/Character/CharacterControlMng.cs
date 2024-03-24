@@ -4,6 +4,7 @@ using UnityEngine;
 using static TouchPadController;
 using static HandlePauseTool;
 using static UI_UseToolClass;
+using static UseTool;
 using UnityEngine.AI;
 
 public class CharacterControlMng : Subject, Observer
@@ -17,27 +18,28 @@ public class CharacterControlMng : Subject, Observer
 
     Vector3 velocity;
     public bool isBattle;                              // 전투중인지 체크
-    [SerializeField]bool isReverseGround;                       // 반중력 체크
-    [SerializeField]bool isEndReverseAnimation;                 // 반중력 회전 애니메이션 종료
-    [SerializeField]bool isGrounded;                            // 지면인지 체크
-    bool isJump;                                // 점프중인지 체크
+    bool isReverseGround;                       // 반중력 체크
+    bool isEndReverseAnimation;                 // 반중력 회전 애니메이션 종료
+    bool isGrounded;                            // 지면인지 체크
+    [SerializeField]bool isJump;                                // 점프중인지 체크
     bool isBlinking;                            // 회피중인지 체크
     bool isBlinkCoolTimeFleg;                   // 쿨타임 코루틴함수 제어 플래그
     bool isBlinkStart;                          // 블링크 애니메이션이 시작되었는지 체크
     
 
-    float jumpHeight = 2f;                      // 점프 높이
+    float jumpHeight = 2.5f;                      // 점프 높이
     float groundDistance = 0f;                // 지면과의 거리
-    float zPos;                          // 제어용 좌표 값
-    float xPos;                          // 제어용 좌표 값
-    float runX;                          // 달리기 제어용 변수
-    float runZ;                          // 달리기 제어용 변수
+    float zPos;                                 // 제어용 좌표 값
+    float xPos;                                 // 제어용 좌표 값
+    float runX;                                 // 달리기 제어용 변수
+    float runZ;                                 // 달리기 제어용 변수
     float rotationSpeed = 100f;                 // 캐릭터 회전 속도
     float gravity = -9.81f;                     // 중력
     float fBliknkCoolTime = 3.0f;               // 회피기 충전 주기
     
     int nBlinkNumber = 2;                       // 회피기 숫자
     Coroutine blinkCoolTimeCoroutine;           // Coroutine 객체를 저장할 변수
+    Coroutine jumpFinishCoroutine;              // 점프 애니메이션 관리용 코루틴
     CharacterManager characMng;                 // 캐릭터 매니저 싱글턴
     e_BlinkPos blinkpos;
     #endregion
@@ -200,7 +202,7 @@ public class CharacterControlMng : Subject, Observer
             controller.Move((move * 5 + velocity) * Time.deltaTime); // 중력이 적용된 이동
 
         // x,y 값이 0에 가까우면, 이동을 멈추고 iDle상태로 바꿈
-        if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
+        if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
         {
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_Idle);
             controller.Move(Vector3.zero);
@@ -237,20 +239,33 @@ public class CharacterControlMng : Subject, Observer
 
         if (isGrounded && isJump)
         {
-            var mng = gameObject.GetComponent<CharacterAttackMng>();
+            var mng = characMng.AttackMng;
             mng.FlagValueReset();  
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_JUMP);
 
-            isJump = false;
+            //isJump = false;
             velocity.y += jumpHeight * Time.deltaTime;
+            controller.Move(velocity * jumpHeight * Time.deltaTime);
+            if (jumpFinishCoroutine == null)
+                jumpFinishCoroutine = StartCoroutine(JumFinish());
         }
 
-        if(isReverseGround)
-            velocity.y -= gravity * Time.deltaTime;
-        else
-            velocity.y += gravity * Time.deltaTime;
+        if(!isJump)
+        {
+            if (isReverseGround)
+                velocity.y -= gravity * Time.deltaTime;
+            else
+                velocity.y += gravity * Time.deltaTime;
+        }
 
-        controller.Move(velocity * jumpHeight * Time.deltaTime);
+    }
+    IEnumerator JumFinish()
+    {
+        float time = GetAnimationLength(characMng.GetAnimator(), "Jump");
+        yield return new WaitForSeconds(time);
+        isJump = false;
+        jumpFinishCoroutine = null;
+        yield break;
     }
     #endregion
 
@@ -331,7 +346,7 @@ public class CharacterControlMng : Subject, Observer
 
 
         // x,y 값이 0에 가까우면, 이동을 멈추고 ATTACK 상태로 바꿈
-        if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
+        if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
         {
             // 대기 모드 전환을 위한 함수 호출
             var instance = gameObject.GetComponent<CharacterAttackMng>();
@@ -391,6 +406,8 @@ public class CharacterControlMng : Subject, Observer
             controller.Move(moveDirection);
         }
         NotifyBlinkValue(blinkpos);
+        StartCoroutine(BlinkFinish());
+
         characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_AVOID);
         // 옵저버에게 블링크 값 넘기기
     }
@@ -423,14 +440,34 @@ public class CharacterControlMng : Subject, Observer
         }
     }
 
-    public void GetBlinkEndNotify() // 블링크 종료됨을 Get하여, 반영
+    IEnumerator BlinkFinish()
     {
-        Debug.Log(nameof(GetBlinkEndNotify));
+        float time;
+        string[] names = { "Tumbling", "L-Tumbling", "R-Tumbling", "B-Tumbling" };
+        string name = "";
+        switch(blinkpos)
+        {
+            case e_BlinkPos.Front:
+                name = names[0];
+                break;
+            case e_BlinkPos.Back:
+                name = names[3];
+                break;
+            case e_BlinkPos.Right:
+                name = names[2];
+                break;
+            case e_BlinkPos.Left:
+                name = names[1];
+                break;
+        }
+        time = GetAnimationLength(characMng.GetAnimator(), name);
+        yield return new WaitForSeconds(time);
+
         blinkpos = e_BlinkPos.None;
         isBlinking = false;
         isBlinkStart = false;
 
-        characMng.AttackMng.CallCurtainOff(0.09f);
+        characMng.AttackMng.CallCurtainOff(0.11f);
     }
 
     public void GetBlinkStartNotify()
@@ -644,6 +681,11 @@ public class CharacterControlMng : Subject, Observer
                 StartCoroutine(RotateX_Dgree(value ? 180 : 0));
             }
         }
+    }
+    public bool IsJump
+    {
+        get { return isJump; }
+        set { isJump = value; }
     }
 
     #endregion

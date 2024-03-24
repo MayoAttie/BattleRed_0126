@@ -97,6 +97,8 @@ public class CharacterAttackMng : Subject, Observer
     // 버튼으로 호출되는 공격 함수
     public void CharaceterAttackCheck()
     {
+        if (characMng.ControlMng.IsJump == true)
+            return;
 
         isClick = true;
         characMng.SetIsBattle(true);
@@ -150,7 +152,7 @@ public class CharacterAttackMng : Subject, Observer
 
     public void AttackSkillStart()
     {
-        if (darkCurtain.activeSelf == true)
+        if (darkCurtain.activeSelf == true || characMng.ControlMng.IsJump == true)
             return;
 
         if (isClickedCoolCheck == true)
