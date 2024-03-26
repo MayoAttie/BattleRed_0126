@@ -27,7 +27,6 @@ public class CharacterControlMng : Subject, Observer
     bool isBlinkStart;                          // 블링크 애니메이션이 시작되었는지 체크
     
 
-    float jumpHeight = 2.5f;                      // 점프 높이
     float groundDistance = 0f;                // 지면과의 거리
     float zPos;                                 // 제어용 좌표 값
     float xPos;                                 // 제어용 좌표 값
@@ -36,6 +35,8 @@ public class CharacterControlMng : Subject, Observer
     float rotationSpeed = 100f;                 // 캐릭터 회전 속도
     float gravity = -9.81f;                     // 중력
     float fBliknkCoolTime = 3.0f;               // 회피기 충전 주기
+    float jumpSpeed = 10f;                      // 점프력 변수
+    float verticalSpeed = 0f;                   // 수직 속력 변수
     
     int nBlinkNumber = 2;                       // 회피기 숫자
     Coroutine blinkCoolTimeCoroutine;           // Coroutine 객체를 저장할 변수
@@ -81,7 +82,8 @@ public class CharacterControlMng : Subject, Observer
 
         characMng = CharacterManager.Instance;
         TouchController = GameObject.FindGameObjectWithTag("TouchPad").GetComponent<TouchPadController>();
-        
+
+        InvokeRepeating("RemoveRigidBody", 0f, 2.5f);
     }
 
     private void OnEnable()
@@ -138,7 +140,7 @@ public class CharacterControlMng : Subject, Observer
         //Debug.Log(nameof(xPos) + ":" + xPos);
 
         // 회피 중이 아닐 때, 걷기 혹은 달리기 상태로 캐릭터의 상태를 지정함
-        if (!isBlinking)
+        if (!isBlinking && !isJump)
         {
             if (!isBattle)
                 characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_WALK);
@@ -151,6 +153,9 @@ public class CharacterControlMng : Subject, Observer
     //중력함수
     void GravityFunc()
     {
+        if (isJump)
+            return;
+
         // isReverseGround가 true이면 y 축의 위쪽 방향으로 Ray를 쏘도록 설정
         Vector3 rayDirection = isReverseGround ? Vector3.up : Vector3.down;
         // Physics.Raycast를 사용하여 Ray를 발사하여 지면과의 충돌을 체크
@@ -218,6 +223,7 @@ public class CharacterControlMng : Subject, Observer
         if (isGrounded)
         {
             isJump = true;
+            verticalSpeed = jumpSpeed;
         }
     }
 
@@ -234,7 +240,6 @@ public class CharacterControlMng : Subject, Observer
         RaycastHit hitInfo;
         bool isRaycastHit = Physics.Raycast(groundCheck.position, rayDirection, out hitInfo, groundDistance, groundMask);
 
-
         isGrounded = isRaycastHit;
 
         if (isGrounded && isJump)
@@ -243,9 +248,13 @@ public class CharacterControlMng : Subject, Observer
             mng.FlagValueReset();  
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_JUMP);
 
-            //isJump = false;
-            velocity.y += jumpHeight * Time.deltaTime;
-            controller.Move(velocity * jumpHeight * Time.deltaTime);
+            verticalSpeed -= (isReverseGround == true ? gravity : -gravity) * Time.deltaTime;
+
+            Vector3 verticalMove = new Vector3(0f, verticalSpeed, 0f);
+            controller.Move(verticalMove * Time.deltaTime);
+
+            //velocity.y += jumpHeight * Time.deltaTime;
+            //controller.Move(velocity * jumpHeight * Time.deltaTime);
             if (jumpFinishCoroutine == null)
                 jumpFinishCoroutine = StartCoroutine(JumFinish());
         }
@@ -478,6 +487,12 @@ public class CharacterControlMng : Subject, Observer
     #endregion
 
     #region 기타이동
+
+    void RemoveRigidBody()
+    {
+        Rigidbody body = gameObject.GetComponent<Rigidbody>();
+        if(body != null) Destroy(body); 
+    }
 
     public void Move_aPoint_to_bPoint(Vector3 aPoint, Vector3 bPoint, float time)
     {
