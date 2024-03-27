@@ -99,4 +99,13 @@ public abstract class Subject : MonoBehaviour
             tmp.CallUndergroundObjectNorify(other);
         }
     }
+
+    // 캐릭터 회전 알림 _ 카메라 수신
+    public void CharacterRotate_NotifyForCamera()
+    {
+        foreach(Observer tmp in _observers)
+        {
+            tmp.CharacterRotate_NotifyForCamera();
+        }
+    }
 }

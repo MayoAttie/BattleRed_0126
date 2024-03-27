@@ -170,9 +170,8 @@ public class CameraController : MonoBehaviour, Observer
 
         if (Target == null) return;
 
-        float characterYaw = Target.eulerAngles.y;
-
-        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, characterYaw, transform.eulerAngles.z);
+        //float characterYaw = Target.eulerAngles.y;
+        //transform.rotation = Quaternion.Euler(transform.eulerAngles.x, characterYaw, transform.eulerAngles.z);
 
         var startPos = Target.position;
         var endPos = startPos - transform.forward * Distance;
@@ -307,7 +306,9 @@ public class CameraController : MonoBehaviour, Observer
             if (playerObject != null)
             {
                 CharacterAttackMng characMng = playerObject.GetComponent<CharacterAttackMng>();
+                CharacterControlMng characConMng = playerObject.GetComponent<CharacterControlMng>();
                 characMng.Attach(this);
+                characConMng.Attach(this);
                 // Player 레이어에 속한 객체 찾기
                 Target = playerObject.transform;
 
@@ -318,10 +319,15 @@ public class CameraController : MonoBehaviour, Observer
                 // x축 각도를 8로 보정
                 targetRotation *= Quaternion.Euler(16, 0, 0);
                 transform.rotation = targetRotation;
+
+
+                float characterYaw = Target.eulerAngles.y;
+                transform.rotation = Quaternion.Euler(transform.eulerAngles.x, characterYaw, transform.eulerAngles.z);
             }
             isFindTarget = false;
         }
     }
+    
 
     // 리스트 내의 좌표들을 순회하며 부드럽게 움직임
     IEnumerator MoveToTargetByLerp()
@@ -439,6 +445,12 @@ public class CameraController : MonoBehaviour, Observer
     }
 
     public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
+
+    public void CharacterRotate_NotifyForCamera()
+    {   // 캐릭터 회전 수신
+        float characterYaw = Target.eulerAngles.y;
+        transform.rotation = Quaternion.Euler(transform.eulerAngles.x, characterYaw, transform.eulerAngles.z);
+    }
 
 
     #endregion

@@ -582,6 +582,8 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
 
     public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
 
+    public void CharacterRotate_NotifyForCamera(){}
+
 
 
     #endregion

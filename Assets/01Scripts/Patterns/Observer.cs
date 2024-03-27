@@ -12,5 +12,6 @@ public interface Observer
     void WorldMapCloseNotify();
     void ConvertToTargetStateNotify(List<Vector3> listTarget);
     void CallUndergroundObjectNorify(UnderObj_CircleBlock other);
+    void CharacterRotate_NotifyForCamera();
 }
 

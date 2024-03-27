@@ -293,16 +293,18 @@ public class CharacterControlMng : Subject, Observer
         {
             // 캐릭터를 오른쪽으로 회전시킵니다.
             newRotation *= Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
+            CharacterRotate_NotifyForCamera();
         }
         // 만약 수평 방향 입력이 왼쪽(Left)으로 감지된 경우
         else if (touchDic == e_TouchSlideDic.Left)
         {
             // 캐릭터를 왼쪽으로 회전시킵니다.
             newRotation *= Quaternion.Euler(0, -rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
+            CharacterRotate_NotifyForCamera();
         }
 
         // 회전 중이 아닌 경우에도 x축 회전값을 유지하기 위해 이전 회전값을 복원
-        if(isEndReverseAnimation)
+        if (isEndReverseAnimation)
             newRotation.eulerAngles = new Vector3(newRotation.eulerAngles.x, newRotation.eulerAngles.y, 180);
         else
             newRotation.eulerAngles = new Vector3(0, newRotation.eulerAngles.y, newRotation.eulerAngles.z);

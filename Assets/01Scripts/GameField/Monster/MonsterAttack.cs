@@ -251,6 +251,8 @@ public class MonsterAttack : MonoBehaviour, Observer
 
     public void CallUndergroundObjectNorify(UnderObj_CircleBlock other){}
 
+    public void CharacterRotate_NotifyForCamera(){}
+
 
 
     #endregion

@@ -186,6 +186,11 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
             Transform[] colliders = other.transform.GetComponentsInChildren<Transform>(true).Where(t => t.name == "collider").ToArray();
             StartCoroutine(CallColliderOn(colliders, 1.85f));
         }
+        if (correctedName == "bot01")
+        {
+            Transform[] colliders = other.transform.GetComponentsInChildren<Transform>(true).Where(t => t.name == "collider").ToArray();
+            StartCoroutine(CallColliderOn(colliders, 1.95f));
+        }
     }
 
 
@@ -270,6 +275,8 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
     public void WorldMapCloseNotify() { }
 
     public void ConvertToTargetStateNotify(List<Vector3> listTarget) { }
+
+    public void CharacterRotate_NotifyForCamera(){}
 
 
     #endregion
