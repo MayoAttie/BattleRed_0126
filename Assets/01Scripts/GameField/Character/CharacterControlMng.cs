@@ -37,6 +37,7 @@ public class CharacterControlMng : Subject, Observer
     float fBliknkCoolTime = 3.0f;               // 회피기 충전 주기
     float jumpSpeed = 10f;                      // 점프력 변수
     float verticalSpeed = 0f;                   // 수직 속력 변수
+    float yDegreeSave;                          // y축 각도를 저장하기 위한 변수(달리기에 사용)
     
     int nBlinkNumber = 2;                       // 회피기 숫자
     Coroutine blinkCoolTimeCoroutine;           // Coroutine 객체를 저장할 변수
@@ -103,6 +104,8 @@ public class CharacterControlMng : Subject, Observer
     {
         if (!characMng.IsControl)
             return;
+
+        Debug.Log("zpos: " + zPos + " xpos: " + xPos);
 
         isBattle = characMng.GetIsBattle();
         // 코루틴이 실행 중이지 않은 경우에만 코루틴을 시작.
@@ -209,6 +212,7 @@ public class CharacterControlMng : Subject, Observer
         // x,y 값이 0에 가까우면, 이동을 멈추고 iDle상태로 바꿈
         if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
         {
+            yDegreeSave = 0;
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_Idle);
             controller.Move(Vector3.zero);
         }
@@ -274,6 +278,7 @@ public class CharacterControlMng : Subject, Observer
         yield return new WaitForSeconds(time);
         isJump = false;
         jumpFinishCoroutine = null;
+        yDegreeSave = 0;
         yield break;
     }
     #endregion
@@ -293,6 +298,7 @@ public class CharacterControlMng : Subject, Observer
         {
             // 캐릭터를 오른쪽으로 회전시킵니다.
             newRotation *= Quaternion.Euler(0, rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
+            yDegreeSave = 0;
             CharacterRotate_NotifyForCamera();
         }
         // 만약 수평 방향 입력이 왼쪽(Left)으로 감지된 경우
@@ -300,6 +306,7 @@ public class CharacterControlMng : Subject, Observer
         {
             // 캐릭터를 왼쪽으로 회전시킵니다.
             newRotation *= Quaternion.Euler(0, -rotationSpeed * Time.deltaTime, 0);  // y축 회전만 적용
+            yDegreeSave = 0;
             CharacterRotate_NotifyForCamera();
         }
 
@@ -319,53 +326,136 @@ public class CharacterControlMng : Subject, Observer
     //달리기 애니메이션 함수
     private void RunCharacterFunction()
     {
-
         characMng.AnimatorFloatValueSetter(zPos, xPos);
         GravityFunc();
 
-        if (Mathf.Abs(xPos - 1f) < 0.1f)
-        {
-            // 오른쪽으로 방향 전환 (90도 회전)
-            Quaternion targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y + 150f, 0f);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
-        else if (Mathf.Abs(xPos + 1f) < 0.1f)
-        {
-            // 왼쪽으로 방향 전환 (90도 회전)
-            Quaternion targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y - 150f, 0f);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
-        }
-        else if (Mathf.Abs(zPos + 1f) < 0.06f)
-        {
-            // 이동 멈추기
-            xPos = 0f;
-            zPos = 0f;
 
-            var instance = gameObject.GetComponent<CharacterAttackMng>();
-            instance.ShildAct();
-            characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+        // 좌우 이동값에 따라 회전 각도 설정
+        if (xPos < -0.8f) // 좌
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y - 90f;
+        }
+        if (xPos > 0.8f) // 우
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y + 90f;
         }
 
+        // 상하 이동값에 따라 회전 각도 보정
+        if (zPos > 0.9f) // 상
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y;
+        }
+        if (zPos < -0.9f) // 하
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y - 180f;
+        }
 
-        Vector3 move = transform.right * xPos + transform.forward * zPos;
-        // 객체 이동
-        if (isEndReverseAnimation)
-            controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
-        else
-            controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+        //// right up
+        if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y + 45f;
+        }
+        // left down
+        if (zPos < -0.4f && zPos > -0.7 && xPos > -0.7 && xPos < -0.4)
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y - 135f;
+        }
+        // left up
+        if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y - 45f;
+        }
+        // right down
+        if (zPos < -0.4f && zPos > -0.7 && xPos > 0.4 && xPos < 0.7)
+        {
+            if (yDegreeSave == 0)
+                yDegreeSave = transform.eulerAngles.y + 135f;
+        }
 
 
 
-        // x,y 값이 0에 가까우면, 이동을 멈추고 ATTACK 상태로 바꿈
+
+
+        // 이동이 멈추면 ATTACK 상태로 전환
         if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
         {
-            // 대기 모드 전환을 위한 함수 호출
+            yDegreeSave = 0;
             var instance = gameObject.GetComponent<CharacterAttackMng>();
             controller.Move(Vector3.zero);
             instance.OffBattleMode();
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
         }
+        else
+        {
+            // 회전 각도 적용
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, yDegreeSave, transform.eulerAngles.z);
+
+            // 이동 처리
+            Vector3 move = transform.forward;
+            if (isEndReverseAnimation)
+                controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
+            else
+                controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+        }
     }
+    //레거시 달리기 애니메이션 함수
+    //private void RunCharacterFunction()
+    //{
+
+    //    characMng.AnimatorFloatValueSetter(zPos, xPos);
+    //    GravityFunc();
+
+    //    if (Mathf.Abs(xPos - 1f) < 0.1f)
+    //    {
+    //        // 오른쪽으로 방향 전환 (90도 회전)
+    //        Quaternion targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y + 150f, 0f);
+    //        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    //    }
+    //    else if (Mathf.Abs(xPos + 1f) < 0.1f)
+    //    {
+    //        // 왼쪽으로 방향 전환 (90도 회전)
+    //        Quaternion targetRotation = Quaternion.Euler(0f, transform.eulerAngles.y - 150f, 0f);
+    //        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    //    }
+    //    else if (Mathf.Abs(zPos + 1f) < 0.06f)
+    //    {
+    //        // 이동 멈추기
+    //        xPos = 0f;
+    //        zPos = 0f;
+
+    //        var instance = gameObject.GetComponent<CharacterAttackMng>();
+    //        instance.ShildAct();
+    //        characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+    //    }
+
+
+    //    Vector3 move = transform.right * xPos + transform.forward * zPos;
+    //    // 객체 이동
+    //    if (isEndReverseAnimation)
+    //        controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
+    //    else
+    //        controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+
+
+
+    //    // x,y 값이 0에 가까우면, 이동을 멈추고 ATTACK 상태로 바꿈
+    //    if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
+    //    {
+    //        // 대기 모드 전환을 위한 함수 호출
+    //        var instance = gameObject.GetComponent<CharacterAttackMng>();
+    //        controller.Move(Vector3.zero);
+    //        instance.OffBattleMode();
+    //        characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+    //    }
+    //}
+
     #endregion
 
     #region 회피기
@@ -477,7 +567,7 @@ public class CharacterControlMng : Subject, Observer
         blinkpos = e_BlinkPos.None;
         isBlinking = false;
         isBlinkStart = false;
-
+        yDegreeSave = 0;
         characMng.AttackMng.CallCurtainOff(0.11f);
     }
 

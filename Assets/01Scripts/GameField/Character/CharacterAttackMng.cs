@@ -310,6 +310,9 @@ public class CharacterAttackMng : Subject, Observer
     // 막기 동작 시작 함수
     public void ShildAct()
     {
+        if (!isBattle)
+            return;
+
         nAtkLevel = (int)e_AttackLevel.Brock;
         NotifyAtkLevel((e_AttackLevel)nAtkLevel);
         isBrock = true;
@@ -342,6 +345,12 @@ public class CharacterAttackMng : Subject, Observer
             skillBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(skillBtn);
             skillBtnObj.onClick.AddListener(() => AttackSkillStart());
+
+            ButtonClass blockBtn = parents.GetChild(9).GetComponent<ButtonClass>();
+            var blockBtnObj = blockBtn.GetButton();
+            blockBtnObj.onClick.RemoveAllListeners();
+            ButtonClass_Reset(blockBtn);
+            blockBtnObj.onClick.AddListener(() => ShildAct());
         }
     }
 

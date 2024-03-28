@@ -71,11 +71,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         UI_Manager.Instance.HpBarFill_Init(clsCharacter.GetCurrentHp());
         UI_Manager.Instance.HpBarFill_End(clsCharacter.GetMaxHp(), clsCharacter.GetCurrentHp(), true);
         element = clsCharacter.GetCurrnetElement().GetElement();    // 캐릭터 클래스 - 현재 원소 초기화
-
-        ///DontDestroyOnLoad 객체의 파인드 방법 강구하기.
-        ///객체를 찾지 못하는 오류 발생.
-        ///씬 전환 간에 원활한 객체 생성 불가.
-        ///방법1 : DontDestroy객체를 List에 저장하여 보관.
+        element = clsCharacter.GetCurrnetElement().GetElement();    // 캐릭터 클래스 - 현재 원소 초기화
 
         sideUI_ObjPrintTransformObject = GameObject.Find("Drop_Item_ScrolView").GetComponent<Drop_Item_ScrolViewMng>();
 
