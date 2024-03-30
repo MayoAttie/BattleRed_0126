@@ -62,6 +62,7 @@ public class GameManager : Singleton<GameManager>
     // 기타
     [SerializeField] Transform objectPoolSavePos;
     DungeonManager dungeonMng;
+    GameObject mainCamera;
 
 
     // 전역변수
@@ -1450,6 +1451,7 @@ public class GameManager : Singleton<GameManager>
                 UI_Manager.Instance.GetWorldMap_Manager.MinimapCamera = cameraMng.MiniMapCamera;
                 UI_Manager.Instance.GetWorldMap_Manager.CameraFarSize = cameraMng.MiniMapSize;
                 UI_Manager.Instance.GetWorldMap_Manager._cameraController = cameraMng;
+                mainCamera = tmp;
                 break;
             }
         }
@@ -1789,6 +1791,10 @@ public class GameManager : Singleton<GameManager>
 
     public DungeonManager DungeonMng { get { return dungeonMng; } }
     public void SetUserClass(UserClass cls){playerData = cls;}
+    public GameObject MainCamera
+    {
+        get { return mainCamera; }
+    }
     #endregion
 
 }

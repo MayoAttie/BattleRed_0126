@@ -334,49 +334,48 @@ public class CharacterControlMng : Subject, Observer
         if (xPos < -0.8f) // 좌
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y - 90f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 90f;
         }
         if (xPos > 0.8f) // 우
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y + 90f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 90f;
         }
 
         // 상하 이동값에 따라 회전 각도 보정
-        if (zPos > 0.9f) // 상
+        if (zPos > 0.8f) // 상
         {
-            if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y;
+             yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y;
         }
-        if (zPos < -0.9f) // 하
+        if (zPos < -0.8f) // 하
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y - 180f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 180f;
         }
 
         //// right up
         if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y + 45f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 45f;
         }
         // left down
         if (zPos < -0.4f && zPos > -0.7 && xPos > -0.7 && xPos < -0.4)
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y - 135f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 135f;
         }
         // left up
         if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y - 45f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 45f;
         }
         // right down
         if (zPos < -0.4f && zPos > -0.7 && xPos > 0.4 && xPos < 0.7)
         {
             if (yDegreeSave == 0)
-                yDegreeSave = transform.eulerAngles.y + 135f;
+                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 135f;
         }
 
 
