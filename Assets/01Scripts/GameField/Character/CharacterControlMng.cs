@@ -330,79 +330,104 @@ public class CharacterControlMng : Subject, Observer
         GravityFunc();
 
 
-        // 좌우 이동값에 따라 회전 각도 설정
-        if (xPos < -0.8f) // 좌
+        if (zPos > 0.3f)
         {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 90f;
-        }
-        if (xPos > 0.8f) // 우
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 90f;
-        }
+            if (xPos>0.7f)
+            {
+                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y + 40f, 0f);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
+            else if (xPos<-0.7f)
+            {
+                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y - 40f, 0f);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            }
+            else
+            {
+                float degree = GameManager.Instance.MainCamera.transform.eulerAngles.y;
+                transform.rotation = Quaternion.Euler(transform.eulerAngles.x, degree, transform.eulerAngles.z);
+            }
 
-        // 상하 이동값에 따라 회전 각도 보정
-        if (zPos > 0.8f) // 상
-        {
-             yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y;
-        }
-        if (zPos < -0.8f) // 하
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 180f;
-        }
-
-        //// right up
-        if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 45f;
-        }
-        // left down
-        if (zPos < -0.4f && zPos > -0.7 && xPos > -0.7 && xPos < -0.4)
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 135f;
-        }
-        // left up
-        if (zPos > 0.4f && zPos < 0.7 && xPos > -0.7 && xPos < -0.4)
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 45f;
-        }
-        // right down
-        if (zPos < -0.4f && zPos > -0.7 && xPos > 0.4 && xPos < 0.7)
-        {
-            if (yDegreeSave == 0)
-                yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 135f;
-        }
-
-
-
-
-
-        // 이동이 멈추면 ATTACK 상태로 전환
-        if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
-        {
-            yDegreeSave = 0;
-            var instance = gameObject.GetComponent<CharacterAttackMng>();
-            controller.Move(Vector3.zero);
-            instance.OffBattleMode();
-            characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
-        }
-        else
-        {
-            // 회전 각도 적용
-            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, yDegreeSave, transform.eulerAngles.z);
-
-            // 이동 처리
-            Vector3 move = transform.forward;
+            Vector3 move = transform.right * xPos + transform.forward * zPos;
+            // 객체 이동
             if (isEndReverseAnimation)
                 controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
             else
                 controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+
+            yDegreeSave = 0;
+
+            // 이동이 멈추면 ATTACK 상태로 전환
+            if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
+            {
+                var instance = gameObject.GetComponent<CharacterAttackMng>();
+                controller.Move(Vector3.zero);
+                instance.OffBattleMode();
+                characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+            }
         }
+        else
+        {
+            // 좌우 이동값에 따라 회전 각도 설정
+            if (xPos < -0.8f) // 좌
+            {
+                if (yDegreeSave == 0)
+                    yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 90f;
+            }
+            if (xPos > 0.8f) // 우
+            {
+                if (yDegreeSave == 0)
+                    yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 90f;
+            }
+            if (zPos < -0.8f) // 하
+            {
+                if (yDegreeSave == 0)
+                    yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 180f;
+            }
+            else
+            {
+                // left down
+                if (xPos<0)
+                {
+                    if (yDegreeSave == 0)
+                        yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y - 135f;
+                }
+                // right down
+                else
+                {
+                    if (yDegreeSave == 0)
+                        yDegreeSave = GameManager.Instance.MainCamera.transform.eulerAngles.y + 135f;
+                }
+            }
+
+            // 회전 각도 적용
+            transform.rotation = Quaternion.Euler(transform.eulerAngles.x, yDegreeSave, transform.eulerAngles.z);
+
+
+            // 이동이 멈추면 ATTACK 상태로 전환
+            if (Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f) && !isJump)
+            {
+                yDegreeSave = 0;
+                var instance = gameObject.GetComponent<CharacterAttackMng>();
+                controller.Move(Vector3.zero);
+                instance.OffBattleMode();
+
+                float dgree = GameManager.Instance.MainCamera.transform.eulerAngles.y;
+                transform.rotation = Quaternion.Euler(transform.eulerAngles.x, dgree, transform.eulerAngles.z);
+                characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+            }
+            else
+            {
+                // 이동 처리
+                Vector3 move = transform.forward;
+                if (isEndReverseAnimation)
+                    controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
+                else
+                    controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
+
+            }
+        }
+
     }
     //레거시 달리기 애니메이션 함수
     //private void RunCharacterFunction()
