@@ -24,16 +24,19 @@ public class UserClass
 
     [SerializeField] private string userMail;
 
+    List<QuestClass> questList;
+
     public UserClass() 
     {
         userCharacter = new CharacterClass(300, 300, 0, 100, 50, 20, 1, 20, 3.0f, CharacterClass.eCharactgerState.e_NONE, 50, 120, 50, 2.8f, "플레이어", "Knight", 0, true, 100, 20, 0, 0, 0);
-        
+
         hadWeaponList = new List<ItemClass>();
         hadEquipmentList = new List<ItemClass>();
         hadGemList = new List<ItemClass>();
         hadFoodList = new List<ItemClass>();
         hadEtcItemList = new List<ItemClass>();
         hadGrowMaterialList = new List<ItemClass>();
+        questList = new List<QuestClass>();
 
         userEquippedWeapon = new ItemClass();
         userEquippedEquipment = new ItemClass[5];
@@ -70,6 +73,8 @@ public class UserClass
         hadGrowMaterialList = new List<ItemClass>();
         userEquippedWeapon = new ItemClass();
         userEquippedEquipment = new ItemClass[5];
+        questList = new List<QuestClass>();
+
 
         this.nMora = nMora;
         this.nStarLight = nStarLight;
@@ -121,6 +126,7 @@ public class UserClass
     public void SetHadFoodList(List<ItemClass> hadFoodList) { this.hadFoodList= hadFoodList; }
     public void SetHadEtcItemList(List<ItemClass> hadEtcItemList) { this.hadEtcItemList = hadEtcItemList; }
     public void SetHadGrowMaterialList(List<ItemClass> hadGrowMaterialList) { this.hadGrowMaterialList= hadGrowMaterialList; }
+    public void SetQuestList(List<QuestClass> questList) { this.questList = questList; }
     public void SetUserLastConnectTime(DateTime userLastConnectTime) { this.userLastConnectTime = userLastConnectTime; }
     public void SetMora(int nMora) { this.nMora = nMora; }
 
@@ -133,6 +139,7 @@ public class UserClass
     public List<ItemClass> GetHadFoodList() { return this.hadFoodList; }
     public List<ItemClass> GetHadGrowMaterialList() { return this.hadGrowMaterialList; }
     public List<ItemClass> GetHadEtcItemList() { return hadEtcItemList; } 
+    public List<QuestClass> GetQuestList() { return questList; }
     public DateTime GetUserLastConnectTime() { return this.userLastConnectTime; }
     public int GetMora() { return this.nMora; }
 

@@ -111,8 +111,6 @@
     <Compile Include="Assets\01Scripts\GameField\Object\ObjectTriggerEnterCheck.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\PuzzleObject.cs" />
     <Compile Include="Assets\01Scripts\GameField\Objects.cs" />
-    <Compile Include="Assets\01Scripts\GameField\Quest\QuestClass.cs" />
-    <Compile Include="Assets\01Scripts\GameField\Quest\QuestManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\TimelineManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\AttackRange.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\CharacterViewRange.cs" />
@@ -147,6 +145,8 @@
     <Compile Include="Assets\01Scripts\Patterns\Observer.cs" />
     <Compile Include="Assets\01Scripts\Patterns\Singleton.cs" />
     <Compile Include="Assets\01Scripts\Patterns\Subject.cs" />
+    <Compile Include="Assets\01Scripts\Quest\QuestClass.cs" />
+    <Compile Include="Assets\01Scripts\Quest\QuestManager.cs" />
     <Compile Include="Assets\01Scripts\SceneMaster\DontDestroyer.cs" />
     <Compile Include="Assets\01Scripts\SceneMaster\SceneLoadManager.cs" />
     <Compile Include="Assets\01Scripts\UseTool.cs" />

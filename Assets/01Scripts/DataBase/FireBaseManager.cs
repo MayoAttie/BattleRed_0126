@@ -255,6 +255,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 }
             });
 
+        SaveQuestData(userID);
     }
 
 
@@ -304,6 +305,26 @@ public class FireBaseManager : Singleton<FireBaseManager>
         {
             Debug.LogWarning("유저 " + nodeName + " 데이터가 없습니다.");
         }
+    }
+
+    void SaveQuestData(string userID)
+    {
+        List<QuestClass> questDatas = GameManager.Instance.GetUserClass().GetQuestList();
+
+        // 리스트 저장
+        Dictionary<string, object>[] itemDataArray = questDatas.Select(item => item?.ToDictionary()).ToArray();
+        dbReference.Child("userID").Child(userID).Child("UserData").Child("questData").SetValueAsync(itemDataArray)
+            .ContinueWithOnMainThread(itemListTask =>
+            {
+                if (itemListTask.IsCompleted)
+                {
+                    Debug.Log("유저 " + "퀘스트 데이터" + " 데이터 저장 완료");
+                }
+                else
+                {
+                    Debug.LogError("유저 " + "퀘스트 데이터" + " 데이터 저장 실패: " + itemListTask.Exception);
+                }
+            });
     }
 
     #endregion
@@ -365,6 +386,8 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     LoadUserMora(snapshot);
                     LoadUserStar(snapshot);
                     LoadUserMail(snapshot);
+
+                    LoadQuestData(snapshot);
 
                     Debug.Log("유저 데이터 로드 완료");
                 }
@@ -667,6 +690,64 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 {
                     T data = JsonConvert.DeserializeObject<T>(itemDataString);
                     onDataLoaded?.Invoke(data);
+                }
+            }
+        }
+    }
+
+    void LoadQuestData(DataSnapshot snapshot)
+    {
+        if (snapshot.Exists)
+        {
+            List<QuestClass> questData = GameManager.Instance.GetUserClass().GetQuestList();
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+            if (userDataDict != null)
+            {
+                if (userDataDict.ContainsKey("questData"))
+                {
+                    object itemDataObject = userDataDict["questData"];
+
+                    if (itemDataObject is IList<object> itemDataList)
+                    {
+                        List<QuestClass> fullList = new List<QuestClass>();
+
+                        foreach (var data in itemDataList)
+                        {
+                            if (data is IDictionary<string, object> stringDataList)
+                            {
+                                Dictionary<string, object> convertDic = new Dictionary<string, object>();
+
+                                foreach (var stringData in stringDataList)
+                                {
+                                    string key = stringData.Key;
+                                    object value = stringData.Value;
+                                    convertDic.Add(key, value);
+                                }
+
+                                QuestClass newItem = new QuestClass();
+                                newItem.SetFromDictionary(convertDic);
+                                fullList.Add(newItem);
+                            }
+                            else
+                            {
+                                Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+                            }
+                        }
+
+                        questData.Clear();
+                        questData.AddRange(fullList);
+                        Debug.Log("퀘스트 데이터 로드 완료");
+
+
+                        // 퀘스트 타임 체크 및 재설정
+                        QuestManager questMng =  QuestManager.Instance;
+                        if (questMng != null)
+                            questMng.QuestD_DayRest();
+                    }
+                    else
+                    {
+                        Debug.LogError("퀘스트 데이터 형식 오류");
+                    }
                 }
             }
         }

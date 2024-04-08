@@ -1047,7 +1047,6 @@ public class GameManager : Singleton<GameManager>
         playerData.SetUserEquippedWeapon(playerData.GetHadWeaponList().Find(item => item.GetIsActive() == true));
         playerData.SetUserEquippedEquipment(playerData.GetHadEquipmentList().FindAll(item => item.GetIsActive() == true).ToArray());
 
-
         CharacterDataReviseToWeapon();
         CharacterDataReviseToEquipment();
     }
@@ -1493,8 +1492,6 @@ public class GameManager : Singleton<GameManager>
                     dungeonMng = mng;
             }
         }
-
-
 
     }
 
