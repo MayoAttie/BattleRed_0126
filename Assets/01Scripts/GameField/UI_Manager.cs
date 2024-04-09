@@ -100,13 +100,22 @@ public class UI_Manager : EnergyBarManager
     #endregion
 
 
-    #region 오브젝트 관련 변수
+    #region 오브젝트 관련 변수 _ Class
 
     [Header("합성대 (Synthesis's Values)")]
     public InventoryButton[] SynthesisTypeButtons;                             // 인벤토리 아이템 타입 선택 버튼들(0- 성유물 합성,1- 무기 합성, 2-기타 합성)
     public GameObject SynthesisObjectScreen;                                    // 합성대 UI 오브젝트
     public Synthesis synthesis;
 
+    #endregion
+
+    #region 퀘스트 UI 관련 변수 _ Class
+
+    [Header("퀘스트 변수들 (Quest_UI's Values)")]
+
+    Quest_UI questUi_;
+    public GameObject quest_ui_object;
+    public GameObject quest_ui_prefab;
 
     #endregion
 
@@ -143,7 +152,7 @@ public class UI_Manager : EnergyBarManager
     }
     #endregion
 
-
+    #region Awake - Start
     private void Awake()
     {
         // 싱글턴 인스턴스 설정
@@ -181,11 +190,15 @@ public class UI_Manager : EnergyBarManager
         
 
     }
-   
     private void Start()
     {
         synthesis = new Synthesis();
     }
+
+    #endregion
+
+    #region Update
+
     private void Update()
     {
         if (touchPad != null && touchPad.gameObject.activeSelf == true)
@@ -205,6 +218,8 @@ public class UI_Manager : EnergyBarManager
             }
         }
     }
+
+    #endregion
 
 
     #region 인벤토리 UI 관리
@@ -3127,6 +3142,37 @@ public class UI_Manager : EnergyBarManager
 
     #region 기타 및 툴
 
+    // 씬 전환 간 컨트롤러 함수 연결 초기화
+    public void UI_Manager_ControllerSet()
+    {
+        var parents = GameObject.FindGameObjectWithTag("Controller").transform;
+        if (parents != null)
+        {
+            ButtonClass bagOpenBtn = parents.GetChild(7).GetComponent<ButtonClass>();
+            var bagOpenBtnObj = bagOpenBtn.GetButton();
+            bagOpenBtnObj.onClick.RemoveAllListeners();
+            ButtonClass_Reset(bagOpenBtn);
+            bagOpenBtnObj.onClick.AddListener(() => BagOpenButtonClick());
+
+            ButtonClass infoOpenBtn = parents.GetChild(8).GetComponent<ButtonClass>();
+            var infoOpenBtnObj = infoOpenBtn.GetButton();
+            infoOpenBtnObj.onClick.RemoveAllListeners();
+            ButtonClass_Reset(infoOpenBtn);
+            infoOpenBtnObj.onClick.AddListener(() => OpenPlayerInfoScreenButton());
+
+            if(questUi_ == null)
+            {
+                questUi_ = new Quest_UI();
+            }
+
+            ButtonClass questUiBtn = parents.GetChild(10).GetComponent<ButtonClass>();
+            var questUiBtnOnj = questUiBtn.GetButton();
+            questUiBtnOnj.onClick.RemoveAllListeners();
+            ButtonClass_Reset(questUiBtn);
+            questUiBtnOnj.onClick.AddListener(() => questUi_.InitOpen());
+        }
+    }
+
     private void ResetToSelectButtonScriptPoolDatas()
     {
         // 오브젝트 풀로 가져온 각 버튼에 Button이벤트를 Remove함
@@ -3173,25 +3219,7 @@ public class UI_Manager : EnergyBarManager
     }
 
 
-    // 씬 전환 간 컨트롤러 함수 연결 초기화
-    public void UI_Manager_ControllerSet()
-    {
-        var parents = GameObject.FindGameObjectWithTag("Controller").transform;
-        if (parents != null)
-        {
-            ButtonClass bagOpenBtn = parents.GetChild(7).GetComponent<ButtonClass>();
-            var bagOpenBtnObj = bagOpenBtn.GetButton();
-            bagOpenBtnObj.onClick.RemoveAllListeners();
-            ButtonClass_Reset(bagOpenBtn);
-            bagOpenBtnObj.onClick.AddListener(() => BagOpenButtonClick());
 
-            ButtonClass infoOpenBtn = parents.GetChild(8).GetComponent<ButtonClass>();
-            var infoOpenBtnObj = infoOpenBtn.GetButton();
-            infoOpenBtnObj.onClick.RemoveAllListeners();
-            ButtonClass_Reset(infoOpenBtn);
-            infoOpenBtnObj.onClick.AddListener(() => OpenPlayerInfoScreenButton());
-        }
-    }
 
 
     public void WorldMapOpenButtonClick()
@@ -3244,7 +3272,7 @@ public class UI_Manager : EnergyBarManager
 
 
 
-    #region 오브젝트 제어 클래스
+    #region 오브젝트 제어 클래스 _ Class
 
     public class Synthesis 
     {
@@ -4169,11 +4197,65 @@ public class UI_Manager : EnergyBarManager
 
     }
 
+    #endregion
 
 
+    #region 퀘스트 UI 클래스 _ Class
+
+    public class Quest_UI
+    {
+        GameObject parents_Ui_object;               // 퀘스트 ui 출력용 마스터 오브젝트
+        Transform scrollView_contentObj;            // 퀘스트 ui 출력 스크롤뷰
+        GameObject scrollview_prefab;               // 스크롤뷰 콘텐츠 프리팹
+        List<ButtonClass2> questTypeButton;         // 타입 선택 버튼
+
+        bool is_dataSet;
+
+        public Quest_UI()
+        {
+            is_dataSet = false;
+            parents_Ui_object = instance.quest_ui_object;
+            parents_Ui_object.SetActive(false);
+        }
+
+        // 퀘스트 창 오픈 버튼 클릭
+        public void InitOpen()
+        {
+            parents_Ui_object.SetActive(true);
+            DataSetting();
+        }
+
+        void CloseButtonClick()
+        {
+            parents_Ui_object.SetActive(false);
+        }
+
+        void DataSetting()
+        {
+            if (is_dataSet)
+                return;
+
+            scrollView_contentObj = parents_Ui_object.transform.GetChild(0).GetChild(3).GetChild(0).GetChild(0).GetChild(0);
+
+            questTypeButton = new List<ButtonClass2>();
+            Transform buttonsParents = parents_Ui_object.transform.GetChild(0).GetChild(0);
+            ButtonClass2 btn1 = buttonsParents.GetChild(0).GetComponent<ButtonClass2>();
+            ButtonClass2 btn2 = buttonsParents.GetChild(1).GetComponent<ButtonClass2>();
+            ButtonClass2 btn3 = buttonsParents.GetChild(2).GetComponent<ButtonClass2>();
+
+            questTypeButton.Add(btn1);
+            questTypeButton.Add(btn2);
+            questTypeButton.Add(btn3);
+
+            scrollview_prefab = instance.quest_ui_prefab;
+
+            Button closeBtn = parents_Ui_object.transform.GetChild(0).GetChild(2).GetComponent<Button>();
+            closeBtn.onClick.AddListener(() => CloseButtonClick());
 
 
-
+            is_dataSet = true;
+        }
+    }
 
     #endregion
 }
