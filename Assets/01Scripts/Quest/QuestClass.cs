@@ -10,6 +10,7 @@ public class QuestClass
         DayToDay,   // 일일임무
         WeekToWeek, // 주간임무
         Normal,     // 일반임무
+        All,        // 전체(정렬용)
         Max
     }
 
@@ -132,14 +133,15 @@ public class QuestClass
         {
             if(targetValue is List<object> targetList)
             {
-                List_TargetNum = new List<float>();
+                list_TargetNum = new List<float>();
                 foreach(var target in targetList)
                 {
                     if(target is float values)
                     {
-                        List_TargetNum.Add(values);
+                        list_TargetNum.Add(values);
                     }
                 }
+                list_TargetNum = List_TargetNum;
             }
         }
         if (dict.TryGetValue("list_CurrentNum", out object currentValue))

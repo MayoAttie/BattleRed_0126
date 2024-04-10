@@ -115,7 +115,7 @@ public class UI_Manager : EnergyBarManager
 
     Quest_UI questUi_;
     public GameObject quest_ui_object;
-    public GameObject quest_ui_prefab;
+    public Quest_ui_prefab_Cls quest_ui_prefab;
 
     #endregion
 
@@ -4205,11 +4205,16 @@ public class UI_Manager : EnergyBarManager
     public class Quest_UI
     {
         GameObject parents_Ui_object;               // 퀘스트 ui 출력용 마스터 오브젝트
-        Transform scrollView_contentObj;            // 퀘스트 ui 출력 스크롤뷰
-        GameObject scrollview_prefab;               // 스크롤뷰 콘텐츠 프리팹
-        List<ButtonClass2> questTypeButton;         // 타입 선택 버튼
+        Transform pos_scrollView_contentObj;            // 퀘스트 ui 출력 스크롤뷰
+        Quest_ui_prefab_Cls scrollview_prefab;      // 스크롤뷰 콘텐츠 프리팹
+        List<Quest_ui_prefab_Cls> list_activePrefabs;    // 출력된 프리팹 객체들
 
-        bool is_dataSet;
+        Transform rewardObj;                        // 보상출력 객체
+        TextMeshProUGUI rewardPrintText;            // 보삭출력 텍스트 객체
+
+        QuestClass.e_QuestType sortType;            // 선택된 정렬 타입
+
+        bool is_dataSet;                            // 클래스 세팅 완료 유무 체크변수
 
         public Quest_UI()
         {
@@ -4218,43 +4223,212 @@ public class UI_Manager : EnergyBarManager
             parents_Ui_object.SetActive(false);
         }
 
+        #region 기본함수
+
         // 퀘스트 창 오픈 버튼 클릭
         public void InitOpen()
         {
             parents_Ui_object.SetActive(true);
             DataSetting();
+            Scrollview_dataPrint();
         }
 
+        // 퀘스트 창 종료 버튼 클릭
         void CloseButtonClick()
         {
+            RewardObjectClose();
+            ResetScrollview();
             parents_Ui_object.SetActive(false);
         }
 
+        // ui 데이터 및 오브젝트 세팅
         void DataSetting()
         {
             if (is_dataSet)
                 return;
 
-            scrollView_contentObj = parents_Ui_object.transform.GetChild(0).GetChild(3).GetChild(0).GetChild(0).GetChild(0);
-
-            questTypeButton = new List<ButtonClass2>();
-            Transform buttonsParents = parents_Ui_object.transform.GetChild(0).GetChild(0);
-            ButtonClass2 btn1 = buttonsParents.GetChild(0).GetComponent<ButtonClass2>();
-            ButtonClass2 btn2 = buttonsParents.GetChild(1).GetComponent<ButtonClass2>();
-            ButtonClass2 btn3 = buttonsParents.GetChild(2).GetComponent<ButtonClass2>();
-
-            questTypeButton.Add(btn1);
-            questTypeButton.Add(btn2);
-            questTypeButton.Add(btn3);
-
+            // 마스터 객체 인스턴스화
+            pos_scrollView_contentObj = parents_Ui_object.transform.GetChild(0).GetChild(3).GetChild(0).GetChild(0).GetChild(0);
+            // 스크롤뷰 출력 ui 프리팹
             scrollview_prefab = instance.quest_ui_prefab;
+            
+            // 출력 활성화된 객체 저장용 리스트
+            list_activePrefabs = new List<Quest_ui_prefab_Cls>();
 
-            Button closeBtn = parents_Ui_object.transform.GetChild(0).GetChild(2).GetComponent<Button>();
+            // 타입 선택 버튼 함수 설정
+            Transform buttonsParents = parents_Ui_object.transform.GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0);
+            ButtonClass2 btn1 = buttonsParents.GetChild(0).GetComponent<ButtonClass2>();    // 일일
+            ButtonClass2 btn2 = buttonsParents.GetChild(1).GetComponent<ButtonClass2>();    // 주간
+            ButtonClass2 btn3 = buttonsParents.GetChild(2).GetComponent<ButtonClass2>();    // 일반
+            ButtonClass2 btn4 = buttonsParents.GetChild(3).GetComponent<ButtonClass2>();    // 전체
+
+            QuestClass.e_QuestType typeDay = QuestClass.e_QuestType.DayToDay;
+            QuestClass.e_QuestType typeWeek = QuestClass.e_QuestType.WeekToWeek;
+            QuestClass.e_QuestType typeNorbal = QuestClass.e_QuestType.Normal;
+            QuestClass.e_QuestType typeAll = QuestClass.e_QuestType.All;
+
+            btn1.GetButton().onClick.AddListener(() => SortSelectButton(typeDay));
+            btn2.GetButton().onClick.AddListener(() => SortSelectButton(typeWeek));
+            btn3.GetButton().onClick.AddListener(() => SortSelectButton(typeNorbal));
+            btn4.GetButton().onClick.AddListener(() => SortSelectButton(typeAll));
+
+
+            Button closeBtn = parents_Ui_object.transform.GetChild(0).GetChild(1).GetComponent<Button>();
             closeBtn.onClick.AddListener(() => CloseButtonClick());
+
+            // 보상 출력 객체 세팅
+            rewardObj = parents_Ui_object.transform.GetChild(0).GetChild(4);
+            rewardPrintText = rewardObj.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>();
+            
+            Button rewardOutBtn = rewardObj.GetChild(0).GetComponent<Button>();
+            rewardOutBtn.onClick.AddListener(() => RewardObjectClose());
+            sortType = QuestClass.e_QuestType.DayToDay;
+
+            rewardObj.gameObject.SetActive(false);
 
 
             is_dataSet = true;
         }
+
+        #endregion
+
+        #region 퀘스트 출력
+
+        // 정렬 버튼
+        void SortSelectButton(QuestClass.e_QuestType type)
+        {
+            ResetScrollview();
+            sortType = type;
+            Scrollview_dataPrint();
+        }
+
+        // 스크롤뷰 초기화
+        void ResetScrollview()
+        {
+            foreach(var i in list_activePrefabs)
+            {
+                Destroy(i.gameObject);
+            }
+            list_activePrefabs.Clear();
+        }
+        // 특정 객체 스크롤 뷰에서 제거
+        void DestroyTargetPrefab(Quest_ui_prefab_Cls target)
+        {
+            list_activePrefabs.Remove(target);
+            Destroy(target.gameObject);
+        }
+
+        // 스크롤뷰 데이터 출력
+        void Scrollview_dataPrint()
+        {
+            List<QuestClass> questDatas = GameManager.Instance.GetUserClass().GetQuestList();
+            
+            if(questDatas == null)
+            {
+                Debug.LogError("유저-퀘스트 데이터 리스트 널");
+                return;
+            }    
+
+            foreach(QuestClass quest in questDatas)
+            {
+                if (quest.QuestType != sortType)
+                {
+                    if(sortType != QuestClass.e_QuestType.All)
+                        continue;
+                }
+
+                if (quest.IsQuestActive == false)               // 퀘스트가 비활성 상태라면 스킵
+                    continue;
+
+                Quest_ui_prefab_Cls tmp = Instantiate(scrollview_prefab, Vector2.zero, Quaternion.identity ,pos_scrollView_contentObj);
+
+                tmp.QuestData = quest;          // 퀘스트 세팅
+
+                // 타입 출력
+                if (quest.QuestType == QuestClass.e_QuestType.DayToDay)
+                    tmp.TypeText.text = "일일";
+                if (quest.QuestType == QuestClass.e_QuestType.WeekToWeek)
+                    tmp.TypeText.text = "주간";
+                if (quest.QuestType == QuestClass.e_QuestType.Normal)
+                    tmp.TypeText.text = "일반";
+
+                // 버튼 연결
+                tmp.ButtonObj.onClick.RemoveAllListeners();
+                tmp.ButtonObj.onClick.AddListener(()=> QuestManager.Instance.ClearQuestCheck(tmp,this));
+
+
+                // 데이터 출력
+                Quest_ui_prefab_Print(tmp, quest);
+                list_activePrefabs.Add(tmp);            // 객체 생성 후, 리스트 삽입
+            }
+        }
+
+        // 내용 출력 함수
+        public void Quest_ui_prefab_Print(Quest_ui_prefab_Cls obj, QuestClass cls)
+        {
+            // 내용 출력
+            obj.ContentText.text = cls.Explanation;
+
+            // 진행사항 표시
+            float maxValue = 0;
+            foreach (float i in cls.List_TargetNum)
+            { maxValue += i; }
+
+            float curValue = 0;
+            foreach (float i in cls.List_CurrentNum)
+            { curValue += i; }
+
+            float fillAmount = curValue / maxValue;
+            obj.FillProgress = fillAmount;
+
+            // 알파값 수정
+            AlphaRevise(obj);
+        }
+
+        void AlphaRevise(Quest_ui_prefab_Cls obj)
+        {
+            Image img_parentObj = obj.Img_parentObj;
+            Image img_typeTextBgr = obj.Img_typeTextBgr;
+            TextMeshProUGUI typeText = obj.TypeText;
+            TextMeshProUGUI titleText = obj.TitleText;
+            TextMeshProUGUI contentText = obj.ContentText;
+
+            if (obj.QuestData.IsClear)
+            {
+                img_parentObj.color = new Color(img_parentObj.color.r, img_parentObj.color.g, img_parentObj.color.b, 0.6f);
+                img_typeTextBgr.color = new Color(img_typeTextBgr.color.r, img_typeTextBgr.color.g, img_typeTextBgr.color.b, 0.6f);
+                typeText.alpha = 0.6f;
+                titleText.alpha = 0.6f;
+                contentText.alpha = 0.6f;
+            }
+            else
+            {
+                img_parentObj.color = new Color(img_parentObj.color.r, img_parentObj.color.g, img_parentObj.color.b, 1.0f);
+                img_typeTextBgr.color = new Color(img_typeTextBgr.color.r, img_typeTextBgr.color.g, img_typeTextBgr.color.b, 1.0f);
+                typeText.alpha = 1.0f;
+                titleText.alpha = 1.0f;
+                contentText.alpha = 1.0f;
+            }
+        }
+
+
+
+        #endregion
+
+        #region 보상 출력
+
+        public void RewardObjectOpen()
+        {
+            rewardObj.gameObject.SetActive(true);
+        }
+
+        void RewardObjectClose()
+        {
+            rewardObj.gameObject.SetActive(false);
+        }
+        
+
+        #endregion
     }
 
     #endregion

@@ -115,4 +115,39 @@ public class QuestManager : Singleton<QuestManager>
     }
 
     #endregion
+
+
+    #region 클리어 체크 및 처리
+
+    // 클리어 상태 체크
+    public void ClearQuestCheck(Quest_ui_prefab_Cls obj, UI_Manager.Quest_UI master)
+    {
+        float maxValue = 0;
+        foreach (float i in obj.QuestData.List_TargetNum)
+        { maxValue += i; }
+
+        float curValue = 0;
+        foreach (float i in obj.QuestData.List_CurrentNum)
+        { curValue += i; }
+
+        // 퀘스트 클리어 가능일 시,
+        if(curValue == maxValue)
+        {   // 보상창 출력
+            master.RewardObjectOpen();
+            obj.QuestData.IsClear = true;
+
+            // 클리어 시, 내용 수정
+            master.Quest_ui_prefab_Print(obj, obj.QuestData);
+        }
+        else
+        {
+            return;
+        }
+    }
+
+    #endregion
+
+    #region 퀘스트 진행 처리
+    
+    #endregion
 }
