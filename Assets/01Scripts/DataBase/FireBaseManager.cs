@@ -387,7 +387,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     LoadUserStar(snapshot);
                     LoadUserMail(snapshot);
 
-                    LoadQuestData(snapshot);
+                    //LoadQuestData(snapshot);
 
                     Debug.Log("유저 데이터 로드 완료");
                 }

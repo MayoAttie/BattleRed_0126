@@ -4417,9 +4417,10 @@ public class UI_Manager : EnergyBarManager
 
         #region 보상 출력
 
-        public void RewardObjectOpen()
+        public void RewardObjectOpen(string text)
         {
             rewardObj.gameObject.SetActive(true);
+            rewardPrintText.text = text;
         }
 
         void RewardObjectClose()

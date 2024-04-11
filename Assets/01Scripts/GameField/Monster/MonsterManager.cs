@@ -223,20 +223,21 @@ public class MonsterManager : Subject, Observer
     // 몬스터 사망시, 오브젝트 풀 리턴
     void DeadAnimation()
     {
-        MonsterManager monsterManager = GetComponent<MonsterManager>();
+        QuestManager.Instance.Kill_andProgressUp(monster);
+        //MonsterManager monsterManager = GetComponent<MonsterManager>();
         string name = monster.GetName();
         switch (name)
         {
             case "Cactus":
-                ItemDropManager.Instance.ItemDrop(this.transform, "무기");    // 무기 드랍
-                GameManager.Instance.CactusPool.ReturnToPool(monsterManager);
+                ItemDropManager.Instance.ItemDrop(transform, "무기");    // 무기 드랍
+                GameManager.Instance.CactusPool.ReturnToPool(this);
                 break;
             case "MushroomAngry":
-                ItemDropManager.Instance.ItemDrop(this.transform, "성유물");   // 성유물 드랍
-                GameManager.Instance.MushroomAngryPool.ReturnToPool(monsterManager);
+                ItemDropManager.Instance.ItemDrop(transform, "성유물");   // 성유물 드랍
+                GameManager.Instance.MushroomAngryPool.ReturnToPool(this);
                 break;
             case "Golem_Boss":
-                GameManager.Instance.GolemBossPool.ReturnToPool(monsterManager);
+                GameManager.Instance.GolemBossPool.ReturnToPool(this);
                 break;
             default: break;
         }
