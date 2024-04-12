@@ -33,11 +33,19 @@ public class QuestManager : Singleton<QuestManager>
             this.targetNumIdx = targetNumIdx;
         }
     }
+    public enum e_ClearedQuest     // 클리어한 퀘스트 enum 
+    {
+        NONE,
+        Dungeon_UndgerLabyrinth,
+        Dungeon_DicePuzzle,
+        MAX
+    }
 
     #endregion
 
-    Dictionary<string, List<idxSet>> dic_monsterAnd_questIdx;
-    Dictionary<int, QuestReward> dic_rewardSet;
+    Dictionary<string, List<idxSet>> dic_kill_MonsterAnd_questIdx;          // 킬몬스터 _ 퀘스트 인덱스 find 맵
+    Dictionary<int, QuestReward> dic_rewardSet;                             // 퀘스트 클리어 후 보상 find 맵
+    Dictionary<e_ClearedQuest, List<idxSet>> dic_questCleared_Idx;          // 퀘스트 진행 후, 인덱스 find 맵
     private void Awake()
     {
         InitDataSet();
@@ -57,22 +65,15 @@ public class QuestManager : Singleton<QuestManager>
         {
             List<QuestClass> newData = new List<QuestClass>();
 
-            List<float> zero = new List<float> { 0 };
-            List<float> one = new List<float> { 1 };
-            List<float> five = new List<float> { 5 };
-            List<float> twoZero = new List<float> { 0, 0 };
-            List<float> twoTen = new List<float> { 10,10 };
-
             // 즉시 활성화
-            QuestClass data1 = new QuestClass(0, e_QuestType.DayToDay, nowTime, "선인장 5마리 사냥", false, true, five, zero);
-            QuestClass data2 = new QuestClass(1, e_QuestType.DayToDay, nowTime, "버섯 5마리 사냥", false, true, five, zero);
-            QuestClass data3 = new QuestClass(2, e_QuestType.WeekToWeek, nowTime, "선인장 10마리, 버섯 10마리 사냥", false, true, twoTen, twoZero);
-            QuestClass data4 = new QuestClass(3, e_QuestType.Normal, nowTime, "던전 골렘 보스 1회 사냥", false, true, one, zero);
-            
+            QuestClass data1 = new QuestClass(0, e_QuestType.DayToDay, nowTime, "선인장 5마리 사냥", false, true, new List<float> { 5 }, new List<float> { 0 });
+            QuestClass data2 = new QuestClass(1, e_QuestType.DayToDay, nowTime, "버섯 5마리 사냥", false, true, new List<float> { 5 }, new List<float> { 0 });
+            QuestClass data3 = new QuestClass(2, e_QuestType.WeekToWeek, nowTime, "선인장 10마리, 버섯 10마리 사냥", false, true, new List<float> { 10, 10 }, new List<float> { 0, 0 });
+            QuestClass data4 = new QuestClass(3, e_QuestType.Normal, nowTime, "던전 골렘 보스 1회 사냥", false, true, new List<float> { 1 }, new List<float> { 0 });
             // 이후 활성화
-            QuestClass data5 = new QuestClass(4, e_QuestType.Normal, nowTime, "던전의 지하 미궁 탈출", false, false, one, zero);
-            QuestClass data6 = new QuestClass(5, e_QuestType.Normal, nowTime, "던전의 지하 주사위 퍼즐 해결", false, false, one, zero);
-            
+            QuestClass data5 = new QuestClass(4, e_QuestType.Normal, nowTime, "던전의 지하 미궁 탈출", false, false, new List<float> { 1 }, new List<float> { 0 });
+            QuestClass data6 = new QuestClass(5, e_QuestType.Normal, nowTime, "던전의 지하 주사위 퍼즐 해결", false, false, new List<float> { 1 }, new List<float> { 0 });
+
             newData.Add(data1);
             newData.Add(data2);
             newData.Add(data3);
@@ -103,14 +104,22 @@ public class QuestManager : Singleton<QuestManager>
         dic_rewardSet.Add(5, quest6);
 
         // idx - 몬스터 딕셔너리 Set
-        dic_monsterAnd_questIdx = new Dictionary<string, List<idxSet>>();
+        dic_kill_MonsterAnd_questIdx = new Dictionary<string, List<idxSet>>();
         List<idxSet> cactusList = new List<idxSet> { new idxSet(0, 0), new idxSet(2, 0) };
         List<idxSet> mushroomList = new List<idxSet> { new idxSet(1, 0), new idxSet(2, 1) };
         List<idxSet> golemBossList = new List<idxSet> { new idxSet(3, 0) };
 
-        dic_monsterAnd_questIdx.Add("Cactus", cactusList);
-        dic_monsterAnd_questIdx.Add("MushroomAngry", mushroomList);
-        dic_monsterAnd_questIdx.Add("Golem_Boss", golemBossList);
+        dic_kill_MonsterAnd_questIdx.Add("Cactus", cactusList);
+        dic_kill_MonsterAnd_questIdx.Add("MushroomAngry", mushroomList);
+        dic_kill_MonsterAnd_questIdx.Add("Golem_Boss", golemBossList);
+
+        // idx - 퀘스트 진행에 따른 딕셔너리 Set
+        dic_questCleared_Idx = new Dictionary<e_ClearedQuest, List<idxSet>>();
+        List<idxSet> dungeon_UndgerLabyrinthList = new List<idxSet> { new idxSet(4, 0) };
+        List<idxSet> dungeon_DicePuzzleList = new List<idxSet> { new idxSet(5, 0) };
+
+        dic_questCleared_Idx.Add(e_ClearedQuest.Dungeon_UndgerLabyrinth, dungeon_UndgerLabyrinthList);
+        dic_questCleared_Idx.Add(e_ClearedQuest.Dungeon_DicePuzzle, dungeon_DicePuzzleList);
     }
     #endregion
 
@@ -287,15 +296,31 @@ public class QuestManager : Singleton<QuestManager>
         string mobName = mob.GetName();
         var questList = GameManager.Instance.GetUserClass().GetQuestList();
 
-        List<idxSet> idxValues = dic_monsterAnd_questIdx[mobName];
+        List<idxSet> idxValues = dic_kill_MonsterAnd_questIdx[mobName];
 
         foreach (idxSet value in idxValues)
         {
-            QuestClass quest = questList[value.questIdx];
+            QuestClass quest = questList.Find(tmp => tmp.QuestNumber == value.questIdx);                // idx에 해당하는 퀘스트 찾기.
             float targertNum = quest.List_TargetNum[value.targetNumIdx];
             float curNum = quest.List_CurrentNum[value.targetNumIdx];
-            float tmp = Mathf.Min(curNum + 1, targertNum);
-            quest.List_CurrentNum[value.targetNumIdx] = tmp;
+            float val = Mathf.Min(curNum + 1, targertNum);
+            quest.List_CurrentNum[value.targetNumIdx] = val;
+        }
+    }
+
+    // 퀘스트 진행 후, 퀘스트 진행도 반영 함수
+    public void QuestGetProgressUp(e_ClearedQuest data)
+    {
+        var questList = GameManager.Instance.GetUserClass().GetQuestList();
+        List<idxSet> indexValues = dic_questCleared_Idx[data];
+
+        foreach(idxSet value in indexValues)
+        {
+            QuestClass quest = questList.Find(tmp => tmp.QuestNumber == value.questIdx);                // idx에 해당하는 퀘스트 찾기.
+            float targertNum = quest.List_TargetNum[value.targetNumIdx];
+            float curNum = quest.List_CurrentNum[value.targetNumIdx];
+            float val = Mathf.Min(curNum + 1, targertNum);
+            quest.List_CurrentNum[value.targetNumIdx] = val;
         }
     }
 

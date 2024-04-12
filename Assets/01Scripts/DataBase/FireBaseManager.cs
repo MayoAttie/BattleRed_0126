@@ -386,8 +386,8 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     LoadUserMora(snapshot);
                     LoadUserStar(snapshot);
                     LoadUserMail(snapshot);
+                    LoadQuestData(snapshot);
 
-                    //LoadQuestData(snapshot);
 
                     Debug.Log("유저 데이터 로드 완료");
                 }
@@ -721,7 +721,33 @@ public class FireBaseManager : Singleton<FireBaseManager>
                                 {
                                     string key = stringData.Key;
                                     object value = stringData.Value;
-                                    convertDic.Add(key, value);
+
+                                    if(value is IDictionary<string, object> valueDataList)
+                                    {
+                                        Dictionary<string, object> insideDic = new Dictionary<string, object>();
+
+                                        foreach (var insideData in valueDataList)
+                                        {
+                                            string insideKey = insideData.Key;
+                                            object insideVal = insideData.Value;
+                                            insideDic.Add(insideKey, insideVal);
+                                        }
+
+                                        convertDic.Add(key, insideDic);
+                                    }
+                                    else if(value is IList<object> valueDataList2)
+                                    {
+                                        List<object> insideList = new List<object>();
+                                        foreach(var insideData in valueDataList2)
+                                        {
+                                            insideList.Add(insideData);
+                                        }
+                                        convertDic.Add(key, insideList);
+                                    }
+                                    else
+                                    {
+                                        convertDic.Add(key, value);
+                                    }
                                 }
 
                                 QuestClass newItem = new QuestClass();

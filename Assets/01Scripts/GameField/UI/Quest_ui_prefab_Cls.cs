@@ -20,12 +20,12 @@ public class Quest_ui_prefab_Cls : MonoBehaviour
     private void Awake()
     {
         img_parentObj = gameObject.GetComponent<Image>();
-        button = transform.GetChild(0).GetComponent<Button>();
         img_typeTextBgr = transform.GetChild(0).GetComponent<Image>();
         typeText = transform.GetChild(1).GetComponent<TextMeshProUGUI>();
         titleText = transform.GetChild(2).GetComponent<TextMeshProUGUI>();
         contentText = transform.GetChild(3).GetComponent<TextMeshProUGUI>();
         img_fillProgress = transform.GetChild(4).GetChild(0).GetComponent<Image>();
+        button = transform.GetChild(5).GetComponent<Button>();
         f_FillProgress = 0;
     }
     public Image Img_parentObj

@@ -212,6 +212,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         InteractionObject cls = box.GetComponent<InteractionObject>();
         cls.Name = rewardObjName;    // 보물상자에 설정된 이름을 초기화. (오브젝트 매니저에서 보상처리할 때 사용)
         ObjectManager.Instance.IsOpenChecker[cls] = false;
+        QuestManager.Instance.QuestGetProgressUp(QuestManager.e_ClearedQuest.Dungeon_UndgerLabyrinth);
         return true;
     }
 
@@ -233,7 +234,7 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
             {
                 if(other.IsMovePossible == true)        // 회전 가능 객체 (이동)
                     Move_Between_TwoPoint(other);
-                else
+                else    // 이동 가능 상태가 아닐 시, 서클 밖으로 캐릭터 빼기.(마지막 구역 제외)
                 {
                     Transform originPos = other.transform.Find("EndPos");
                     bool isDestination = CheckLastObject(other, originPos);

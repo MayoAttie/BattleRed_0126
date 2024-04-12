@@ -104,6 +104,7 @@
     <Compile Include="Assets\01Scripts\GameField\Monster\MonsterAttack.cs" />
     <Compile Include="Assets\01Scripts\GameField\Monster\MonsterHp.cs" />
     <Compile Include="Assets\01Scripts\GameField\Monster\MonsterManager.cs" />
+    <Compile Include="Assets\01Scripts\GameField\NPC\NonePlayerCharacterManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\ElementRocksObject.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\IObjectTriggerCheckFunc.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\InteractionObject.cs" />
@@ -290,6 +291,7 @@
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\BlendDistort.shader" />
     <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
     <None Include="Assets\02Assets\Hovl Studio\HSFiles\Shaders\Scroll.shader" />
+    <None Include="Assets\02Assets\Stylized NPC - Peasant Nolant\README.txt" />
     <None Include="Assets\02Assets\VolumetricLines\BuiltInRenderPipeline\Shaders\SingleLine-TextureAlphaBlended.shader" />
     <None Include="Assets\Polytope Studio\Lowpoly_Environments\Sources\Shaders\PT_Vegetation_Flowers_Shader_VS.shader" />
     <None Include="Assets\donjon\Standard Assets\Water (Pro Only)\Sources\Shaders\FX-Water.shader" />
