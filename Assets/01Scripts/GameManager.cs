@@ -68,6 +68,7 @@ public class GameManager : Singleton<GameManager>
     // 기타
     [SerializeField] Transform objectPoolSavePos;
     DungeonManager dungeonMng;
+    Total_NpcManager npcMng;
     GameObject mainCamera;
 
 
@@ -1523,8 +1524,11 @@ public class GameManager : Singleton<GameManager>
             if(tmp.tag == "Manager")
             {
                 var mng = tmp.GetComponent<DungeonManager>();
+                var mng2 = tmp.GetComponent<Total_NpcManager>();
                 if (mng != null)
                     dungeonMng = mng;
+                if (mng2 != null)
+                    npcMng = mng2;
             }
         }
 
@@ -1828,6 +1832,7 @@ public class GameManager : Singleton<GameManager>
     {
         get { return mainCamera; }
     }
+    public Total_NpcManager TotalNpcMng { get { return npcMng; } }
     #endregion
 
 }

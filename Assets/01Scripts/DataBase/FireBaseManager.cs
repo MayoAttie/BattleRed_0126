@@ -14,6 +14,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
     FirebaseAuth auth;
     DatabaseReference dbReference;
     static bool isUserLogin;
+    static string sUserEmail;
     bool isActive;
 
     private bool isQuitting = false;
@@ -240,9 +241,14 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 }
             });
 
-        string userMail = userDatas.UserMail;
-        string jsonMail = JsonUtility.ToJson(userMail);
-        dbReference.Child("userID").Child(userID).Child("UserData").Child("userMail").SetValueAsync(userMail)
+
+        // 퀘스트 데이터 저장
+        SaveQuestData(userID);
+
+
+        string mailValue = userDatas.UserMail;
+        string jsonMail = JsonUtility.ToJson(mailValue);
+        dbReference.Child("userID").Child(userID).Child("UserData").Child("userMail").SetValueAsync(jsonMail)
             .ContinueWithOnMainThread(mailTask =>
             {
                 if (mailTask.IsCompleted)
@@ -254,8 +260,6 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     Debug.LogError("유저 메일 저장 실패: " + mailTask.Exception);
                 }
             });
-
-        SaveQuestData(userID);
     }
 
 
@@ -385,8 +389,8 @@ public class FireBaseManager : Singleton<FireBaseManager>
                     LoadUserLastConnectTime(snapshot);
                     LoadUserMora(snapshot);
                     LoadUserStar(snapshot);
-                    LoadUserMail(snapshot);
                     LoadQuestData(snapshot);
+                    LoadUserMail(snapshot);
 
 
                     Debug.Log("유저 데이터 로드 완료");
@@ -669,11 +673,29 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
     private void LoadUserMail(DataSnapshot snapshot)
     {
-        LoadSimpleData<string>(snapshot, "userMail", (userMail) =>
+        if (snapshot.Exists)
         {
-            GameManager.Instance.GetUserClass().UserMail = userMail;
-            Debug.Log("userMail 데이터 로드 완료");
-        });
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            // 사용자 이메일 키가 존재하면 이메일 값을 가져옵니다.
+            if (userDataDict != null && userDataDict.TryGetValue("userMail", out object itemDataObject))
+            {
+                // 이메일 값을 string으로 변환합니다.
+                if (itemDataObject is string itemDataString)
+                {
+                    string data = JsonConvert.DeserializeObject<string>(itemDataString);
+                    GameManager.Instance.GetUserClass().UserMail = data;
+                    Debug.Log("유저 이메일 데이터 로드 완료");
+                }
+            }
+            else
+            {
+                GameManager.Instance.GetUserClass().UserMail = sUserEmail;
+                Debug.Log("유저 이메일 데이터 저장 완료");
+            }
+        }
+        else
+            Debug.LogError("유저 이메일 데이터 로드 실패");
     }
 
     private void LoadSimpleData<T>(DataSnapshot snapshot, string nodeName, Action<T> onDataLoaded)
@@ -722,23 +744,19 @@ public class FireBaseManager : Singleton<FireBaseManager>
                                     string key = stringData.Key;
                                     object value = stringData.Value;
 
-                                    if(value is IDictionary<string, object> valueDataList)
-                                    {
-                                        Dictionary<string, object> insideDic = new Dictionary<string, object>();
-
-                                        foreach (var insideData in valueDataList)
-                                        {
-                                            string insideKey = insideData.Key;
-                                            object insideVal = insideData.Value;
-                                            insideDic.Add(insideKey, insideVal);
-                                        }
-
-                                        convertDic.Add(key, insideDic);
-                                    }
-                                    else if(value is IList<object> valueDataList2)
+                                    if(value is IDictionary<string , object> valueDataDic)
                                     {
                                         List<object> insideList = new List<object>();
-                                        foreach(var insideData in valueDataList2)
+                                        foreach (var insideData in valueDataDic)
+                                        {
+                                            insideList.Add(insideData.Value);
+                                        }
+                                        convertDic.Add(key, insideList);
+                                    }
+                                    if(value is IList<object> valueDataList)
+                                    {
+                                        List<object> insideList = new List<object>();
+                                        foreach(var insideData in valueDataList)
                                         {
                                             insideList.Add(insideData);
                                         }
@@ -762,13 +780,13 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
                         questData.Clear();
                         questData.AddRange(fullList);
-                        Debug.Log("퀘스트 데이터 로드 완료");
-
 
                         // 퀘스트 타임 체크 및 재설정
                         QuestManager questMng =  QuestManager.Instance;
                         if (questMng != null)
                             questMng.QuestD_DayRest();
+                        
+                        Debug.Log("퀘스트 데이터 로드 완료");
                     }
                     else
                     {
@@ -804,5 +822,10 @@ public class FireBaseManager : Singleton<FireBaseManager>
     {
         get { return isActive; }
         set { isActive = value; }
+    }
+    public string UserEmail
+    {
+        get { return sUserEmail; }
+        set { sUserEmail = value; }
     }
 }

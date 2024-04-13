@@ -105,7 +105,7 @@ public class CharacterControlMng : Subject, Observer
         if (!characMng.IsControl)
             return;
 
-        Debug.Log("zpos: " + zPos + " xpos: " + xPos);
+        ///Debug.Log("zpos: " + zPos + " xpos: " + xPos);
 
         isBattle = characMng.GetIsBattle();
         // 코루틴이 실행 중이지 않은 경우에만 코루틴을 시작.
@@ -115,7 +115,6 @@ public class CharacterControlMng : Subject, Observer
         }
         GravityFunc();                      // 중력 함수
         ControllerGetInputData();           // 컨트롤러 값 호출 함수
-        RotateCharacter();                  // 캐릭터 회전 함수
         if (!isBlinking)
         {
             if (isBattle)
@@ -129,6 +128,7 @@ public class CharacterControlMng : Subject, Observer
                 MoveCharacterFunction();    // 걷기 함수
             }
         }
+        RotateCharacter();                  // 캐릭터 회전 함수
         JumpCharacterFunction();            // 점프 함수
 
     }
@@ -148,7 +148,10 @@ public class CharacterControlMng : Subject, Observer
             if (!isBattle)
                 characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_WALK);
             else
-                characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_RUN);
+            {
+                if (zPos > F_Epsilon || xPos > F_Epsilon)
+                    characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_RUN);
+            }
 
         }
     }
@@ -329,17 +332,20 @@ public class CharacterControlMng : Subject, Observer
         characMng.AnimatorFloatValueSetter(zPos, xPos);
         GravityFunc();
 
+        if (characMng.GetCharacterClass().GetState() != CharacterClass.eCharactgerState.e_RUN && Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
+            return;
+
 
         if (zPos > 0.3f)
         {
             if (xPos>0.7f)
             {
-                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y + 40f, 0f);
+                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y + 20f, 0f);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
             else if (xPos<-0.7f)
             {
-                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y - 40f, 0f);
+                Quaternion targetRotation = Quaternion.Euler(0f, GameManager.Instance.MainCamera.transform.eulerAngles.y - 20f, 0f);
                 transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             }
             else

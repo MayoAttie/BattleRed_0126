@@ -53,6 +53,7 @@ public class AuthManager : MonoBehaviour
            {
                isLogin = true;
                isLogout = false;
+               FireBaseManager.Instance.UserEmail = mail_field.text;
                Debug.Log(mail_field.text + "의 로그인 성공");
            }
            else
@@ -96,9 +97,6 @@ public class AuthManager : MonoBehaviour
 
                 AuthResult authResult = task.Result;
                 FirebaseUser newUser = authResult.User;
-
-                string userID = newUser.UserId;
-
                 //FireBaseManager.Instance.SaveUserData(new UserClass(), userID);
             }
             else

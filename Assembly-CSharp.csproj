@@ -105,6 +105,7 @@
     <Compile Include="Assets\01Scripts\GameField\Monster\MonsterHp.cs" />
     <Compile Include="Assets\01Scripts\GameField\Monster\MonsterManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\NPC\NonePlayerCharacterManager.cs" />
+    <Compile Include="Assets\01Scripts\GameField\NPC\Total_NpcManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\ElementRocksObject.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\IObjectTriggerCheckFunc.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\InteractionObject.cs" />

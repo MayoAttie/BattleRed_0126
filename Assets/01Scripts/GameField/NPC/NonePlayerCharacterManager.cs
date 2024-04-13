@@ -40,4 +40,10 @@ public class NonePlayerCharacterManager : MonoBehaviour
                 break;
         }
     }
+
+    public CharacterClass NpcCharaceter
+    {
+        get { return npcCharaceter; }
+        set { npcCharaceter = value; }
+    }
 }

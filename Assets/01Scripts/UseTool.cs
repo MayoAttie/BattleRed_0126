@@ -4,6 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class UseTool
 {
+    static float fEpsilon = 0.0001f;
+    public static float F_Epsilon
+    {
+        get { return fEpsilon; }
+    }
+
     // 애니메이션의 길이를 얻는 함수
     public static float GetAnimationLength(Animator animator, string clipName)
     {
@@ -70,6 +76,72 @@ public class UseTool
     {
         float mt = 1f - t;
         return mt * mt * start + 2f * mt * t * middle + t * t * end;
+    }
+
+
+    public static void ObjectValueConverter<T>(ref List<T> targetList, List<object> objList)
+    {
+        if (objList == null)
+        {
+            return;
+        }
+
+        targetList = new List<T>();
+        foreach (object item in objList)
+        {
+            // 각 항목의 유형을 처리하는 메서드 호출
+            ConvertObjectToType(ref targetList, item);
+        }
+    }
+    private static void ConvertObjectToType<T>(ref List<T> targetList, object obj)
+    {
+        if (obj is double doubleValue)
+        {
+            targetList.Add((T)(object)((float)doubleValue));
+        }
+        else if (obj is float floatValue)
+        {
+            targetList.Add((T)(object)floatValue);
+        }
+        else if (obj is int intValue)
+        {
+            targetList.Add((T)(object)intValue);
+        }
+        else if (obj is long longValue)
+        {
+            targetList.Add((T)(object)((float)longValue));
+        }
+        else if (obj is uint uintValue)
+        {
+            targetList.Add((T)(object)uintValue);
+        }
+        else if (obj is ulong ulongValue)
+        {
+            targetList.Add((T)(object)((float)ulongValue));
+        }
+        else if (obj is short shortValue)
+        {
+            targetList.Add((T)(object)shortValue);
+        }
+        else if (obj is ushort ushortValue)
+        {
+            targetList.Add((T)(object)ushortValue);
+        }
+        else if (obj is byte byteValue)
+        {
+            targetList.Add((T)(object)byteValue);
+        }
+        else if (obj is sbyte sbyteValue)
+        {
+            targetList.Add((T)(object)sbyteValue);
+        }
+        else if (obj is string stringValue && float.TryParse(stringValue, out float parsedValue))
+        {
+            targetList.Add((T)(object)parsedValue);
+        }
+        else
+        {
+        }
     }
 
 }

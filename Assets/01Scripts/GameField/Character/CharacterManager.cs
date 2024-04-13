@@ -28,9 +28,11 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
     int SpwanPoint;
     int monsterLayer;
     int interactionLayer;
+    int npcLayer;
 
     public List<Transform> targetsListIn10Range;       // 범위 내 몬스터 객체 리스트
     Dictionary<InteractionObject, DropItem_UI> dic_dropAndInterObj; // 상호작용 오브젝트와 ui 묶음
+    Dictionary<NonePlayerCharacterManager, DropItem_UI> dic_dropAndNpcObj;
 
     CharacterControlMng controlMng;
     CharacterAttackMng attackMng;
@@ -63,6 +65,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         objMng_instance = ObjectManager.Instance;
         pathFinder = gameObject.GetComponent<PathFinder>();
         dic_dropAndInterObj = new Dictionary<InteractionObject, DropItem_UI>();
+        dic_dropAndNpcObj = new Dictionary<NonePlayerCharacterManager, DropItem_UI>();
     }
 
     private void Start()
@@ -79,6 +82,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         SpwanPoint = LayerMask.NameToLayer("SpwanPoint");
         monsterLayer = LayerMask.NameToLayer("Monster");
         interactionLayer = LayerMask.NameToLayer("InteractionObj");
+        npcLayer = LayerMask.NameToLayer("NPC");
 
         StartCoroutine("CheckCollidersPeriodically");
 
@@ -114,9 +118,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         SatelliteParticleColorSwitch();                         // 원소 변경
 
     }
-    private void FixedUpdate()
-    {
-    }
+
 
     #region 애니메이션 제어
 
@@ -293,6 +295,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
             {
                 World_InCharacterCheck_ForMonster();
                 World_InteractionObjCheck();
+                World_InCharacterCheck_ForNPC();
             }
             If_DropUI_Null_ScrollOff();
             yield return new WaitForSeconds(0.2f);
@@ -400,10 +403,70 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
             }
         }
     }
-
     public void InteractionObjReturnCall(InteractionObject obj)
     {
         dic_dropAndInterObj.Remove(obj);
+    }
+    //public void Npc_DropUIObjectReturnCall(NonePlayerCharacterManager obj)
+    //{
+    //    dic_dropAndNpcObj.Remove(obj);
+    //}
+    void World_InCharacterCheck_ForNPC()
+    {
+        if (targetsListIn10Range.Count > 0)
+        {
+            Collider[] layerList = Physics.OverlapSphere(transform.position, 3, 1 << npcLayer);
+
+            if(layerList.Length > 0)
+            {
+                for(int i=0; i< layerList.Length; i++)
+                {
+                    Collider obj = layerList[i];
+                    bool isCreate = true;
+                    var objMnager = obj.GetComponent<NonePlayerCharacterManager>();
+
+                    foreach(var pair in dic_dropAndNpcObj)  // 중복 체크
+                    {
+                        NonePlayerCharacterManager existingData = pair.Key;
+
+                        if (existingData.Equals(objMnager))
+                        {
+                            isCreate = false;
+                            break;
+                        }
+                    }
+
+                    if(isCreate)
+                    {
+                        Total_NpcManager totalNpcMng = GameManager.Instance.TotalNpcMng;
+                        if (totalNpcMng.Dic_IsDropUI_openToObj[objMnager] == true)  // ui 활성 상태 체크
+                        {
+                            isCreate = false;
+                        }
+                        if (isCreate)
+                        {
+                            // 객체를 생성하고 함수 연결, 이후 관리용 딕셔너리에 Add
+                            var tmp = totalNpcMng.DropUI_ObjectSetInit(sideUI_ObjPrintTransformObject.GetScrollObject(), objMnager);
+                            dic_dropAndNpcObj.Add(objMnager, tmp);
+                        }
+                    }
+                }
+            }
+        }
+        else                // 범위를 벗어나면 ui 데이터 전부 삭제.
+        {
+            Dictionary<NonePlayerCharacterManager, DropItem_UI> copyList = new Dictionary<NonePlayerCharacterManager, DropItem_UI>(dic_dropAndNpcObj);
+            GameManager gameMng = GameManager.Instance;
+            foreach (var pair in copyList)
+            {
+                NonePlayerCharacterManager key = pair.Key;
+
+                dic_dropAndNpcObj.Remove(key);
+                gameMng.TotalNpcMng.Dic_IsDropUI_openToObj[key] = false;
+                gameMng.TotalNpcMng.Dic_dropUI_NPcObj.Remove(key);
+                gameMng.DropItemUI_Pool.ReturnToPool(pair.Value);
+            }
+        }
     }
 
     private void If_DropUI_Null_ScrollOff()

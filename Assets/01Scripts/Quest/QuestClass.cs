@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using static UseTool;
 public class QuestClass
 {
     public enum e_QuestType
@@ -133,100 +134,14 @@ public class QuestClass
         {
             if (targetValue is List<object> targetList)
             {
-                list_TargetNum = new List<float>();
-                foreach (object target in targetList)
-                {
-                    if (target is object targetObject)
-                    {
-                        if (targetObject is double doubleValue)
-                        {
-                            list_TargetNum.Add((float)doubleValue);
-                        }
-                        else if (targetObject is float floatValue)
-                        {
-                            list_TargetNum.Add(floatValue);
-                        }
-                        else if (targetObject is int intValue)
-                        {
-                            list_TargetNum.Add(intValue);
-                        }
-                        else if (targetObject is string stringValue)
-                        {
-                            if (float.TryParse(stringValue, out float parsedValue))
-                            {
-                                list_TargetNum.Add(parsedValue);
-                            }
-                        }
-                        else if (targetObject is char charValue)
-                        {
-                            list_TargetNum.Add((float)charValue);
-                        }
-                        else
-                        {
-                            object oTmp = targetObject;
-                            float tmp = (float)oTmp;
-                            list_TargetNum.Add(tmp);
-                        }
-                    }
-                    else if (target is int intValue)
-                    {
-                        list_TargetNum.Add((float)intValue); 
-                    }
-                    else if (target is float floatValue)
-                    {
-                        list_TargetNum.Add(floatValue); 
-                    }
-                }
+                ObjectValueConverter(ref list_TargetNum, targetList);
             }
         }
         if (dict.TryGetValue("list_CurrentNum", out object currentValue))
         {
             if (currentValue is List<object> currentList)
             {
-                list_CurrentNum = new List<float>();
-                foreach (object current in currentList)
-                {
-                    if (current is object currentObject)
-                    {
-                        if (currentObject is double doubleValue)
-                        {
-                            list_CurrentNum.Add((float)doubleValue);
-                        }
-                        else if (currentObject is float floatValue)
-                        {
-                            list_CurrentNum.Add(floatValue);
-                        }
-                        else if (currentObject is int intValue)
-                        {
-                            list_CurrentNum.Add(intValue);
-                        }
-                        else if (currentObject is string stringValue)
-                        {
-                            if (float.TryParse(stringValue, out float parsedValue))
-                            {
-                                list_CurrentNum.Add(parsedValue);
-                            }
-                        }
-                        else if (currentObject is char charValue)
-                        {
-                            list_CurrentNum.Add((float)charValue);
-                        }
-                        else
-                        {
-                            object oTmp = currentObject;
-                            float tmp = (float)oTmp;
-                            list_CurrentNum.Add(tmp);
-                        }
-                    }
-                    else if (current is int intValue)
-                    {
-                        list_CurrentNum.Add((float)intValue); 
-                    }
-                    else if (current is float floatValue)
-                    {
-                        list_CurrentNum.Add(floatValue); 
-                    }
-                }
+                ObjectValueConverter(ref list_CurrentNum, currentList);
             }
         }
     }

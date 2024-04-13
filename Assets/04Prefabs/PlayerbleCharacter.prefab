@@ -1851,7 +1851,7 @@ MonoBehaviour:
   viewAngle: 360
   targetMask:
     serializedVersion: 2
-    m_Bits: 66560
+    m_Bits: 1115136
   obstacleMask:
     serializedVersion: 2
     m_Bits: 0
@@ -1901,9 +1901,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 4294967295
   isBattle: 0
-  isReverseGround: 0
-  isEndReverseAnimation: 0
-  isGrounded: 0
+  isJump: 0
+  debugging: 0
 --- !u!195 &8717780107579843530
 NavMeshAgent:
   m_ObjectHideFlags: 0
