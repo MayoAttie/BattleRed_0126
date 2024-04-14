@@ -301,6 +301,8 @@ public class GameManager : Singleton<GameManager>
         list_npcDatas = new List<CharacterClass>();
         CharacterClass npc1 = new CharacterClass(1000, 1000, 0, 0, 100, 50, 50, 50, 4, CharacterClass.eCharactgerState.e_Idle, 0, 150, 70, 1.5f, "NPC", "카단", 0, true, 100, 20, 0, 0, 0);
         list_npcDatas.Add(npc1);
+        CharacterClass npc2 = new CharacterClass(1000, 1000, 0, 0, 100, 50, 50, 50, 4, CharacterClass.eCharactgerState.e_Idle, 0, 150, 70, 1.5f, "NPC", "루더렉", 0, true, 100, 20, 0, 0, 0);
+        list_npcDatas.Add(npc2);
 
         #endregion
     }

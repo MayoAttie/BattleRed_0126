@@ -4,6 +4,7 @@ using System;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq;
+using System.Collections;
 using UnityEngine.SceneManagement;
 using static CharacterUpgradeManager;
 using static UI_UseToolClass;
@@ -96,7 +97,7 @@ public class UI_Manager : EnergyBarManager
     [Header("기타(Etc)")]
     [SerializeField] GetResourcePrintUI getResourcePrintUI;             // 재료 획득처 출력 객체
     [SerializeField] WorldMap_Manager wolrdMap_manager;                 // 월드맵 매니저 객체
-    
+    [SerializeField] PrintTextFieldUICls obj_PrintTextFieldUI_obj;                   // 대사 출력용 오브젝트 객체
     #endregion
 
 
@@ -3219,9 +3220,6 @@ public class UI_Manager : EnergyBarManager
     }
 
 
-
-
-
     public void WorldMapOpenButtonClick()
     {
         wolrdMap_manager.WorldMapOpenClick();
@@ -3264,13 +3262,10 @@ public class UI_Manager : EnergyBarManager
     public e_InventoryTypeSelected GetnSelectedInvenIdx(){return invenType_Index; }
     
     public WorldMap_Manager GetWorldMap_Manager{ get { return wolrdMap_manager; } }
-
+    public PrintTextFieldUICls printTextFieldUI_Cls { get { return obj_PrintTextFieldUI_obj; } }
     #endregion
 
     #endregion
-
-
-
 
     #region 오브젝트 제어 클래스 _ Class
 

@@ -132,6 +132,7 @@
     <Compile Include="Assets\01Scripts\GameField\UI\ItemSpritesSaver.cs" />
     <Compile Include="Assets\01Scripts\GameField\UI\PlayerInfoUI_Button.cs" />
     <Compile Include="Assets\01Scripts\GameField\UI\PopUpScreenClass.cs" />
+    <Compile Include="Assets\01Scripts\GameField\UI\PrintTextFieldUICls.cs" />
     <Compile Include="Assets\01Scripts\GameField\UI\Quest_ui_prefab_Cls.cs" />
     <Compile Include="Assets\01Scripts\GameField\UI\SelectButtonScript.cs" />
     <Compile Include="Assets\01Scripts\GameField\UI\SliderController.cs" />
