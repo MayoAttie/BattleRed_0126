@@ -9,6 +9,8 @@ using Firebase.Database;
 using Firebase.Extensions;
 using Firebase.Analytics;
 using Newtonsoft.Json;
+using Cysharp.Threading;
+using Cysharp.Threading.Tasks;
 public class FireBaseManager : Singleton<FireBaseManager>
 {
     FirebaseAuth auth;
@@ -68,6 +70,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
             Debug.Log("로그인되어 있지 않습니다.");
         }
     }
+    
 
     private void OnApplicationQuitting()
     {
@@ -336,147 +339,214 @@ public class FireBaseManager : Singleton<FireBaseManager>
 
     #region 데이터 불러오기
 
-    public void LoadUserDataForGameManager()
+    public async void LoadUserDataForGameManager()
     {
-        FirebaseApp.CheckAndFixDependenciesAsync().ContinueWithOnMainThread(task =>
+        await FirebaseApp.CheckAndFixDependenciesAsync();
+
+        // Firebase 데이터 로딩이 완료된 후에 다음 코드 실행
+
+        // 현재 로그인한 사용자 가져오기
+        FirebaseUser user = auth.CurrentUser;
+
+        if (user != null)
         {
-
-            // Firebase 데이터 로딩이 완료된 후에 다음 코드 실행
-
-            // 현재 로그인한 사용자 가져오기
-            FirebaseUser user = auth.CurrentUser;
-
-            if (user != null)
-            {
-                // 사용자가 로그인 중인 경우, 해당 사용자의 데이터를 가져오기
-                Debug.Log("데이터 로드");
-                LoadUserData(user.UserId);
-            }
-            else
-            {
-                Debug.Log("로그인 아님");
-            }
-        });
+            // 사용자가 로그인 중인 경우, 해당 사용자의 데이터를 가져오기
+            Debug.Log("데이터 로드");
+            await LoadUserData(user.UserId);
+        }
+        else
+        {
+            Debug.Log("로그인 아님");
+        }
     }
 
-
-    // 데이터 불러오기
-    private void LoadUserData(string userID)
+    private async UniTask LoadUserData(string userID)
     {
         dbReference = FirebaseDatabase.DefaultInstance.RootReference;
         dbReference = FirebaseDatabase.DefaultInstance.GetReference("userID").Child(userID).Child("UserData");
 
         // 해당 사용자의 데이터 가져오기
-        dbReference.GetValueAsync().ContinueWithOnMainThread(task =>
+        DataSnapshot snapshot = await dbReference.GetValueAsync();
+
+        if (snapshot.Exists)
         {
-            if (task.IsCompleted)
+            await UniTask.WhenAll(
+                LoadUserCharacter(snapshot),
+                LoadUserEquippedWeapon(snapshot),
+                LoadUserEquippedEquipment(snapshot),
+                LoadItemList(snapshot, "hadWeaponList", GameManager.Instance.GetUserClass().GetHadWeaponList(), true),
+                LoadItemList(snapshot, "hadEquipmentList", GameManager.Instance.GetUserClass().GetHadEquipmentList(), true),
+                LoadItemList(snapshot, "hadGemList", GameManager.Instance.GetUserClass().GetHadGemList(), false),
+                LoadItemList(snapshot, "hadFoodList", GameManager.Instance.GetUserClass().GetHadFoodList(), false),
+                LoadItemList(snapshot, "hadGrowMaterialList", GameManager.Instance.GetUserClass().GetHadGrowMaterialList(), false),
+                LoadItemList(snapshot, "hadEtcItemList", GameManager.Instance.GetUserClass().GetHadEtcItemList(), false),
+                LoadUserLastConnectTime(snapshot),
+                LoadUserMora(snapshot),
+                LoadUserStar(snapshot),
+                LoadQuestData(snapshot),
+                LoadUserMail(snapshot)
+            );
+
+            Debug.Log("유저 데이터 로드 완료");
+        }
+        else
+        {
+            // 데이터가 없는 경우 또는 해당 경로에 아무 데이터도 없는 경우
+            Debug.Log("데이터가 없습니다.");
+        }
+    }
+
+    private async UniTask LoadUserCharacter(DataSnapshot snapshot)
+    {
+        await UniTask.SwitchToMainThread();
+
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null && userDataDict.ContainsKey("userCharacter"))
             {
-                DataSnapshot snapshot = task.Result;
+                Dictionary<string, object> equippedWeaponData = userDataDict["userCharacter"] as Dictionary<string, object>;
 
-                if (snapshot.Exists)
+                if (equippedWeaponData != null)
                 {
-                    // 데이터가 존재하는 경우
-                    LoadUserCharacter(snapshot);
-                    LoadUserEquippedWeapon(snapshot);
-                    LoadUserEquippedEquipment(snapshot);
-                    LoadItemList(snapshot, "hadWeaponList", GameManager.Instance.GetUserClass().GetHadWeaponList(),true);
-                    LoadItemList(snapshot, "hadEquipmentList", GameManager.Instance.GetUserClass().GetHadEquipmentList(),true);
-                    LoadItemList(snapshot, "hadGemList", GameManager.Instance.GetUserClass().GetHadGemList(),false);
-                    LoadItemList(snapshot, "hadFoodList", GameManager.Instance.GetUserClass().GetHadFoodList(),false);
-                    LoadItemList(snapshot, "hadGrowMaterialList", GameManager.Instance.GetUserClass().GetHadGrowMaterialList(),false);
-                    LoadItemList(snapshot, "hadEtcItemList", GameManager.Instance.GetUserClass().GetHadEtcItemList(),false);
+                    GameManager.Instance.GetUserClass().GetUserCharacter().SetFromDictionary(equippedWeaponData);
+                }
 
-                    LoadUserLastConnectTime(snapshot);
-                    LoadUserMora(snapshot);
-                    LoadUserStar(snapshot);
-                    LoadQuestData(snapshot);
-                    LoadUserMail(snapshot);
+                await UniTask.Delay(TimeSpan.FromSeconds(1)); // 1초 대기
 
+                Debug.Log("userCharacter 데이터 로드 완료");
+            }
+        }
+    }
 
-                    Debug.Log("유저 데이터 로드 완료");
+    private async UniTask LoadUserEquippedWeapon(DataSnapshot snapshot)
+    {
+        await UniTask.SwitchToMainThread();
+
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null && userDataDict.ContainsKey("userEquippedWeapon"))
+            {
+                Dictionary<string, object> equippedWeaponData = userDataDict["userEquippedWeapon"] as Dictionary<string, object>;
+
+                if (equippedWeaponData != null)
+                {
+                    GameManager.Instance.GetUserClass().GetUserEquippedWeapon().SetFromDictionary(equippedWeaponData);
+                }
+
+                Debug.Log("userEquippedWeapon 데이터 로드 완료");
+            }
+        }
+    }
+
+    private async UniTask LoadUserEquippedEquipment(DataSnapshot snapshot)
+    {
+        await UniTask.SwitchToMainThread();
+
+        if (snapshot.Exists)
+        {
+            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+
+            if (userDataDict != null && userDataDict.ContainsKey("userEquippedEquipment"))
+            {
+                object equippedEquipmentDataObject = userDataDict["userEquippedEquipment"];
+
+                if (equippedEquipmentDataObject is List<object> itemDataList)
+                {
+                    List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>() { null, null, null, null, null };
+                    foreach (var data in itemDataList)
+                    {
+                        if (data == "null" || data == null)
+                            continue;
+                        if (data is IDictionary<string, object> stringDataList)
+                        {
+
+                            Dictionary<string, object> convertDic = new Dictionary<string, object>();
+
+                            foreach (var stringData in stringDataList)
+                            {
+                                string key = stringData.Key;
+                                object value = stringData.Value;
+                                convertDic.Add(key, value);
+                            }
+                            WeaponAndEquipCls newItem = new WeaponAndEquipCls();
+                            newItem.SetFromDictionary(convertDic);
+
+                            // 태그에 따라서, 배열 인덱스 설정
+                            string tag = newItem.GetTag();
+                            int index = 0;
+                            if (tag == "꽃") index = 0;
+                            else if (tag == "깃털") index = 1;
+                            else if (tag == "모래") index = 2;
+                            else if (tag == "성배") index = 3;
+                            else if (tag == "왕관") index = 4;
+
+                            fullList[index] = newItem;
+                        }
+                        else
+                        {
+                            Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+
+                        }
+                        GameManager.Instance.GetUserClass().SetUserEquippedEquipment(fullList.ToArray());
+                        Debug.Log("userEquippedEquipment 데이터 로드 완료");
+
+                    }
+                }
+                else if (equippedEquipmentDataObject is IDictionary<string, object> equippedEquipmentDataDict)
+                {
+                    List<WeaponAndEquipCls> userEquippedEquipmentList = new List<WeaponAndEquipCls>();
+
+                    foreach (var equipData in equippedEquipmentDataDict)
+                    {
+                        if (equipData.Value is Dictionary<string, object> equipDict)
+                        {
+                            WeaponAndEquipCls equip = new WeaponAndEquipCls();
+                            equip.SetFromDictionary(equipDict);
+                            userEquippedEquipmentList.Add(equip);
+                        }
+                        else
+                        {
+                            Debug.LogError("자식 노드의 형식이 예상과 다릅니다.");
+                        }
+                    }
+
+                    GameManager.Instance.GetUserClass().SetUserEquippedEquipment(userEquippedEquipmentList.ToArray());
+
+                    Debug.Log("userEquippedEquipment 데이터 로드 완료");
                 }
                 else
                 {
-                    // 데이터가 없는 경우 또는 해당 경로에 아무 데이터도 없는 경우
-                    Debug.Log("데이터가 없습니다.");
-                }
-            }
-        });
-    }
-    // 캐릭터 정보 불러오기
-    private void LoadUserCharacter(DataSnapshot snapshot)
-    {
-        if (snapshot.Exists)
-        {
-            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-
-            if (userDataDict != null)
-            {
-                if (userDataDict.ContainsKey("userCharacter"))
-                {
-                    Dictionary<string, object> equippedWeaponData = userDataDict["userCharacter"] as Dictionary<string, object>;
-
-                    if (equippedWeaponData != null)
-                    {
-                        GameManager.Instance.GetUserClass().GetUserCharacter().SetFromDictionary(equippedWeaponData);
-                    }
-                    Invoke("CallHpModifyFunc", 1f);
-                    Debug.Log("userCharacter 데이터 로드 완료");
+                    Debug.LogError("userEquippedEquipment 데이터 형식 오류");
                 }
             }
         }
     }
-    void CallHpModifyFunc()
-    {   // 체력 수정 함수 호출
-        CharacterManager.Instance.Hp_Modify();
-    }
-
-    // 착용 무기 정보 불러오기
-    private void LoadUserEquippedWeapon(DataSnapshot snapshot)
+    // 아이템 리스트 정보 불러오기
+    private async UniTask LoadItemList(DataSnapshot snapshot, string nodeName, List<ItemClass> itemList, bool isWeaponAndEuip)
     {
-        if (snapshot.Exists)
+        await UniTask.SwitchToMainThread();
+
+        if (isWeaponAndEuip)
         {
-            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-
-            if (userDataDict != null)
+            if (snapshot.Exists)
             {
-                if (userDataDict.ContainsKey("userEquippedWeapon"))
+                Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
+                if (userDataDict != null && userDataDict.ContainsKey(nodeName))
                 {
-                    Dictionary<string, object> equippedWeaponData = userDataDict["userEquippedWeapon"] as Dictionary<string, object>;
+                    object itemDataObject = userDataDict[nodeName];
 
-                    if (equippedWeaponData != null)
+                    if (itemDataObject is IList<object> itemDataList)
                     {
-                        GameManager.Instance.GetUserClass().GetUserEquippedWeapon().SetFromDictionary(equippedWeaponData);
-                    }
-                    Debug.Log("userEquippedWeapon 데이터 로드 완료");
+                        List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>();
 
-                }
-            }
-        }
-    }
-    // 착용 장비 정보 불러오기
-    private void LoadUserEquippedEquipment(DataSnapshot snapshot)
-    {
-        if (snapshot.Exists)
-        {
-            Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-
-            if (userDataDict != null)
-            {
-                if (userDataDict.ContainsKey("userEquippedEquipment"))
-                {
-                    object equippedEquipmentDataObject = userDataDict["userEquippedEquipment"];
-
-                    if(equippedEquipmentDataObject is List<object> itemDataList)
-                    {
-                        List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>() { null, null, null, null, null };
                         foreach (var data in itemDataList)
                         {
-                            if (data == "null" || data == null)
-                                continue;
-                            if (data is IDictionary<string,object> stringDataList)
+                            if (data is IDictionary<string, object> stringDataList)
                             {
-
                                 Dictionary<string, object> convertDic = new Dictionary<string, object>();
 
                                 foreach (var stringData in stringDataList)
@@ -485,109 +555,24 @@ public class FireBaseManager : Singleton<FireBaseManager>
                                     object value = stringData.Value;
                                     convertDic.Add(key, value);
                                 }
+
                                 WeaponAndEquipCls newItem = new WeaponAndEquipCls();
                                 newItem.SetFromDictionary(convertDic);
-
-                                // 태그에 따라서, 배열 인덱스 설정
-                                string tag = newItem.GetTag();
-                                int index = 0;
-                                if (tag == "꽃") index = 0;
-                                else if (tag == "깃털") index = 1;
-                                else if (tag == "모래") index = 2;
-                                else if (tag == "성배") index = 3;
-                                else if (tag == "왕관") index = 4;
-
-                                fullList[index] = newItem;
+                                fullList.Add(newItem);
                             }
                             else
                             {
                                 Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
-
-                            }
-                            GameManager.Instance.GetUserClass().SetUserEquippedEquipment(fullList.ToArray());
-                            Debug.Log("userEquippedEquipment 데이터 로드 완료");
-
-                        }
-                    }
-                    else if(equippedEquipmentDataObject is IDictionary<string, object> equippedEquipmentDataDict)
-                    {
-                        List<WeaponAndEquipCls> userEquippedEquipmentList = new List<WeaponAndEquipCls>();
-
-                        foreach (var equipData in equippedEquipmentDataDict)
-                        {
-                            if (equipData.Value is Dictionary<string, object> equipDict)
-                            {
-                                WeaponAndEquipCls equip = new WeaponAndEquipCls();
-                                equip.SetFromDictionary(equipDict);
-                                userEquippedEquipmentList.Add(equip);
-                            }
-                            else
-                            {
-                                Debug.LogError("자식 노드의 형식이 예상과 다릅니다.");
                             }
                         }
 
-                        GameManager.Instance.GetUserClass().SetUserEquippedEquipment(userEquippedEquipmentList.ToArray());
-
-                        Debug.Log("userEquippedEquipment 데이터 로드 완료");
+                        itemList.Clear();
+                        itemList.AddRange(fullList);
+                        Debug.Log(nodeName + " 데이터 로드 완료");
                     }
                     else
                     {
-                        Debug.LogError("userEquippedEquipment 데이터 형식 오류");
-                    }
-                }
-            }
-        }
-    }
-    // 아이템 리스트 정보 불러오기
-    private void LoadItemList(DataSnapshot snapshot, string nodeName, List<ItemClass> itemList, bool isWeaponAndEuip)
-    {
-        if(isWeaponAndEuip)
-        {
-            if (snapshot.Exists)
-            {
-                Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-                if (userDataDict != null)
-                {
-                    if (userDataDict.ContainsKey(nodeName))
-                    {
-                        object itemDataObject = userDataDict[nodeName];
-
-                        if (itemDataObject is IList<object> itemDataList)
-                        {
-                            List<WeaponAndEquipCls> fullList = new List<WeaponAndEquipCls>();
-
-                            foreach (var data in itemDataList)
-                            {
-                                if (data is IDictionary<string,object> stringDataList)
-                                {
-                                    Dictionary<string, object> convertDic = new Dictionary<string, object>();
-
-                                    foreach (var stringData in stringDataList)
-                                    {
-                                        string key = stringData.Key;
-                                        object value = stringData.Value;
-                                        convertDic.Add(key, value);
-                                    }
-
-                                    WeaponAndEquipCls newItem = new WeaponAndEquipCls();
-                                    newItem.SetFromDictionary(convertDic);
-                                    fullList.Add(newItem);
-                                }
-                                else
-                                {
-                                    Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
-                                }
-                            }
-
-                            itemList.Clear();
-                            itemList.AddRange(fullList);
-                            Debug.Log(nodeName + " 데이터 로드 완료");
-                        }
-                        else
-                        {
-                            Debug.LogError(nodeName + " 데이터 형식 오류");
-                        }
+                        Debug.LogError(nodeName + " 데이터 형식 오류");
                     }
                 }
             }
@@ -597,82 +582,83 @@ public class FireBaseManager : Singleton<FireBaseManager>
             if (snapshot.Exists)
             {
                 Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-                if (userDataDict != null)
+                if (userDataDict != null && userDataDict.ContainsKey(nodeName))
                 {
-                    if (userDataDict.ContainsKey(nodeName))
+                    object itemDataObject = userDataDict[nodeName];
+
+                    if (itemDataObject is IList<object> itemDataList)
                     {
-                        object itemDataObject = userDataDict[nodeName];
+                        List<ItemClass> fullList = new List<ItemClass>();
 
-                        if (itemDataObject is IList<object> itemDataList)
+                        foreach (var data in itemDataList)
                         {
-                            List<ItemClass> fullList = new List<ItemClass>();
-
-                            foreach (var data in itemDataList)
+                            if (data is IDictionary<string, object> stringDataList)
                             {
-                                if (data is IDictionary<string, object> stringDataList)
-                                {
-                                    Dictionary<string, object> convertDic = new Dictionary<string, object>();
+                                Dictionary<string, object> convertDic = new Dictionary<string, object>();
 
-                                    foreach (var stringData in stringDataList)
-                                    {
-                                        string key = stringData.Key;
-                                        object value = stringData.Value;
-                                        convertDic.Add(key, value);
-                                    }
-
-                                    ItemClass newItem = new ItemClass();
-                                    newItem.SetFromDictionary(convertDic);
-                                    fullList.Add(newItem);
-                                }
-                                else
+                                foreach (var stringData in stringDataList)
                                 {
-                                    Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+                                    string key = stringData.Key;
+                                    object value = stringData.Value;
+                                    convertDic.Add(key, value);
                                 }
+
+                                ItemClass newItem = new ItemClass();
+                                newItem.SetFromDictionary(convertDic);
+                                fullList.Add(newItem);
                             }
+                            else
+                            {
+                                Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+                            }
+                        }
 
-                            itemList.Clear();
-                            itemList.AddRange(fullList);
-                            Debug.Log(nodeName + " 데이터 로드 완료");
-                        }
-                        else
-                        {
-                            Debug.LogError(nodeName + " 데이터 형식 오류");
-                        }
+                        itemList.Clear();
+                        itemList.AddRange(fullList);
+                        Debug.Log(nodeName + " 데이터 로드 완료");
+                    }
+                    else
+                    {
+                        Debug.LogError(nodeName + " 데이터 형식 오류");
                     }
                 }
             }
         }
-        
     }
-    private void LoadUserLastConnectTime(DataSnapshot snapshot)
+    private async UniTask LoadUserLastConnectTime(DataSnapshot snapshot)
     {
-        LoadSimpleData<DateTime>(snapshot, "userLastConnectTime", (lastConnectTime) =>
+        await UniTask.SwitchToMainThread();
+        await LoadSimpleData<DateTime>(snapshot, "userLastConnectTime", (lastConnectTime) =>
         {
             GameManager.Instance.GetUserClass().SetUserLastConnectTime(lastConnectTime);
             Debug.Log("userLastConnectTime 데이터 로드 완료");
         });
     }
 
-    private void LoadUserMora(DataSnapshot snapshot)
+    private async UniTask LoadUserMora(DataSnapshot snapshot)
     {
-        LoadSimpleData<int>(snapshot, "userMora", (mora) =>
+        await UniTask.SwitchToMainThread();
+        await LoadSimpleData<int>(snapshot, "userMora", (mora) =>
         {
             GameManager.Instance.GetUserClass().SetMora(mora);
             Debug.Log("userMora 데이터 로드 완료");
         });
     }
 
-    private void LoadUserStar(DataSnapshot snapshot)
+    private async UniTask LoadUserStar(DataSnapshot snapshot)
     {
-        LoadSimpleData<int>(snapshot, "userStar", (starLight) =>
+        await UniTask.SwitchToMainThread();
+        await LoadSimpleData<int>(snapshot, "userStar", (starLight) =>
         {
             GameManager.Instance.GetUserClass().NStarLight = starLight;
             Debug.Log("userStar 데이터 로드 완료");
         });
     }
 
-    private void LoadUserMail(DataSnapshot snapshot)
+    private async UniTask LoadUserMail(DataSnapshot snapshot)
     {
+        await UniTask.SwitchToMainThread();
+
         if (snapshot.Exists)
         {
             Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
@@ -698,8 +684,10 @@ public class FireBaseManager : Singleton<FireBaseManager>
             Debug.LogError("유저 이메일 데이터 로드 실패");
     }
 
-    private void LoadSimpleData<T>(DataSnapshot snapshot, string nodeName, Action<T> onDataLoaded)
+    private async UniTask LoadSimpleData<T>(DataSnapshot snapshot, string nodeName, Action<T> onDataLoaded)
     {
+        await UniTask.SwitchToMainThread();
+
         if (snapshot.Exists)
         {
             Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
@@ -717,81 +705,80 @@ public class FireBaseManager : Singleton<FireBaseManager>
         }
     }
 
-    void LoadQuestData(DataSnapshot snapshot)
+    private async UniTask LoadQuestData(DataSnapshot snapshot)
     {
+        await UniTask.SwitchToMainThread();
+
         if (snapshot.Exists)
         {
             List<QuestClass> questData = GameManager.Instance.GetUserClass().GetQuestList();
             Dictionary<string, object> userDataDict = snapshot.Value as Dictionary<string, object>;
-            if (userDataDict != null)
+            if (userDataDict != null && userDataDict.ContainsKey("questData"))
             {
-                if (userDataDict.ContainsKey("questData"))
+                object itemDataObject = userDataDict["questData"];
+
+                if (itemDataObject is IList<object> itemDataList)
                 {
-                    object itemDataObject = userDataDict["questData"];
+                    List<QuestClass> fullList = new List<QuestClass>();
 
-                    if (itemDataObject is IList<object> itemDataList)
+                    foreach (var data in itemDataList)
                     {
-                        List<QuestClass> fullList = new List<QuestClass>();
-
-                        foreach (var data in itemDataList)
+                        if (data is IDictionary<string, object> stringDataList)
                         {
-                            if (data is IDictionary<string, object> stringDataList)
-                            {
-                                Dictionary<string, object> convertDic = new Dictionary<string, object>();
+                            Dictionary<string, object> convertDic = new Dictionary<string, object>();
 
-                                foreach (var stringData in stringDataList)
+                            foreach (var stringData in stringDataList)
+                            {
+                                string key = stringData.Key;
+                                object value = stringData.Value;
+
+                                if (value is IDictionary<string, object> valueDataDic)
                                 {
-                                    string key = stringData.Key;
-                                    object value = stringData.Value;
-
-                                    if(value is IDictionary<string , object> valueDataDic)
+                                    List<object> insideList = new List<object>();
+                                    foreach (var insideData in valueDataDic)
                                     {
-                                        List<object> insideList = new List<object>();
-                                        foreach (var insideData in valueDataDic)
-                                        {
-                                            insideList.Add(insideData.Value);
-                                        }
-                                        convertDic.Add(key, insideList);
+                                        insideList.Add(insideData.Value);
                                     }
-                                    if(value is IList<object> valueDataList)
-                                    {
-                                        List<object> insideList = new List<object>();
-                                        foreach(var insideData in valueDataList)
-                                        {
-                                            insideList.Add(insideData);
-                                        }
-                                        convertDic.Add(key, insideList);
-                                    }
-                                    else
-                                    {
-                                        convertDic.Add(key, value);
-                                    }
+                                    convertDic.Add(key, insideList);
                                 }
+                                if (value is IList<object> valueDataList)
+                                {
+                                    List<object> insideList = new List<object>();
+                                    foreach (var insideData in valueDataList)
+                                    {
+                                        insideList.Add(insideData);
+                                    }
+                                    convertDic.Add(key, insideList);
+                                }
+                                else
+                                {
+                                    convertDic.Add(key, value);
+                                }
+                            }
 
-                                QuestClass newItem = new QuestClass();
-                                newItem.SetFromDictionary(convertDic);
-                                fullList.Add(newItem);
-                            }
-                            else
-                            {
-                                Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
-                            }
+                            QuestClass newItem = new QuestClass();
+                            newItem.SetFromDictionary(convertDic);
+                            fullList.Add(newItem);
                         }
-
-                        questData.Clear();
-                        questData.AddRange(fullList);
-
-                        // 퀘스트 타임 체크 및 재설정
-                        QuestManager questMng =  QuestManager.Instance;
-                        if (questMng != null)
-                            questMng.QuestD_DayRest();
-                        
-                        Debug.Log("퀘스트 데이터 로드 완료");
+                        else
+                        {
+                            Debug.LogError("데이터 형식이 맞지 않습니다: " + data);
+                        }
                     }
-                    else
-                    {
-                        Debug.LogError("퀘스트 데이터 형식 오류");
-                    }
+
+                    questData.Clear();
+                    questData.AddRange(fullList);
+
+                    // 퀘스트 타임 체크 및 재설정
+                    QuestManager questMng = QuestManager.Instance;
+                    if (questMng != null)
+                        questMng.QuestD_DayRest();
+
+                    Debug.Log("퀘스트 데이터 로드 완료");
+                }
+                else
+                {
+                    Debug.LogError("퀘스트 데이터 형식 오류");
                 }
             }
         }

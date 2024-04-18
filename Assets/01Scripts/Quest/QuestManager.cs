@@ -206,7 +206,7 @@ public class QuestManager : Singleton<QuestManager>
         { curValue += i; }
 
         // 퀘스트 클리어 가능일 시,
-        if(curValue == maxValue)
+        if(curValue == maxValue && obj.QuestData.IsClear == false)
         {   // 보상창 출력
             master.RewardObjectOpen(CompensationProcessing(obj));
             obj.QuestData.IsClear = true;
@@ -278,8 +278,6 @@ public class QuestManager : Singleton<QuestManager>
                 havData.SetNumber(havCnt + rewardData.nNumber);
             }
         }
-
-        
         // 보상 텍스트 작성
         textValue = "보상 : " + rewardData.sValue + ", " + rewardData.nNumber + " 획득!";
         
