@@ -5,7 +5,9 @@ using UnityEngine.UI;
 using TMPro;
 using System.Linq;
 using System.Collections;
-
+using Cysharp.Threading;
+using Cysharp.Threading.Tasks;
+using Cysharp;
 public class PrintTextFieldUICls : MonoBehaviour
 {
     TextMeshProUGUI contentText;                                        // 내용 텍스트 객체
@@ -53,65 +55,128 @@ public class PrintTextFieldUICls : MonoBehaviour
     #region 텍스트 출력
 
     // 출력
-    public void ContentTextPrint(string[] contentTexts, string title, float intervalSec)
+    public async void ContentTextPrint(string[] contentTexts, string title, float intervalSec)
     {
         OpenPrintUI_Object();
         nowCnt = 0;
         targetCnt = contentTexts.Length;
-        StartCoroutine(RepeatText(contentTexts, title, intervalSec));
+        await RepeatText(contentTexts, title, intervalSec);
     }
 
-    IEnumerator RepeatText(string[] texts, string title, float intervalSec)
+    async UniTask RepeatText(string[] texts, string title, float intervalSec)
     {
+        bool isEnd = false;
         for (int i = 0; i < texts.Length; i++)
         {
             contentText.text = "";
             titleText.text = title;
-            yield return StartCoroutine(ShowText(texts[i], intervalSec));
+            await ShowText(texts[i], intervalSec);
         }
     }
-
-    public void ContentTextPrint(string conText, string title, float intervalSec)
+    public async UniTask ContentTextPrint(string conText, string title, float intervalSec)
     {
         OpenPrintUI_Object();
         nowCnt = 0;
         targetCnt = 1;
         contentText.text = "";
         titleText.text = title;
-        StartCoroutine(ShowText(conText, intervalSec));
+        await ShowText(conText, intervalSec);
     }
 
-    IEnumerator ShowText(string text, float sec)
+    async UniTask ShowText(string text, float sec)
     {
         string curText = "";
-        obj_arrowImg.SetActive(false);                              // 화살표 객체는 비활성화
+        obj_arrowImg.SetActive(false); // 화살표 객체는 비활성화
 
-        isSkip = false;              // 플래그 변수들을 다시 초기화
+        isSkip = false; // 플래그 변수들을 다시 초기화
         isNext = false;
 
         // 인터벌 간격으로 텍스트 출력
         for (int i = 0; i < text.Length; i++)
         {
-            if (isSkip == true)     // 스킵이 true라면 반복문 탈출
+            if (isSkip == true) // 스킵이 true라면 반복문 탈출
                 break;
 
             curText = text.Substring(0, i + 1);
             contentText.text = curText;
-            yield return new WaitForSeconds(sec);
+            await UniTask.Delay(TimeSpan.FromSeconds(sec));
         }
 
-        contentText.text = text;        // 전체 텍스트 출력
-        isSkip = true;                  // 무조건 넥스트 판정을 위한, 스킵 true화
+        contentText.text = text; // 전체 텍스트 출력
+        isSkip = true; // 무조건 넥스트 판정을 위한, 스킵 true화
         while (!isNext)
         {
-            obj_arrowImg.SetActive(true);                        // 화살표 객체 활성화
-            yield return new WaitForSeconds(1);
+            obj_arrowImg.SetActive(true); // 화살표 객체 활성화
+            await UniTask.Delay(TimeSpan.FromSeconds(1));
         }
-        isSkip = false;              // 플래그 변수들을 다시 초기화
+        isSkip = false; // 플래그 변수들을 다시 초기화
         isNext = false;
         nowCnt++;
-        yield break;
     }
+
+    #region 코루틴 레거시
+
+    //public void ContentTextPrint(string[] contentTexts, string title, float intervalSec)
+    //{
+    //    OpenPrintUI_Object();
+    //    nowCnt = 0;
+    //    targetCnt = contentTexts.Length;
+    //    StartCoroutine(RepeatText(contentTexts, title, intervalSec));
+    //}
+
+    //IEnumerator RepeatText(string[] texts, string title, float intervalSec)
+    //{
+    //    for (int i = 0; i < texts.Length; i++)
+    //    {
+    //        contentText.text = "";
+    //        titleText.text = title;
+    //        yield return StartCoroutine(ShowText(texts[i], intervalSec));
+    //    }
+    //}
+
+    //public void ContentTextPrint(string conText, string title, float intervalSec)
+    //{
+    //    OpenPrintUI_Object();
+    //    nowCnt = 0;
+    //    targetCnt = 1;
+    //    contentText.text = "";
+    //    titleText.text = title;
+    //    StartCoroutine(ShowText(conText, intervalSec));
+    //}
+
+    //IEnumerator ShowText(string text, float sec)
+    //{
+    //    string curText = "";
+    //    obj_arrowImg.SetActive(false);                              // 화살표 객체는 비활성화
+
+    //    isSkip = false;              // 플래그 변수들을 다시 초기화
+    //    isNext = false;
+
+    //    // 인터벌 간격으로 텍스트 출력
+    //    for (int i = 0; i < text.Length; i++)
+    //    {
+    //        if (isSkip == true)     // 스킵이 true라면 반복문 탈출
+    //            break;
+
+    //        curText = text.Substring(0, i + 1);
+    //        contentText.text = curText;
+    //        yield return new WaitForSeconds(sec);
+    //    }
+
+    //    contentText.text = text;        // 전체 텍스트 출력
+    //    isSkip = true;                  // 무조건 넥스트 판정을 위한, 스킵 true화
+    //    while (!isNext)
+    //    {
+    //        obj_arrowImg.SetActive(true);                        // 화살표 객체 활성화
+    //        yield return new WaitForSeconds(1);
+    //    }
+    //    isSkip = false;              // 플래그 변수들을 다시 초기화
+    //    isNext = false;
+    //    nowCnt++;
+    //    yield break;
+    //}
+
+    #endregion
 
     // next 버튼
     void ClickNextButton()
