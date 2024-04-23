@@ -113,6 +113,7 @@
     <Compile Include="Assets\01Scripts\GameField\Object\ObjectTriggerEnterCheck.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\PuzzleObject.cs" />
     <Compile Include="Assets\01Scripts\GameField\Objects.cs" />
+    <Compile Include="Assets\01Scripts\GameField\SoundManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\TimelineManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\AttackRange.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\CharacterViewRange.cs" />
