@@ -567,6 +567,30 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         }
     }
 
+    #region 지역 입장 체크
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("BossZone"))
+        {
+            if(other.name == "BossZone_1")
+            {
+                SoundManager.Instance.BgmSoundSetting(SoundManager.eTYPE_BGM.GolemBoss);
+            }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("BossZone"))
+        {
+            if (other.name == "BossZone_1")
+            {
+                SoundManager.Instance.BgmSoundSetting(SoundManager.eTYPE_BGM.Deongun);
+            }
+        }
+    }
+    #endregion
+
 
 
     #region 게터세터

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-
+using System;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 public class SoundManager : Singleton<SoundManager>
 {
     public enum eTYPE_BGM
@@ -48,7 +50,7 @@ public class SoundManager : Singleton<SoundManager>
             }
         }
     }
-    public void PlayBGM(eTYPE_BGM type, float volum = 1.0f, bool isloop = true)
+    private void PlayBGM(eTYPE_BGM type, float volum = 1.0f, bool isloop = true)
     {
         if (bgmPlayer.isPlaying && bgmPlayer.clip == bgmClips[(int)type])
         {
@@ -92,4 +94,63 @@ public class SoundManager : Singleton<SoundManager>
         AS.Play();
         _ltEffPlayers.Add(AS);
     }
+    public async UniTaskVoid PlayEffect(GameObject obj, eTYPE_EFFECT type, float volume, float time, bool loop)
+    {
+        // AudioSource를 생성하고 설정합니다.
+        GameObject go = new GameObject("EffectClips");
+        go.transform.SetParent(obj.transform);
+        go.transform.localPosition = Vector3.zero;
+
+        AudioSource audioSource = go.AddComponent<AudioSource>();
+        audioSource.clip = EffectClips[(int)type];
+        audioSource.volume = volume;
+        audioSource.loop = loop;
+
+        // 사운드를 재생합니다.
+        audioSource.Play();
+
+        // 지정된 시간이 경과할 때까지 대기합니다.
+        int delayTimeMillis = Mathf.Min((int)(time * 1000), (int)(audioSource.clip.length * 1000));
+        await UniTask.Delay(delayTimeMillis);
+
+        // 사운드를 중지하고 GameObject를 제거합니다.
+        audioSource.Stop();
+        Destroy(go);
+    }
+
+
+    #region 브금처리
+
+    public void BgmSoundSetting(string name)
+    {
+        switch (name)
+        {
+            case "GameField":
+                PlayBGM(eTYPE_BGM.Field);
+                break;
+            case "Dungeon_1":
+                PlayBGM(eTYPE_BGM.Deongun);
+                break;
+            case "GolemBoss":
+                PlayBGM(eTYPE_BGM.GolemBoss);
+                break;
+        }
+    }
+    public void BgmSoundSetting(eTYPE_BGM type)
+    {
+        switch (type)
+        {
+            case eTYPE_BGM.Field:
+                PlayBGM(eTYPE_BGM.Field);
+                break;
+            case eTYPE_BGM.Deongun:
+                PlayBGM(eTYPE_BGM.Deongun);
+                break;
+            case eTYPE_BGM.GolemBoss:
+                PlayBGM(eTYPE_BGM.GolemBoss);
+                break;
+        }
+    }
+
+    #endregion
 }

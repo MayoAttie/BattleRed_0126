@@ -143,8 +143,8 @@ public class DungeonMng_1 : DungeonManager, Observer
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if(playerObj != null && !isAfterSetting)
         {
-            MonsterSpawn();
             isAfterSetting = true;
+            MonsterSpawn();
             
             // 체크포인트에 옵저버 패턴 연결
             GameObject[] checkPoints = GameObject.FindGameObjectsWithTag("CheckPoint");

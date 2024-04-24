@@ -52,13 +52,16 @@ public class SceneLoadManager : Singleton<SceneLoadManager>
         }
     }
 
-#region 싱글로딩
+
+
+    #region 싱글로딩
     //싱글 로딩, 로딩바 표시
     public void SceneLoadder(string sceneName)
     {
         nextScene = sceneName;
         eCurrnetState = eLoadingState.ING;
         StartCoroutine(LoadSceneManager());
+        SoundManager.Instance.BgmSoundSetting(sceneName);
     }
     //싱글 로딩, 로딩바 표시X
     public void SceneLoadderForNotLoadProcessShow(string sceneName)

@@ -6,6 +6,9 @@ using static HandlePauseTool;
 using static UI_UseToolClass;
 using static UseTool;
 using UnityEngine.AI;
+using Cysharp.Threading.Tasks;
+using System;
+using System.Threading;
 
 public class CharacterControlMng : Subject, Observer
 {
@@ -39,10 +42,11 @@ public class CharacterControlMng : Subject, Observer
     float verticalSpeed = 0f;                   // 수직 속력 변수
     float yDegreeSave;                          // y축 각도를 저장하기 위한 변수(달리기에 사용)
     
-    int nBlinkNumber = 2;                       // 회피기 숫자
-    Coroutine blinkCoolTimeCoroutine;           // Coroutine 객체를 저장할 변수
-    Coroutine jumpFinishCoroutine;              // 점프 애니메이션 관리용 코루틴
-    CharacterManager characMng;                 // 캐릭터 매니저 싱글턴
+    int nBlinkNumber = 2;                                       // 회피기 숫자
+    Coroutine blinkCoolTimeCoroutine;                           // Coroutine 객체를 저장할 변수
+    Coroutine jumpFinishCoroutine;                              // 점프 애니메이션 관리용 코루틴
+    CancellationTokenSource moveSoundControlTokenSource;        // 무브 사운드용 유니테스크 인스턴스
+    CharacterManager characMng;                                 // 캐릭터 매니저 싱글턴
     e_BlinkPos blinkpos;
     #endregion
 
@@ -218,6 +222,43 @@ public class CharacterControlMng : Subject, Observer
             yDegreeSave = 0;
             characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_Idle);
             controller.Move(Vector3.zero);
+            CancelMoveSoundControl();
+        }
+        else
+            StartMoveSoundControl(1.4f);
+    }
+
+    #endregion
+
+    #region 사운드처리
+    private void StartMoveSoundControl(float time)
+    {
+        if (moveSoundControlTokenSource == null)
+        {
+            moveSoundControlTokenSource = new CancellationTokenSource();
+            MoveSoundControl(time, moveSoundControlTokenSource.Token).Forget();
+        }
+    }
+
+    private void CancelMoveSoundControl()
+    {
+        if (moveSoundControlTokenSource != null)
+        {
+            moveSoundControlTokenSource.Cancel();
+            moveSoundControlTokenSource.Dispose();
+            moveSoundControlTokenSource = null;
+        }
+    }
+
+    private async UniTaskVoid MoveSoundControl(float time, CancellationToken token)
+    {
+        while (!token.IsCancellationRequested)
+        {
+            if (!Mathf.Approximately(zPos, 0f) || !Mathf.Approximately(xPos, 0f))
+            {
+                SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.walk, Mathf.Infinity, time, false).Forget();
+            }
+            await UniTask.Delay(TimeSpan.FromSeconds(time), cancellationToken: token);
         }
     }
     #endregion
@@ -260,8 +301,6 @@ public class CharacterControlMng : Subject, Observer
             Vector3 verticalMove = new Vector3(0f, verticalSpeed, 0f);
             controller.Move(verticalMove * Time.deltaTime);
 
-            //velocity.y += jumpHeight * Time.deltaTime;
-            //controller.Move(velocity * jumpHeight * Time.deltaTime);
             if (jumpFinishCoroutine == null)
                 jumpFinishCoroutine = StartCoroutine(JumFinish());
         }
@@ -335,7 +374,6 @@ public class CharacterControlMng : Subject, Observer
         if (characMng.GetCharacterClass().GetState() != CharacterClass.eCharactgerState.e_RUN && Mathf.Approximately(zPos, 0f) && Mathf.Approximately(xPos, 0f))
             return;
 
-
         if (zPos > 0.3f)
         {
             if (xPos>0.7f)
@@ -370,7 +408,10 @@ public class CharacterControlMng : Subject, Observer
                 controller.Move(Vector3.zero);
                 instance.OffBattleMode();
                 characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+                CancelMoveSoundControl();
             }
+            else
+                StartMoveSoundControl(0.4f);
         }
         else
         {
@@ -421,6 +462,7 @@ public class CharacterControlMng : Subject, Observer
                 float dgree = GameManager.Instance.MainCamera.transform.eulerAngles.y;
                 transform.rotation = Quaternion.Euler(transform.eulerAngles.x, dgree, transform.eulerAngles.z);
                 characMng.GetCharacterClass().SetState(CharacterClass.eCharactgerState.e_ATTACK);
+                CancelMoveSoundControl();
             }
             else
             {
@@ -430,7 +472,7 @@ public class CharacterControlMng : Subject, Observer
                     controller.Move((move * 12 - velocity) * Time.deltaTime); // 중력이 적용된 이동
                 else
                     controller.Move((move * 12 + velocity) * Time.deltaTime); // 중력이 적용된 이동
-
+                StartMoveSoundControl(0.4f);
             }
         }
 

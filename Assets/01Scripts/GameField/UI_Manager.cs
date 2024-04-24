@@ -970,9 +970,9 @@ public class UI_Manager : EnergyBarManager
         ItemClass tmp = WeaponsList.Find(item => item.GetId().Equals(ExistingItem.GetId()));                    // 기존 장착중인 아이템 리스트에서 찾기
         tmp.SetActive(false);                                                                   // 장착 중이던 아이템을 활성화 X
 
-        ItemClass SelectItem = WeaponsList.Find(item => item.Equals(cls));              // 선택한 아이템 찾기
-        SelectItem.SetActive(true);                                                     // 장착할 아이템 활성화 O
-        GameManager.Instance.GetUserClass().SetUserEquippedWeapon(SelectItem);          // 선택한 아이템 장착
+        ItemClass SelectItem = WeaponsList.Find(item => item.GetId().Equals(cls.GetId()));              // 선택한 아이템 찾기
+        SelectItem.SetActive(true);                                                                     // 장착할 아이템 활성화 O
+        GameManager.Instance.GetUserClass().SetUserEquippedWeapon(SelectItem);                          // 선택한 아이템 장착
         CharacterDataReviseToWeapon();          // 아이템 데이터 증가
 
         // 새로 장착하여 변경된 아이템들을 UI에 출력
@@ -2580,7 +2580,7 @@ public class UI_Manager : EnergyBarManager
             ItemClass tmp = equipList.Find(item => item.GetId().Equals(ExistingItem.GetId()));                              // 기존 장착중인 아이템 리스트에서 찾기
             tmp.SetActive(false);                                                                           // 장착 중이던 아이템을 활성화 X
 
-            ItemClass SelectItem = equipList.Find(item => item.Equals(cls));                        // 선택한 아이템 찾기
+            ItemClass SelectItem = equipList.Find(item => item.GetId().Equals(cls.GetId()));                        // 선택한 아이템 찾기
             SelectItem.SetActive(true);                                                             // 장착할 아이템 활성화 O
             GameManager.Instance.GetUserClass().SetEquipedEquipmentList(SelectItem, index);         // 선택한 아이템 장착
             CharacterDataReviseToEquipment(index);                                                  // 착용한 장비 데이터 수정
@@ -2599,7 +2599,7 @@ public class UI_Manager : EnergyBarManager
         else if(equipedEquipList[index] == null)
         {
             // 선택한 성유물 파츠의 착용 여부가 null일 경우, 바로 장착
-            ItemClass SelectItem = equipList.Find(item => item.Equals(cls));                        // 선택한 아이템 찾기
+            ItemClass SelectItem = equipList.Find(item => item.GetId().Equals(cls.GetId()));                        // 선택한 아이템 찾기
             SelectItem.SetActive(true);                                                             // 장착할 아이템 활성화 O
             GameManager.Instance.GetUserClass().SetEquipedEquipmentList(SelectItem, index);         // 선택한 아이템 장착
             CharacterDataReviseToEquipment(index);                                                  // 착용한 장비 데이터 수정

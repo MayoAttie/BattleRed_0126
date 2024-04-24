@@ -11,6 +11,7 @@ public class EffectManager : Singleton<EffectManager>
     // 1번 : 무색 폭죽
     // 2번 : 붉은 발광
     // 3번 : 폭발
+    // 4번 : 매직 drop 오라(푸른색)
     [SerializeField] GameObject[] effects;
     [SerializeField] GameObject[] ui_effect;
 

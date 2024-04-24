@@ -18,6 +18,7 @@ TagManager:
   - CameraAttachSubjects
   - Fire
   - Manager
+  - BossZone
   layers:
   - Default
   - TransparentFX

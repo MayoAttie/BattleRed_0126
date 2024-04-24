@@ -37,6 +37,9 @@ public class ObjectManager : Singleton<ObjectManager>
             case "던전1":
                 obj.ObjectClickEventSet().onClick.AddListener(() => DungeonEntrence(1));
                 break;
+            case "치료비석":
+                obj.ObjectClickEventSet().onClick.AddListener(() => HealObjectFunction());
+                break;
             case "던전중간통로":
                 obj.ObjectClickEventSet().onClick.AddListener(() => DungeonMiddleDoor(obj));
                 break;
@@ -129,6 +132,20 @@ public class ObjectManager : Singleton<ObjectManager>
         obj2.SetActive(false);
     }
 
+    #endregion
+
+    #region 치료비석
+
+    void HealObjectFunction()
+    {
+        float maxHp = GameManager.Instance.GetUserClass().GetUserCharacter().GetMaxHp();
+        float curHp = GameManager.Instance.GetUserClass().GetUserCharacter().GetCurrentHp();
+        UI_Manager.Instance.HpBarFill_Init(curHp);
+        GameManager.Instance.GetUserClass().GetUserCharacter().SetCurrentHp((int)maxHp);
+        EffectManager.Instance.EffectCreate(CharacterManager.Instance.transform, 4,new Vector3(0,1,0),1.3f);
+        UI_Manager.Instance.HpBarFill_End(maxHp, maxHp, true);
+    }
+    
     #endregion
 
 
@@ -294,7 +311,7 @@ public class ObjectManager : Singleton<ObjectManager>
 
     #endregion
 
-    #region 원형블럭 객체_컨트롤 토템
+    #region 던전1_지하미궁_원형블럭 객체_컨트롤 토템
 
     void CircleBlock_ControlTotem(InteractionObject obj)
     {

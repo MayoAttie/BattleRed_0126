@@ -105,7 +105,7 @@ public class MobGolemBossAttack : MonsterAttack
                     skillAtkFlag = true;
                     IsChageReturn = true;
                     SetAttackLevel(e_MonsterAttackLevel._4th);          // 대기 동작
-                    yield return new WaitForSeconds(2.2f);
+                    yield return new WaitForSeconds(2.9f);
 
                     StartCoroutine(SkillStart());                       // 스킬 시전
 
@@ -143,17 +143,32 @@ public class MobGolemBossAttack : MonsterAttack
     // 애니메이션 크기 동안 대기하는 코루틴 함수
     IEnumerator Attack_Normal()
     {
-
-        GetAtkColliderBox().gameObject.SetActive(true);
         // 현재 재생 중인 애니메이션 클립의 이름 가져오기
         string clipName = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
 
         // 애니메이션 클립의 재생시간 가져오기
         float animationTime = GetAnimationTime(clipName);
+        float waitTime1 = animationTime * 0.7f;
+        float waitTime2 = animationTime * 0.3f;
 
         // 애니메이션 재생시간까지 대기
         float elapsedTime = 0f;
-        while (elapsedTime < animationTime)
+        while (elapsedTime < waitTime1)
+        {
+            if (GetTargetInRange() == false)
+            {
+                ResetDatas();
+                GetAtkColliderBox().gameObject.SetActive(false);
+                yield break;
+            }
+
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        
+        GetAtkColliderBox().gameObject.SetActive(true);
+        elapsedTime = 0f;
+        while (elapsedTime < waitTime2)
         {
             if (GetTargetInRange() == false)
             {
@@ -167,8 +182,21 @@ public class MobGolemBossAttack : MonsterAttack
         }
 
         GetAtkColliderBox().gameObject.SetActive(false);
-        normalAtkFlag = false;
+        
+        SetAttackLevel(e_MonsterAttackLevel._4th);
+        elapsedTime = 0f;
+        while (elapsedTime < 1.3f)
+        {
+            if (GetTargetInRange() == false)
+            {
+                ResetDatas();
+                yield break;
+            }
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
 
+        normalAtkFlag = false;
     }
 
     // 애니메이션 클립의 재생시간을 가져오는 함수

@@ -108,6 +108,7 @@ public class CharacterAttackMng : Subject, Observer
         // 애니메이션 제어
         NotifyAtkLevel((e_AttackLevel)nAtkLevel);   // 바뀐 공격 상태를 캐릭터 매니저에 알림
         characMng.GetCharacterClass().SetState(eCharactgerState.e_ATTACK);
+        SoundControl();
         //Invoke("OffBattleMode", 8f);
     }
 
@@ -122,6 +123,7 @@ public class CharacterAttackMng : Subject, Observer
                 nAtkLevel = (int)e_AttackLevel.Attack1;
             // 애니메이션 제어
             NotifyAtkLevel((e_AttackLevel)nAtkLevel);
+            SoundControl();
             return;
         }
         isAnimationIng = false;                         // 애니메이션 동작 종료
@@ -173,6 +175,7 @@ public class CharacterAttackMng : Subject, Observer
 
         float time = CharacterManager.Instance.GetCharacterClass().GetSkillCoolTime();
 
+        SoundControl();
         GameObject skillButton = GameObject.Find("AtkSkillButton");
         if(skillButton != null)
         {
@@ -248,6 +251,31 @@ public class CharacterAttackMng : Subject, Observer
         characMng.GetCharacterClass().SetState(eCharactgerState.e_ATTACK);
     }
 
+    #endregion
+
+    #region 사운드 처리
+    void SoundControl()
+    {
+        if(nAtkLevel == (int)e_AttackLevel.Attack1)
+        {
+            SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.sword1, 0.6f);
+        }
+        else if(nAtkLevel == (int)e_AttackLevel.Attack2)
+        {
+            SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.sword2, 0.6f);
+
+        }
+        else if(nAtkLevel == (int)e_AttackLevel.Attack3)
+        {
+            SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.sword3, 0.6f);
+
+        }
+        else if(nAtkLevel == (int)e_AttackLevel.AtkSkill)
+        {
+            SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.sword4, 0.6f);
+
+        }
+    }
     #endregion
 
     #region 기타 함수

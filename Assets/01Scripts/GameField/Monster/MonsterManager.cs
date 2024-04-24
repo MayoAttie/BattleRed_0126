@@ -290,7 +290,7 @@ public class MonsterManager : Subject, Observer
     void PatrolAndIdle()
     {
         // Precedence 타입인 경우
-        if (monster.GetMonsterType() == e_MonsterType.Precedence)
+        if (monster.GetMonsterType() == e_MonsterType.Precedence || monster.GetMonsterType() == e_MonsterType.Elite || monster.GetMonsterType() == e_MonsterType.Boss)
         {
             if (isIdle)
             {
