@@ -1035,6 +1035,7 @@ MonoBehaviour:
   - {fileID: 8300000, guid: 7c0867c13812fad479503f4043831bb7, type: 3}
   - {fileID: 8300000, guid: 064a8a1467bbd6840b0d25c5a21d9f0a, type: 3}
   - {fileID: 8300000, guid: 781f59e8863d2e944946496ec71563a9, type: 3}
+  - {fileID: 8300000, guid: c32111fa94f717e4e953072ffdd29af4, type: 3}
   EffectClips:
   - {fileID: 8300000, guid: 9b713c76b05f8b04882a23a60605b0d2, type: 3}
   - {fileID: 8300000, guid: a7736c1763bd76c4eb0d52aaad581deb, type: 3}

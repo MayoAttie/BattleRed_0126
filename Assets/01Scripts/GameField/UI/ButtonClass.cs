@@ -69,6 +69,8 @@ public class ButtonClass : MonoBehaviour
     {
         // 버튼이 눌릴 때 호출되는 이벤트
         onPressed.Invoke();
+
+        SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
     }
 
     public void OnButtonDown()
@@ -79,6 +81,7 @@ public class ButtonClass : MonoBehaviour
 
         // 버튼이 눌렸을 때 호출되는 이벤트
         onButtonDown.Invoke();
+
     }
 
     public void OnButtonUp()

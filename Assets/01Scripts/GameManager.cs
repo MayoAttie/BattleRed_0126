@@ -1445,7 +1445,8 @@ public class GameManager : Singleton<GameManager>
 
     public void ChangeSceneManaging()
     {
-        FireBaseManager.Instance.LoadUserDataForGameManager();
+        if(SceneLoadManager.isDownloadUerData == false)
+            FireBaseManager.Instance.LoadUserDataForGameManager();
         Transform startPos = null;
         GameObject[] allObjects = GameObject.FindObjectsOfType<GameObject>();
 

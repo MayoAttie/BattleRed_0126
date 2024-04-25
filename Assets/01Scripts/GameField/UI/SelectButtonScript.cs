@@ -84,6 +84,7 @@ public class SelectButtonScript : MonoBehaviour
 
         if (!isClicked)
         {
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.confirmMenu);
             // 이미지 알파값을 80%로 변경
             SetImageAlpha(topBgr, 0.7f);
             SetImageAlpha(itemImage, 0.7f);
@@ -91,6 +92,7 @@ public class SelectButtonScript : MonoBehaviour
         }
         else
         {
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.cancleMenu);
             // 이미지 알파값을 원래 값으로 복원
             SetImageAlpha(topBgr, 1f);
             SetImageAlpha(itemImage, 1f);

@@ -113,7 +113,6 @@
     <Compile Include="Assets\01Scripts\GameField\Object\ObjectTriggerEnterCheck.cs" />
     <Compile Include="Assets\01Scripts\GameField\Object\PuzzleObject.cs" />
     <Compile Include="Assets\01Scripts\GameField\Objects.cs" />
-    <Compile Include="Assets\01Scripts\GameField\SoundManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\TimelineManager.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\AttackRange.cs" />
     <Compile Include="Assets\01Scripts\GameField\Tools\CharacterViewRange.cs" />
@@ -154,6 +153,7 @@
     <Compile Include="Assets\01Scripts\Quest\QuestManager.cs" />
     <Compile Include="Assets\01Scripts\SceneMaster\DontDestroyer.cs" />
     <Compile Include="Assets\01Scripts\SceneMaster\SceneLoadManager.cs" />
+    <Compile Include="Assets\01Scripts\SceneMaster\SoundManager.cs" />
     <Compile Include="Assets\01Scripts\UseTool.cs" />
     <Compile Include="Assets\02Assets\Hovl Studio\HSFiles\Scripts\For demo scenes\HS_CameraHolder.cs" />
     <Compile Include="Assets\02Assets\UJoystick\Content\Script\Core\bl_Joystick.cs" />

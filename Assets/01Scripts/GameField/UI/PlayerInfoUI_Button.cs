@@ -40,6 +40,7 @@ public class PlayerInfoUI_Button : MonoBehaviour
     {
         // UI 매니저에 선택한 버튼 객체의 인덱스를 방송하고, 함수 호출
         UI_Manager.Instance.InfoSelectButton(index);
+        SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
     }
 
     // 클릭된 버튼 UI 수정 함수

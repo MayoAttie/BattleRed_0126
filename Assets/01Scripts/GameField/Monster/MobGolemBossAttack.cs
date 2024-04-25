@@ -165,7 +165,10 @@ public class MobGolemBossAttack : MonsterAttack
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        
+
+        // 사운드
+        SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.punch, 0.7f, 0.3f, false).Forget();
+
         GetAtkColliderBox().gameObject.SetActive(true);
         elapsedTime = 0f;
         while (elapsedTime < waitTime2)
@@ -240,6 +243,9 @@ public class MobGolemBossAttack : MonsterAttack
             elapsedTime += Time.deltaTime;
             yield return null;
         }
+
+        //사운드
+        SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.explosion, 0.7f, 0.4f, false).Forget();
 
         foreach (var i in floorings)
         {

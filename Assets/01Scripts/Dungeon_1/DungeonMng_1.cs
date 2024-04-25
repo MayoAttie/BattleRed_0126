@@ -4,9 +4,12 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 public class DungeonMng_1 : DungeonManager, Observer
 {
-    bool isAfterSetting = false;
+    bool isAfterSetting = false;                // 던전 세팅 체크 플래그 변수
     bool[] is_checkPointSpawn;                  // 체크포인트 몬스터 스폰 제어플래그
-    public List<GameObject> list_wave_1;
+    public List<GameObject> list_wave_1;        // 스폰 포인트 진입시, 생성할 몬스터 객체
+
+
+
     // 1번 던전 매니저
 
     void Awake()

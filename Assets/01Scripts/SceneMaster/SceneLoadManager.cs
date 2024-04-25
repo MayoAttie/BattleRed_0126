@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 using TMPro;
 public class SceneLoadManager : Singleton<SceneLoadManager>
 {
+    public static bool isDownloadUerData = false;
+
     enum eLoadingState
     {
         NONE = 0,

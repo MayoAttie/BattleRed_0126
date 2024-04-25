@@ -74,6 +74,10 @@ public class MobCactusAttack : MonsterAttack
         {
             GetAtkColliderBox().gameObject.SetActive(true);
             isAtkAnimationConrolFlag = true;
+
+            // 펀치 사운드
+            SoundManager.Instance.PlayEffect(gameObject, SoundManager.eTYPE_EFFECT.punch, 0.7f, 0.3f,false).Forget();
+
             // 현재 재생 중인 애니메이션 클립의 이름 가져오기
             string clipName = animator.GetCurrentAnimatorClipInfo(0)[0].clip.name;
 

@@ -386,7 +386,7 @@ public class FireBaseManager : Singleton<FireBaseManager>
                 LoadQuestData(snapshot),
                 LoadUserMail(snapshot)
             );
-
+            SceneLoadManager.isDownloadUerData = true;
             Debug.Log("유저 데이터 로드 완료");
         }
         else

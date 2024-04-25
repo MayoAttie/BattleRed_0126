@@ -74,13 +74,21 @@ public class InvenItemObjClass : MonoBehaviour
             // 프레임 리셋.
             UI_Manager.Instance.ExpressFrameReset();
         }
+        
+    }
 
+    public void OnClickEventSound()
+    {
+        if(!isClicked)
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.confirmMenu);
+        else
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.cancleMenu);
+        isClicked = !isClicked;
     }
 
     public void ClickedUIApply()
     {
-        isClicked = !isClicked;
-
+        OnClickEventSound();
         switch(isClicked)
         {
             case true:

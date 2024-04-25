@@ -6,6 +6,11 @@ public class DungeonManager : MonoBehaviour
 {
     Transform monsters;
     [SerializeField] Transform[] objectTransforms;
+
+    [SerializeField]
+    Transform[] bossZones;                        // 보스존 객체
+
+
     protected void Awake()
     {
         monsters = GameObject.Find("GameObjParents").transform;
@@ -55,4 +60,7 @@ public class DungeonManager : MonoBehaviour
     public Transform GetMonstersTrasform() { return monsters; }
 
     public Transform[] ObjectTransforms { get { return objectTransforms; } }
+
+    public Transform[] BossZones{ get { return bossZones; } }
+
 }

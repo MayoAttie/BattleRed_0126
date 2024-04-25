@@ -1448,6 +1448,7 @@ public class UI_Manager : EnergyBarManager
                 // 버튼 클릭 이벤트 리스너 해제 및 연결
                 Button btn = tmp.GetButton();
                 btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => tmp.OnClickEventSound());
                 btn.onClick.AddListener(() => ClickMaterialItemForWeaponUpgrade(tmp, slectBtnCls, listObj));
                 tmp.EquippedItemUIPrint(false); // 장비 중인 아이템 표시용 이미지는 필요 없으므로 False
             }
@@ -1505,6 +1506,7 @@ public class UI_Manager : EnergyBarManager
                 // 버튼 클릭 이벤트 리스너 해제 및 연결
                 Button btn = tmp.GetButton();
                 btn.onClick.RemoveAllListeners();
+                btn.onClick.AddListener(() => tmp.OnClickEventSound());
                 btn.onClick.AddListener(() => ClickMaterialItemForEquipUpgrade(tmp, slectBtnCls, listObj));
                 tmp.EquippedItemUIPrint(false); // 장비 중인 아  이템 표시용 이미지는 필요 없으므로 False
             }
@@ -2094,6 +2096,7 @@ public class UI_Manager : EnergyBarManager
             // 버튼 클릭 이벤트 리스너 해제 및 연결
             Button btn = tmp.GetButton();
             btn.onClick.RemoveAllListeners();
+            btn.onClick.AddListener(() => tmp.OnClickEventSound());
             btn.onClick.AddListener(() => WeaponReforge_SelectResource(tmp, mainObj));
             tmp.EquippedItemUIPrint(false); // 장비 중인 아이템 표시용 이미지는 필요 없으므로 False
         }
@@ -2475,6 +2478,7 @@ public class UI_Manager : EnergyBarManager
             obj.GetButton().onClick.RemoveAllListeners();
             if (obj.GetItemcls().GetTag().Equals(tags[index]))
             {
+                obj.GetButton().onClick.AddListener(() => obj.OnClickEventSound());
                 obj.GetButton().onClick.AddListener(() => EquipmentChangeFunction(obj, index));
                 continue;
             }
@@ -3981,7 +3985,10 @@ public class UI_Manager : EnergyBarManager
                     itemsToRemove.Add(tmp);
                 }
                 else    // 버튼 리스너 연결, 기존 함수 Remove는 Obejct Print 단계에서 모두 제거되기에, Remove할 필요 없음.
+                {
+                    tmp.GetButton().onClick.AddListener(() => tmp.OnClickEventSound());
                     tmp.GetButton().onClick.AddListener(() => Synthesis_Material_UI_Clicked());
+                }
             }
 
             // 반복문 외부에서 아이템 삭제

@@ -6,6 +6,9 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using static Monster;
 using static HandlePauseTool;
+using Cysharp.Threading.Tasks;
+
+
 public class MonsterManager : Subject, Observer
 {
 
@@ -238,11 +241,17 @@ public class MonsterManager : Subject, Observer
                 break;
             case "Golem_Boss":
                 GameManager.Instance.GolemBossPool.ReturnToPool(this);
+                // 브금 재생을 위한 보스존 콜라이더 비활성화
+                var tmp = GameManager.Instance.DungeonMng.BossZones[0].GetComponent<Collider>();
+                tmp.enabled = false;
+                // 승리 브금 재생
+                SoundManager.Instance.VictoryBgmPlay(name).Forget();
                 break;
             default: break;
         }
         GameManager.Instance.MonsterHpBarPool.ReturnToPool(monsterHPMng);
     }
+
 
 
 
