@@ -817,12 +817,14 @@ public class CharacterControlMng : Subject, Observer
         if (parents != null)
         {
             ButtonClass JumpBtn = parents.GetChild(3).GetComponent<ButtonClass>();
+            JumpBtn.IsSoundPlay = false;
             var jumpBtnObj = JumpBtn.GetButton();
             jumpBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(JumpBtn);
             jumpBtnObj.onClick.AddListener(() => JumpCommand());
 
             ButtonClass blinkBtn = parents.GetChild(4).GetComponent<ButtonClass>();
+            blinkBtn.IsSoundPlay = false;
             var blinkBtnObj = blinkBtn.GetButton();
             blinkBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(blinkBtn);

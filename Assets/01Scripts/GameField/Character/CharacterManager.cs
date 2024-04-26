@@ -570,6 +570,7 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
         if(parents != null)
         {
             ButtonClass switchElementBtn = parents.GetChild(5).GetComponent<ButtonClass>();
+            switchElementBtn.IsSoundPlay = false;
             var btnObj = switchElementBtn.GetButton();
             btnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(switchElementBtn);

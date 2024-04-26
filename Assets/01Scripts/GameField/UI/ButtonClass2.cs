@@ -25,6 +25,7 @@ public class ButtonClass2 : MonoBehaviour
 
     private float elapsedTime = 0f;                 // 시간 계산용 변수
     private bool hasInvoked = true;                // 시간 계산용 변수
+    private bool isSoundPlay = true;
 
     // 이미지들의 알파값
     private Color originalBackgroundColor;
@@ -190,7 +191,8 @@ public class ButtonClass2 : MonoBehaviour
 
         // 버튼이 클릭되면 함수 호출을 요청하고, 경과 시간 초기화
         ResetElapsedTime();
-        SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
+        if(isSoundPlay)
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
         // 버튼이 눌릴 때 호출되는 이벤트
         onPressed.Invoke();
     }
@@ -273,5 +275,9 @@ public class ButtonClass2 : MonoBehaviour
     public Image GetBackGroundImg() { return background; }
     public Image GetSymbolImg() { return symbolImg; }   
     public void SetButtonTextInputter(string text) { inText.text = text; }
-
+    public bool IsSoundPlay
+    { 
+        get { return isSoundPlay; }
+        set { isSoundPlay = value; }
+    }
 }

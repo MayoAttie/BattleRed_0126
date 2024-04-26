@@ -10,6 +10,7 @@ public class ButtonClass : MonoBehaviour
     public Sprite btnBackgroundSprite;              // 버튼 백그라운드 이미지
     public Sprite btnInsideSprite;                  // 버튼 이미지
     [Range(0,1)] public float BackgroundAlpha;      // 버튼 백그라운드 알파값
+    bool isSoundPlay;
 
     [Tooltip("onPressed이벤트는, Time Pause의 영향을 받지 않음.")]
     public UnityEngine.Events.UnityEvent onPressed;         // 프레스 이벤트
@@ -25,7 +26,7 @@ public class ButtonClass : MonoBehaviour
     {
         // 버튼에 클릭 이벤트 리스너 등록
         button = this.gameObject.GetComponentInChildren<Button>();
-
+        isSoundPlay = true;
         // 버튼 클릭 이벤트에 대한 메서드 등록
         button.onClick.AddListener(OnClick);
         button.onClick.AddListener(OnButtonDown);
@@ -70,7 +71,8 @@ public class ButtonClass : MonoBehaviour
         // 버튼이 눌릴 때 호출되는 이벤트
         onPressed.Invoke();
 
-        SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
+        if(isSoundPlay)
+            SoundManager.Instance.PlayEffect_OnMng(SoundManager.eTYPE_EFFECT.twinleMenu);
     }
 
     public void OnButtonDown()
@@ -103,4 +105,9 @@ public class ButtonClass : MonoBehaviour
         }
     }
     public Button GetButton(){ return button; }
+    public bool IsSoundPlay
+    {
+        get { return isSoundPlay; }
+        set { isSoundPlay = value; }
+    }
 }

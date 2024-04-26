@@ -363,18 +363,21 @@ public class CharacterAttackMng : Subject, Observer
         if (parents != null)
         {
             ButtonClass attackBtn = parents.GetChild(2).GetComponent<ButtonClass>();
+            attackBtn.IsSoundPlay = false;
             var attackBtnObj = attackBtn.GetButton();
             attackBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(attackBtn);
             attackBtnObj.onClick.AddListener(() => CharaceterAttackCheck());
 
             ButtonClass skillBtn = parents.GetChild(6).GetComponent<ButtonClass>();
+            skillBtn.IsSoundPlay = false;
             var skillBtnObj = skillBtn.GetButton();
             skillBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(skillBtn);
             skillBtnObj.onClick.AddListener(() => AttackSkillStart());
 
             ButtonClass blockBtn = parents.GetChild(9).GetComponent<ButtonClass>();
+            blockBtn.IsSoundPlay = false;
             var blockBtnObj = blockBtn.GetButton();
             blockBtnObj.onClick.RemoveAllListeners();
             ButtonClass_Reset(blockBtn);
