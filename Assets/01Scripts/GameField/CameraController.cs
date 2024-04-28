@@ -269,6 +269,8 @@ public class CameraController : MonoBehaviour, Observer
         e_TouchSlideDic touchDic;
         touchDic = touchPad.GetDirection();
 
+        float playerRotationY = Target.eulerAngles.y;
+
         // 만약 수평 방향 입력이 위쪽(Up)으로 감지된 경우
         if (touchDic == e_TouchSlideDic.Up)
         {
@@ -291,6 +293,8 @@ public class CameraController : MonoBehaviour, Observer
             // 카메라의 상하 회전 적용
             transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         }
+
+        transform.parent.rotation = Quaternion.Euler(0, playerRotationY, 0);
     }
 
 

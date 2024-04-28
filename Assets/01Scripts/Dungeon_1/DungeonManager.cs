@@ -9,6 +9,8 @@ public class DungeonManager : MonoBehaviour
 
     [SerializeField]
     Transform[] bossZones;                        // 보스존 객체
+    [SerializeField]
+    string[] bossNames_forRewardBos;
 
 
     protected void Awake()
@@ -62,5 +64,6 @@ public class DungeonManager : MonoBehaviour
     public Transform[] ObjectTransforms { get { return objectTransforms; } }
 
     public Transform[] BossZones{ get { return bossZones; } }
+    public string[] BossNames { get { return bossNames_forRewardBos; } }
 
 }

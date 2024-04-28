@@ -538,7 +538,13 @@ public class CharacterManager : Singleton<CharacterManager>, Observer
                 break;
             case 3:
                 {
-                    int tmp = 50;
+                    int tmp = 70;
+                    curHp = Mathf.Min(tmp + curHp, maxHp);
+                }
+                break;
+            case 2:
+                {
+                    int tmp = 45;
                     curHp = Mathf.Min(tmp + curHp, maxHp);
                 }
                 break;

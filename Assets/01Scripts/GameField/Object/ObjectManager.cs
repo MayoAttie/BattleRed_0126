@@ -55,6 +55,9 @@ public class ObjectManager : Singleton<ObjectManager>
             case "지하 박스1":
                 obj.ObjectClickEventSet().onClick.AddListener(() => Dynamic_TreasureBox_2(obj));
                 break;
+            case "던전_보스1":
+                obj.ObjectClickEventSet().onClick.AddListener(() => Dynamic_TreasureBox_3(obj));
+                break;
             case "원소비석_불":
             case "원소비석_물":
             case "원소비석_바람":
@@ -242,6 +245,25 @@ public class ObjectManager : Singleton<ObjectManager>
 
     #region 동적 보물상자
 
+    public void InstanceNewTreasureBox(Transform insPos, float fScale, string newBoxName)
+    {
+        var box = Instantiate(treasureBox, insPos);
+        box.transform.localScale *= fScale;
+
+        InteractionObject cls = box.GetComponent<InteractionObject>();
+        cls.Name = newBoxName;
+        isOpenChecker[cls] = false;
+    }
+    public void InstanceNewTreasureBox(Transform insPos, float fScale, string newBoxName,Transform parentObj)
+    {
+        var box = Instantiate(treasureBox, insPos.position,Quaternion.identity,parentObj);
+        box.transform.localScale *= fScale;
+
+        InteractionObject cls = box.GetComponent<InteractionObject>();
+        cls.Name = newBoxName;
+        isOpenChecker[cls] = false;
+    }
+
     void Dynamic_TreasureBox_1(InteractionObject obj)
     {
         IsOpenChecker[obj] = true;
@@ -284,6 +306,28 @@ public class ObjectManager : Singleton<ObjectManager>
         float length = GetAnimationLength(ani, "treasure_chest_open");
 
         Transform pos = GameManager.Instance.DungeonMng.ObjectTransforms[0];
+        CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(pos.position, 5f);
+
+        StartCoroutine(AniPlayWaitAfterFuncStart(length, getItem_list, obj.gameObject));
+    }
+    void Dynamic_TreasureBox_3(InteractionObject obj)
+    {
+        IsOpenChecker[obj] = true;
+
+        List<ItemClass> getItem_list = new List<ItemClass>();
+
+        AddItemToList_CopyData("허니캐럿그릴", getItem_list);
+        AddItemToList_CopyData("달콤달콤 닭고기 스튜", getItem_list);
+        AddItemToList_CopyData("달콤달콤 닭고기 스튜", getItem_list);
+        AddItemToList_CopyData("어부 토스트", getItem_list);
+        AddItemToList_CopyData("어부 토스트", getItem_list);
+
+
+        var ani = obj.GetComponent<Animator>();
+        ani.SetBool("isOpen", true);
+        float length = GetAnimationLength(ani, "treasure_chest_open");
+
+        Transform pos = GameManager.Instance.DungeonMng.ObjectTransforms[1];
         CharacterManager.Instance.ControlMng.Move_aPoint_to_bPoint(pos.position, 5f);
 
         StartCoroutine(AniPlayWaitAfterFuncStart(length, getItem_list, obj.gameObject));

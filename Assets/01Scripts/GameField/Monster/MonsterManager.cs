@@ -240,7 +240,13 @@ public class MonsterManager : Subject, Observer
                 GameManager.Instance.MushroomAngryPool.ReturnToPool(this);
                 break;
             case "Golem_Boss":
+                // 보물상자  생성
+                string bosName = GameManager.Instance.DungeonMng.BossNames[0];
+                Transform parentsObj = GameManager.Instance.DungeonMng.GetMonstersTrasform();
+                ObjectManager.Instance.InstanceNewTreasureBox(transform, 4, bosName, parentsObj);
+
                 GameManager.Instance.GolemBossPool.ReturnToPool(this);
+
                 // 브금 재생을 위한 보스존 콜라이더 비활성화
                 var tmp = GameManager.Instance.DungeonMng.BossZones[0].GetComponent<Collider>();
                 tmp.enabled = false;

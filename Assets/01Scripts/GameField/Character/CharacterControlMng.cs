@@ -351,7 +351,7 @@ public class CharacterControlMng : Subject, Observer
             yDegreeSave = 0;
             CharacterRotate_NotifyForCamera();
         }
-
+        
         // 회전 중이 아닌 경우에도 x축 회전값을 유지하기 위해 이전 회전값을 복원
         if (isEndReverseAnimation)
             newRotation.eulerAngles = new Vector3(newRotation.eulerAngles.x, newRotation.eulerAngles.y, 180);

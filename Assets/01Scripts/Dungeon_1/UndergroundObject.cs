@@ -206,12 +206,13 @@ public class UndergroundObject : MonoBehaviour, IObjectTriggerCheckFunc, Observe
         if (correctedName != "end")
             return false;
 
-        var box = Instantiate(ObjectManager.Instance.TreasureBox, rewardPos);
-        box.transform.localScale *= 8f;
-
-        InteractionObject cls = box.GetComponent<InteractionObject>();
-        cls.Name = rewardObjName;    // 보물상자에 설정된 이름을 초기화. (오브젝트 매니저에서 보상처리할 때 사용)
-        ObjectManager.Instance.IsOpenChecker[cls] = false;
+        //var box = Instantiate(ObjectManager.Instance.TreasureBox, rewardPos);
+        //box.transform.localScale *= 8f;
+        //
+        //InteractionObject cls = box.GetComponent<InteractionObject>();
+        //cls.Name = rewardObjName;    // 보물상자에 설정된 이름을 초기화. (오브젝트 매니저에서 보상처리할 때 사용)
+        //ObjectManager.Instance.IsOpenChecker[cls] = false;
+        ObjectManager.Instance.InstanceNewTreasureBox(rewardPos, 8, rewardObjName);
         QuestManager.Instance.QuestGetProgressUp(QuestManager.e_ClearedQuest.Dungeon_UndgerLabyrinth);
         return true;
     }
