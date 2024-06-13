@@ -112,11 +112,20 @@ public class UI_Manager : EnergyBarManager
 
     #region 퀘스트 UI 관련 변수 _ Class
 
-    [Header("퀘스트 변수들 (Quest_UI's Values)")]
 
     Quest_UI questUi_;
+    [Header("퀘스트 변수들 (Quest_UI's Values)")]
     public GameObject quest_ui_object;
     public Quest_ui_prefab_Cls quest_ui_prefab;
+
+    #endregion
+
+    #region 메뉴 UI 관련 변수
+
+
+    MenuClass menuUi;
+    [Header("메뉴 관련 (Menu_UI's Values)")]
+    public GameObject menu_ui_object;
 
     #endregion
 
@@ -3166,15 +3175,22 @@ public class UI_Manager : EnergyBarManager
             infoOpenBtnObj.onClick.AddListener(() => OpenPlayerInfoScreenButton());
 
             if(questUi_ == null)
-            {
                 questUi_ = new Quest_UI();
-            }
 
             ButtonClass questUiBtn = parents.GetChild(10).GetComponent<ButtonClass>();
             var questUiBtnOnj = questUiBtn.GetButton();
             questUiBtnOnj.onClick.RemoveAllListeners();
             ButtonClass_Reset(questUiBtn);
             questUiBtnOnj.onClick.AddListener(() => questUi_.InitOpen());
+
+            if (menuUi == null)
+                menuUi = new MenuClass();
+
+            ButtonClass menuUiBtn = parents.GetChild(11).GetComponent<ButtonClass>();
+            var menuUiBtnOnj = menuUiBtn.GetButton();
+            menuUiBtnOnj.onClick.RemoveAllListeners();
+            ButtonClass_Reset(menuUiBtn);
+            menuUiBtnOnj.onClick.AddListener(() => menuUi.InitOpen());
         }
     }
 
@@ -4430,6 +4446,87 @@ public class UI_Manager : EnergyBarManager
             rewardObj.gameObject.SetActive(false);
         }
         
+
+        #endregion
+    }
+
+    #endregion
+
+    #region 메뉴 UI 클래스 _ Class
+
+    public class MenuClass
+    {
+        GameObject menu_ui_object;
+        bool is_dataSet;                            // 클래스 세팅 완료 유무 체크변수
+        Transform rewardPrintObj;                          // 광고 출력 객체
+        public MenuClass()
+        {
+            is_dataSet = false;
+            menu_ui_object = instance.menu_ui_object;
+            menu_ui_object.gameObject.SetActive(false);
+        }
+
+        public void InitOpen()
+        {   // 메뉴창 오픈
+            menu_ui_object.gameObject.SetActive(true);
+            DataSetting();
+        }
+
+        void CloseButton()
+        {   // 메뉴창 탈출
+            menu_ui_object.gameObject.SetActive(false);
+        }
+
+        void GameExit()
+        {   // 게임 종료
+#if UNITY_EDITOR
+            Debug.Log("게임종료");
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
+        void AddFunction()
+        {
+            AddManager.Instance.ShowRewardedAd();
+        }
+        // 데이터 세팅
+        private void DataSetting()
+        {
+            if (is_dataSet)
+                return;
+
+            // 메뉴창 종료 버튼 연동
+            ButtonClass closeBtn = menu_ui_object.transform.GetChild(1).GetComponent<ButtonClass>();
+            closeBtn.GetButton().onClick.AddListener(()=> CloseButton());
+
+            // 게임 종료 버튼 연동
+            ButtonClass2 exitBtn = menu_ui_object.transform.GetChild(2).GetComponent<ButtonClass2>();
+            exitBtn.GetButton().onClick.AddListener(() => GameExit());
+
+            // 광고 출력 버튼 연동
+            ButtonClass2 addPrintBtn = menu_ui_object.transform.GetChild(3).GetComponent<ButtonClass2>();
+            addPrintBtn.GetButton().onClick.AddListener(() => AddFunction());
+
+            // 광고출력 객체 인스턴스화
+            rewardPrintObj = menu_ui_object.transform.GetChild(4).GetComponent<Transform>();
+            rewardPrintObj.gameObject.SetActive(false);
+
+            is_dataSet = true;
+        }
+
+
+        #region 게터세터
+
+        public Transform RewardPrintObj
+        {
+            get { return rewardPrintObj; }
+        }
+        public GameObject Menu_ui_object
+        { 
+            get { return menu_ui_object; } 
+        }
 
         #endregion
     }

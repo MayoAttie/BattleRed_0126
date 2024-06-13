@@ -36,7 +36,7 @@ public class DungeonManager : MonoBehaviour
         var controlCanvas = GameObject.FindGameObjectWithTag("Controller");
 
         // Dungeon Exit Button
-        var dungeonExitBtnRect = controlCanvas.transform.GetChild(11).GetComponent<RectTransform>();
+        var dungeonExitBtnRect = controlCanvas.transform.GetChild(12).GetComponent<RectTransform>();
 
         // Minimap
         var minimapRect = topCanvas.transform.GetChild(0).GetComponent<RectTransform>();

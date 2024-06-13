@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KinoBloom.Runtime", "KinoBl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXRDemo", "CFXRDemo.csproj", "{A7E8A5D7-C6FA-9F57-340A-0F0BE26869C0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp-Editor", "Assembly-CSharp-Editor.csproj", "{41D315C0-8C26-2027-D161-C140CC78F863}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXR.WelcomeScreen", "CFXR.WelcomeScreen.csproj", "{EC4F7C2E-62FC-710F-3F71-BEF703158C53}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CFXREditor", "CFXREditor.csproj", "{2B6D4A09-150B-2580-83C4-7B5327D7AA63}"
@@ -18,6 +20,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToonyColorsPro.Demo.Editor", "ToonyColorsPro.Demo.Editor.csproj", "{F9DBC3A8-6DB7-A251-4761-EBF9377092ED}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Coffee.UIParticle.Editor", "Coffee.UIParticle.Editor.csproj", "{64580427-C8CC-95B1-D7A0-A9449C4D9E8E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleMobileAds.Editor", "GoogleMobileAds.Editor.csproj", "{0888B280-D119-A6CF-6672-7720BE232872}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +49,10 @@ Global
 		{A7E8A5D7-C6FA-9F57-340A-0F0BE26869C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7E8A5D7-C6FA-9F57-340A-0F0BE26869C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7E8A5D7-C6FA-9F57-340A-0F0BE26869C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{41D315C0-8C26-2027-D161-C140CC78F863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41D315C0-8C26-2027-D161-C140CC78F863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41D315C0-8C26-2027-D161-C140CC78F863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41D315C0-8C26-2027-D161-C140CC78F863}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EC4F7C2E-62FC-710F-3F71-BEF703158C53}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EC4F7C2E-62FC-710F-3F71-BEF703158C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EC4F7C2E-62FC-710F-3F71-BEF703158C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -61,6 +69,10 @@ Global
 		{64580427-C8CC-95B1-D7A0-A9449C4D9E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64580427-C8CC-95B1-D7A0-A9449C4D9E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64580427-C8CC-95B1-D7A0-A9449C4D9E8E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0888B280-D119-A6CF-6672-7720BE232872}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0888B280-D119-A6CF-6672-7720BE232872}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0888B280-D119-A6CF-6672-7720BE232872}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0888B280-D119-A6CF-6672-7720BE232872}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

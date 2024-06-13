@@ -294,7 +294,7 @@ public class CameraController : MonoBehaviour, Observer
             transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
         }
 
-        transform.parent.rotation = Quaternion.Euler(0, playerRotationY, 0);
+        //transform.parent.rotation = Quaternion.Euler(0, playerRotationY, 0);
     }
 
 
