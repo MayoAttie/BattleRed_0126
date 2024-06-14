@@ -144,4 +144,103 @@ public class UseTool
         }
     }
 
+    public static WeaponAndEquipCls GetRandomItemBasedOnGrade(List<WeaponAndEquipCls> itemList)
+    {
+        while (true)
+        {
+            // grade에 따른 가중치 설정 및 희귀확률 반영
+            float totalWeight = 0;
+            Dictionary<WeaponAndEquipCls, float> itemWeights = new Dictionary<WeaponAndEquipCls, float>();
+
+            foreach (var item in itemList)
+            {
+                float weight = 1.0f / item.GetGrade();
+                itemWeights[item] = weight;
+                totalWeight += weight;
+            }
+
+            float randomWeight = Random.Range(0, totalWeight);
+
+            float cumulativeWeight = 0;
+            foreach (var item in itemWeights)
+            {
+                cumulativeWeight += item.Value;
+                if (randomWeight <= cumulativeWeight)
+                {
+                    // "기타" 태그가 있는 아이템이면 다시 선택
+                    if (item.Key.GetTag() == "기타")
+                    {
+                        break; // 반복문 탈출하여 다시 시도
+                    }
+                    return item.Key;
+                }
+            }
+        }
+    }
+    public static ItemClass GetRandomItemBasedOnGrade(List<ItemClass> itemList)
+    {
+        while (true)
+        {
+            // grade에 따른 가중치 설정 및 희귀확률 반영
+            float totalWeight = 0;
+            Dictionary<ItemClass, float> itemWeights = new Dictionary<ItemClass, float>();
+
+            foreach (var item in itemList)
+            {
+                float weight = 1.0f / item.GetGrade();
+                itemWeights[item] = weight;
+                totalWeight += weight;
+            }
+
+            float randomWeight = Random.Range(0, totalWeight);
+
+            float cumulativeWeight = 0;
+            foreach (var item in itemWeights)
+            {
+                cumulativeWeight += item.Value;
+                if (randomWeight <= cumulativeWeight)
+                {
+                    // "기타" 태그가 있는 아이템이면 다시 선택
+                    if (item.Key.GetTag() == "기타")
+                    {
+                        break; // 반복문 탈출하여 다시 시도
+                    }
+                    return item.Key;
+                }
+            }
+        }
+    }
+
+    public static void ItemDataInsert_excludingEquipment(ItemClass item)
+    {
+        List<ItemClass> haveItemList = null;
+        string tag = item.GetTag();
+
+        if (tag == "육성 아이템")
+        {
+            haveItemList = GameManager.Instance.GetUserClass().GetHadGrowMaterialList();
+        }
+        else if (tag == "광물")
+        {
+            haveItemList = GameManager.Instance.GetUserClass().GetHadGemList();
+        }
+        else if (tag == "음식")
+        {
+            haveItemList = GameManager.Instance.GetUserClass().GetHadFoodList();
+        }
+
+        if (haveItemList != null)
+        {
+            var existingItem = haveItemList.Find(tmp => tmp.GetName() == item.GetName());
+            if (existingItem != null)
+            {
+                existingItem.SetNumber(existingItem.GetNumber() + 1);
+            }
+            else
+            {
+                haveItemList.Add(item);
+            }
+        }
+    }
+
 }

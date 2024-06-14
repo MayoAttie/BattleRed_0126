@@ -346,6 +346,22 @@
       <HintPath>Assets\ExternalDependencyManager\Editor\Google.VersionHandler.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Google.IOSResolver">
+      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.IOSResolver.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.JarResolver">
+      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.JarResolver.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.PackageManagerResolver">
+      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.PackageManagerResolver.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Google.VersionHandlerImpl">
+      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.VersionHandlerImpl.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Firebase.Editor">
       <HintPath>Assets\Firebase\Editor\Firebase.Editor.dll</HintPath>
       <Private>False</Private>
@@ -378,6 +394,30 @@
       <HintPath>Assets\Firebase\Plugins\Google.MiniJson.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="GoogleMobileAds.Common">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Common.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoogleMobileAds.Core">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoogleMobileAds">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoogleMobileAds.Ump">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Ump.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoogleMobileAds.Ump.Unity">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Ump.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="GoogleMobileAds.Unity">
+      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Unity.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>Assets\Plugins\Newtonsoft.Json.dll</HintPath>
       <Private>False</Private>
@@ -396,46 +436,6 @@
     </Reference>
     <Reference Include="unityplastic">
       <HintPath>Library\PackageCache\com.unity.collab-proxy@1.14.4\Lib\Editor\PlasticSCM\unityplastic.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.IOSResolver">
-      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.IOSResolver.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.VersionHandlerImpl">
-      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.VersionHandlerImpl.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds.Core">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Core.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.PackageManagerResolver">
-      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.PackageManagerResolver.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds.Common">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Google.JarResolver">
-      <HintPath>Assets\ExternalDependencyManager\Editor\1.2.179\Google.JarResolver.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds.Ump.Unity">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Ump.Unity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds.Unity">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Unity.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="GoogleMobileAds.Ump">
-      <HintPath>Assets\GoogleMobileAds\GoogleMobileAds.Ump.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="nunit.framework">
@@ -1016,13 +1016,13 @@
       <Project>{EC4F7C2E-62FC-710F-3F71-BEF703158C53}</Project>
       <Name>CFXR.WelcomeScreen</Name>
     </ProjectReference>
-    <ProjectReference Include="Coffee.UIParticle.csproj">
-      <Project>{6F1931F6-D976-1609-865A-F54B3424EF20}</Project>
-      <Name>Coffee.UIParticle</Name>
-    </ProjectReference>
     <ProjectReference Include="GoogleMobileAds.Editor.csproj">
       <Project>{0888B280-D119-A6CF-6672-7720BE232872}</Project>
       <Name>GoogleMobileAds.Editor</Name>
+    </ProjectReference>
+    <ProjectReference Include="Coffee.UIParticle.csproj">
+      <Project>{6F1931F6-D976-1609-865A-F54B3424EF20}</Project>
+      <Name>Coffee.UIParticle</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

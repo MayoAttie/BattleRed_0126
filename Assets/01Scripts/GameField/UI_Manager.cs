@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 using static CharacterUpgradeManager;
 using static UI_UseToolClass;
 using static GameManager;
-
+using static UseTool;
 public class UI_Manager : EnergyBarManager
 {
     // 싱글턴 인스턴스
@@ -4489,7 +4489,17 @@ public class UI_Manager : EnergyBarManager
 
         void AddFunction()
         {
-            AddManager.Instance.ShowRewardedAd();
+            List<ItemClass> datas = new List<ItemClass>();
+            var itemList = GameManager.Instance.GetItemDataList();
+            ItemClass selectedItem = GetRandomItemBasedOnGrade(itemList);
+            datas.Add(selectedItem);
+
+            var equipList = GameManager.Instance.GetWeaponAndEquipmentDataList();
+            WeaponAndEquipCls selectedEquip = GetRandomItemBasedOnGrade(equipList);
+            datas.Add(selectedEquip);
+
+
+            AddManager.Instance.ShowRewardedAd(rewardPrintObj, datas);
         }
         // 데이터 세팅
         private void DataSetting()
@@ -4510,7 +4520,7 @@ public class UI_Manager : EnergyBarManager
             addPrintBtn.GetButton().onClick.AddListener(() => AddFunction());
 
             // 광고출력 객체 인스턴스화
-            rewardPrintObj = menu_ui_object.transform.GetChild(4).GetComponent<Transform>();
+            rewardPrintObj = menu_ui_object.transform.GetChild(4).GetChild(0).GetComponent<Transform>();
             rewardPrintObj.gameObject.SetActive(false);
 
             is_dataSet = true;
